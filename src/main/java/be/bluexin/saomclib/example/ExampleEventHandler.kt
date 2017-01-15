@@ -14,13 +14,12 @@ class ExampleEventHandler {
 
     @SubscribeEvent
     fun attackEntity(e: LivingAttackEvent) {
-        if (e.entity.world.isRemote) return
-
-        if (e.source.entity is EntityPlayer) {
-            LogHelper.logInfo("${e.entityLiving} attacked by ${e.source.entity}")
-            val rand = (Math.random() * 1000).toInt()
-            LogHelper.logInfo("Rand: $rand")
+        if (!e.entity.world.isRemote && e.source.entity is EntityPlayer) {
+            LogHelper.logInfo("${e.entityLiving} attacked by ${e.source.entity}.")
+            val rand: Int = (1000 * Math.random()).toInt()
+            LogHelper.logInfo("Random: $rand.")
             e.source.entity!!.getCapability(SimpleCapability.CAP_INSTANCE, null).num = rand
+            e.source.entity!!.getCapability(SimpleCapability.CAP_INSTANCE, null).sync()
         }
     }
 }

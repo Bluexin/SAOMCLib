@@ -1,13 +1,10 @@
 package be.bluexin.saomclib
 
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
-import be.bluexin.saomclib.example.SimpleCapability
 import net.minecraft.entity.Entity
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.Item
 import net.minecraft.tileentity.TileEntity
 import net.minecraftforge.event.AttachCapabilitiesEvent
-import net.minecraftforge.event.entity.living.LivingAttackEvent
 import net.minecraftforge.event.entity.living.LivingEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -60,14 +57,4 @@ internal class EventHandler {
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesLogin(evt.player)
     }
 
-    @SubscribeEvent
-    fun attackEntity(e: LivingAttackEvent) {
-        if (!e.entity.world.isRemote && e.source.entity is EntityPlayer) {
-            LogHelper.logInfo("${e.entityLiving} attacked by ${e.source.entity}.")
-            val rand: Int = (1000 * Math.random()).toInt()
-            LogHelper.logInfo("Random: $rand.")
-            e.source.entity!!.getCapability(SimpleCapability.CAP_INSTANCE, null).num = rand
-            e.source.entity!!.getCapability(SimpleCapability.CAP_INSTANCE, null).sync()
-        }
-    }
 }

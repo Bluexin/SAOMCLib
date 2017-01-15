@@ -17,7 +17,7 @@ abstract class CapabilityException : RuntimeException {
 /**
  * Thrown when a field or method was found with the wrong type.
  */
-class WrongTypeException(clazz: Class<out AbstractCapability>, what: String) : CapabilityException("The $what found for $clazz was not an instance of ${ResourceLocation::class}.")
+class WrongTypeException(clazz: Class<out AbstractCapability>, what: String, expected: Class<*>, cause: ClassCastException) : CapabilityException("The $what found for $clazz was not an instance of $expected (or has wrong generic type).", cause)
 
 /**
  * Thrown when an expected field or method was not found.

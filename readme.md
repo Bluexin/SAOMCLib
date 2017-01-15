@@ -34,7 +34,7 @@ extraLines += ["PK: org/jetbrains/annotations be/bluexin/saomclib/shade/annotati
 }
 }
 ```
-(an example can be found at [our build.gradle](build.gradle#L92))
+(an example can be found at [our build.gradle](build.gradle#L86))
 
 Regarding your main mod class (annotated by @Mod), you can either make it a Kotlin class or object.
 When using an object (which there is no reason not to), you need to add the following anywhere in your object's declaration :
@@ -44,4 +44,4 @@ When using an object (which there is no reason not to), you need to add the foll
 @Mod.InstanceFactory
 fun whatever() = this
 ```
-(an example can be seen at [our SAOMCLib.kt](src/main/java/be/bluexin/saomclib/SAOMCLib.kt#L48))
+(an example can be seen at [our SAOMCLib.kt](src/main/java/be/bluexin/saomclib/SAOMCLib.kt#L43))

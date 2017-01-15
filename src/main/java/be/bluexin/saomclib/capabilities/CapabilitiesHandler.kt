@@ -101,7 +101,7 @@ object CapabilitiesHandler {
     private fun getKey(clazz: Class<out AbstractCapability>) = try {
         clazz.declaredFields.filter { it.isAnnotationPresent(Key::class.java) }.single().apply { this.isAccessible = true }.get(null) as ResourceLocation
     } catch (e: ClassCastException) {
-        throw WrongTypeException(clazz, "Key")
+        throw WrongTypeException(clazz, "Key", Key::class.java, e)
     } catch (e: NullPointerException) {
         throw NotStaticException(clazz, "Key")
     } catch (e: NoSuchElementException) {
@@ -116,7 +116,7 @@ object CapabilitiesHandler {
         @Suppress("UNCHECKED_CAST")
         clazz.declaredFields.filter { it.isAnnotationPresent(CapabilityInject::class.java) }.single().apply { this.isAccessible = true }.get(null) as Capability<T>
     } catch (e: ClassCastException) {
-        throw WrongTypeException(clazz, "capability instance")
+        throw WrongTypeException(clazz, "capability instance", CapabilityInject::class.java, e)
     } catch (e: NullPointerException) {
         throw NotStaticException(clazz, "capability instance")
     } catch (e: NoSuchElementException) {
