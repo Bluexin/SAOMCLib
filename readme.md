@@ -9,7 +9,7 @@ To add this library to your dev workspace, add the following to your build.gradl
 ```groovy
 repositories {
 maven {
-url = "http://maven.bluexin.be/repository/snapshots/"
+url = "http://maven.bluexin.be/repository/releases/"
 }
 }
 

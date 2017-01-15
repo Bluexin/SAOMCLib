@@ -87,3 +87,12 @@ reobf {
         extraLines += ["PK: org/jetbrains/annotations be/bluexin/saomclib/shade/annotations"]
     }
 }
+
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: "http://maven.bluexin.be/repository/releases/") {
+            authentication(userName: "CI", password: System.getenv('REPO_PWD'))
+        }
+    }
+
+}
