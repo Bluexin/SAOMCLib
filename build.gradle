@@ -1,0 +1,89 @@
+buildscript {
+    ext.kotlin_version = '1.0.5'
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: "maven"
+apply plugin: 'kotlin'
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "1.10.2-1.0"
+group = "be.bluexin"
+archivesBaseName = "saomc-lib"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+minecraft {
+    version = "1.10.2-12.18.3.2185"
+    runDir = "run"
+    mappings = "stable_29"
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+idea { module { inheritOutputDirs = true } }
+
+task sourceJar(type: Jar, dependsOn: "sourceMainJava", overwrite: true) {
+    from "src/main/java"
+    from "src/main/resources"
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourceJar
+}
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    shade
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    shade "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
+
+jar {
+    configurations.shade.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+}
+
+reobf {
+    jar {
+        extraLines += ["PK: kotlin be/bluexin/saomclib/shade/kotlin"]
+        extraLines += ["PK: org/jetbrains/annotations be/bluexin/saomclib/shade/annotations"]
+    }
+}
