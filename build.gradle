@@ -16,7 +16,6 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
-
 apply plugin: "maven"
 apply plugin: 'kotlin'
 apply plugin: 'net.minecraftforge.gradle.forge'
@@ -32,6 +31,32 @@ minecraft {
     version = "1.10.2-12.18.3.2185"
     runDir = "run"
     mappings = "stable_29"
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/java'
+    main.java.srcDirs += 'src/main/java'
+}
+
+reobf {
+    jar {
+        extraLines += ["PK: kotlin be/bluexin/saomclib/shade/kotlin"]
+        extraLines += ["PK: org/jetbrains/annotations be/bluexin/saomclib/shade/annotations"]
+    }
+}
+
+configurations {
+    shade
+    compile.extendsFrom shade
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    shade "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 processResources {
@@ -51,48 +76,45 @@ processResources {
 
 idea { module { inheritOutputDirs = true } }
 
+uploadArchives {
+    if (System.getenv('REPO_PWD') != null) {
+        repositories.mavenDeployer {
+            repository(url: "http://maven.bluexin.be/repository/" + (((String) project.version).contains("SNAPSHOT")? "snapshots": "releases") + "/") {
+                authentication(userName: "CI", password: System.getenv('REPO_PWD'))
+            }
+        }
+    } else {
+        println("No password set up! Uploading to local.")
+        repositories.mavenDeployer {
+            repository(url: 'file://G:/saomclib/build/mvn')
+        }
+    }
+}
+
 task sourceJar(type: Jar, dependsOn: "sourceMainJava", overwrite: true) {
     from "src/main/java"
-    from "src/main/resources"
+    from "build/resources/main"
     classifier = 'sources'
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
 }
 
 artifacts {
     archives sourceJar
-}
-repositories {
-    mavenCentral()
-}
-
-configurations {
-    shade
-}
-
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    shade "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    archives deobfJar
 }
 
 jar {
-    configurations.shade.each { dep ->
+    for (dep in configurations.shade) {
         from(project.zipTree(dep)) {
             exclude 'META-INF', 'META-INF/**'
         }
     }
 }
 
-reobf {
-    jar {
-        extraLines += ["PK: kotlin be/bluexin/saomclib/shade/kotlin"]
-        extraLines += ["PK: org/jetbrains/annotations be/bluexin/saomclib/shade/annotations"]
-    }
-}
-
-uploadArchives {
-    repositories.mavenDeployer {
-        repository(url: "http://maven.bluexin.be/repository/releases/") {
-            authentication(userName: "CI", password: System.getenv('REPO_PWD'))
-        }
-    }
-
+tasks.withType(Copy) {
+    includeEmptyDirs = false
 }

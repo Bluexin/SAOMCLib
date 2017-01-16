@@ -24,17 +24,3 @@ internal object LogHelper {
         logFatal(w.toString())
     }
 }
-/*
-[public be.bluexin.saomclib.capabilities.AbstractCapability be.bluexin.saomclib.example.SimpleCapability.setup(java.lang.Object),
-public be.bluexin.saomclib.example.SimpleCapability be.bluexin.saomclib.example.SimpleCapability.setup(java.lang.Object),
-public final void be.bluexin.saomclib.example.SimpleCapability.setNum(int),
-public final int be.bluexin.saomclib.example.SimpleCapability.getNum(),
-public static final net.minecraft.util.ResourceLocation be.bluexin.saomclib.example.SimpleCapability.access$getKEY$cp(),
-public final void java.lang.Object.wait() throws java.lang.InterruptedException,
-public final void java.lang.Object.wait(long,int) throws java.lang.InterruptedException,
-public final native void java.lang.Object.wait(long) throws java.lang.InterruptedException,
-public boolean java.lang.Object.equals(java.lang.Object),public java.lang.String java.lang.Object.toString(),
-public native int java.lang.Object.hashCode(),public final native java.lang.Class java.lang.Object.getClass(),
-public final native void java.lang.Object.notify(),public final native void java.lang.Object.notifyAll()]
-
- */

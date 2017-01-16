@@ -27,10 +27,6 @@ object SAOMCLib {
     @Mod.EventHandler
     fun preInit(e: FMLPreInitializationEvent) {
         MinecraftForge.EVENT_BUS.register(EventHandler())
-//        MinecraftForge.EVENT_BUS.register(ExampleEventHandler())
-//        PacketPipeline.registerMessage(SyncEntityCapabilityPacket::class.java, SyncEntityCapabilityPacket.Companion.Handler::class.java)
-//        CapabilitiesHandler.registerEntityCapability(SimpleCapability::class.java, SimpleCapability.Companion.Storage(), { it is EntityPlayer })
-//        CapabilitiesHandler.registerEntityCapability(JSimpleCapability::class.java, JSimpleCapability.Storage(), { it is EntityPlayer })
     }
 
     @Mod.EventHandler

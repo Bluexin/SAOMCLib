@@ -8,6 +8,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 /**
  * Part of saomclib by Bluexin.
  *
+ * To register the capabilities or this handler, you can use :
+ *   MinecraftForge.EVENT_BUS.register(ExampleEventHandler())
+ *   PacketPipeline.registerMessage(SyncEntityCapabilityPacket::class.java, SyncEntityCapabilityPacket.Companion.Handler::class.java)
+ *   CapabilitiesHandler.registerEntityCapability(SimpleCapability::class.java, SimpleCapability.Companion.Storage(), { it is EntityPlayer })
+ *   CapabilitiesHandler.registerEntityCapability(JSimpleCapability::class.java, JSimpleCapability.Storage(), { it is EntityPlayer })
+ *
+ * Or the java equivalents :
+ *   MinecraftForge.EVENT_BUS.register(new ExampleEventHandler())
+ *   PacketPipeline.INSTANCE.registerMessage(SyncEntityCapabilityPacket.class, SyncEntityCapabilityPacket.Companion.Handler.class)
+ *   CapabilitiesHandler.INSTANCE.registerEntityCapability(SimpleCapability.class, new SimpleCapability.Companion.Storage(), entity -> entity instanceof EntityPlayer)
+ *   CapabilitiesHandler.INSTANCE.registerEntityCapability(JSimpleCapability.class, new JSimpleCapability.Storage(), entity -> entity instanceof EntityPlayer)
+ *
  * @author Bluexin
  */
 class ExampleEventHandler {
