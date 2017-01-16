@@ -14,7 +14,7 @@ url = "http://maven.bluexin.be/repository/releases/"
 }
 
 dependencies {
-compile("be.bluexin:saomclib:$saomclibversion:deobf")
+compile("be.bluexin:saomc-lib:$saomclibversion")
 }
 ```
 
