@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
  *
  * @author Bluexin
  */
-@Mod(modid = SAOMCLib.MODID, name = "SAOMC Library", version = "1.0")
+@Mod(modid = SAOMCLib.MODID, name = "SAOMC Library", version = "1.0.1")
 object SAOMCLib {
 
     const val MODID = "saomclib"
