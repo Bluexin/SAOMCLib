@@ -12,16 +12,6 @@ package be.bluexin.saomclib.capabilities
  *  - A static field holding a [net.minecraft.util.ResourceLocation] annotated with [Key]
  *          ie: @Key private static final ResourceLocation myKey = new ResourceLocation(MODID, "myCapability")
  *
- *  - A static method named 'isAssignable' with a boolean as return value and with a single parameter of type Object
- *          whose goal will be to determine whether a given argument can be assigned this capability.
- *
- *              Whether this capability should be assigned to a given Object.
- *              Given Object will always be a subclass of what's supported by [net.minecraftforge.event.AttachCapabilitiesEvent].
- *              It will always only be of the type for which you registered this capability.
- *              For example, if I register my capability with [CapabilitiesHandler.registerEntityCapability], then
- *              this method will only be called for subtypes of Entity.
- *          ie: private static boolean isAssignable(Object o) { return o instanceof EntityLivingBase; }
- *
  * Please note that this implementation currently doesn't allow for an [net.minecraft.util.EnumFacing] specification in TEs.
  *
  * @author Bluexin
