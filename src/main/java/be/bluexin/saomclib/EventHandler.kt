@@ -4,6 +4,7 @@ import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.world.World
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.living.LivingEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
@@ -25,6 +26,9 @@ internal class EventHandler {
 
     @SubscribeEvent
     fun attachTECapabilities(event: AttachCapabilitiesEvent<TileEntity>) = CapabilitiesHandler.registerTE(event)
+
+    @SubscribeEvent
+    fun attachWorldCapabilities(event: AttachCapabilitiesEvent<World>) = CapabilitiesHandler.registerWorld(event)
 
     @SubscribeEvent
     fun livingTick(e: LivingEvent.LivingUpdateEvent) {
