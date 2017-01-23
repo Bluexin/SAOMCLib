@@ -2,6 +2,7 @@ package be.bluexin.saomclib
 
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.packets.PacketPipeline
+import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
 import be.bluexin.saomclib.proxy.CommonProxy
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
@@ -15,7 +16,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
  *
  * @author Bluexin
  */
-@Mod(modid = SAOMCLib.MODID, name = "SAOMC Library", version = "1.0.2")
+@Mod(modid = SAOMCLib.MODID, name = "SAOMC Library", version = "1.0.3")
 object SAOMCLib {
 
     const val MODID = "saomclib"
@@ -27,6 +28,7 @@ object SAOMCLib {
     @Mod.EventHandler
     fun preInit(e: FMLPreInitializationEvent) {
         MinecraftForge.EVENT_BUS.register(EventHandler())
+        PacketPipeline.registerMessage(SyncEntityCapabilityPacket::class.java, SyncEntityCapabilityPacket.Companion.Handler::class.java)
     }
 
     @Mod.EventHandler
