@@ -20,7 +20,7 @@ apply plugin: "maven"
 apply plugin: 'kotlin'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.10.2-1.0.3"
+version = "1.10.2-1.0.4"
 group = "be.bluexin"
 archivesBaseName = "saomc-lib"
 
@@ -93,7 +93,6 @@ uploadArchives {
 
 task sourceJar(type: Jar, dependsOn: "sourceMainJava", overwrite: true) {
     from "src/main/java"
-    from "build/resources/main"
     classifier = 'sources'
 }
 

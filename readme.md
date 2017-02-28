@@ -25,6 +25,7 @@ The library's version comes in the form `$mcversion-$libversion`.
 SAOMCLib comes with the Kotlin libraries, currently version 1.0.5.
 If your mod uses Kotlin and this lib, you won't need to shade these yourself.
 All you need to do is add the following to your build.gradle file :
+(please note you also need to do this when not writing in kotlin yourself apparently)
 
 ```groovy
 reobf {
