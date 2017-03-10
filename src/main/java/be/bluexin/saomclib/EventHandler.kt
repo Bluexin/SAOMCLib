@@ -1,6 +1,7 @@
 package be.bluexin.saomclib
 
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
+import be.bluexin.saomclib.capabilities.getPartyCapability
 import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.tileentity.TileEntity
@@ -9,7 +10,6 @@ import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.living.LivingEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-
 
 /**
  *
@@ -59,6 +59,11 @@ internal class EventHandler {
     fun playerConnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent) {
         LogHelper.logInfo("${evt.player} logged in.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesLogin(evt.player)
+    }
+
+    @SubscribeEvent
+    fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
+        evt.player.getPartyCapability().clear()
     }
 
 }
