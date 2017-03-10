@@ -8,6 +8,7 @@ import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
+import net.minecraft.util.math.BlockPos
 
 
 /**
@@ -122,4 +123,12 @@ class PTCommand : CommandBase() {
     override fun getRequiredPermissionLevel() = 0
 
     override fun checkPermission(server: MinecraftServer?, sender: ICommandSender) = sender is EntityPlayer
+
+    override fun getTabCompletions(server: MinecraftServer, sender: ICommandSender, args: Array<out String>, pos: BlockPos?): MutableList<String> {
+        return when (args.size) {
+            1 -> CommandBase.getListOfStringsMatchingLastWord(args, "invite", "accept", "decline", "kick", "leave", "cancel", "print")
+            2 -> CommandBase.getListOfStringsMatchingLastWord(args, *server.onlinePlayerNames)
+            else -> mutableListOf()
+        }
+    }
 }
