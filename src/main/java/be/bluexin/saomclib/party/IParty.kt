@@ -100,7 +100,7 @@ interface IParty {
      *
      * @param time the current world time
      */
-    fun cleanupInvites(time: Long)
+    fun cleanupInvites(time: Long) // TODO: this could use some improvements. Not used for now
 
     /**
      * Gets whether the provided player is the leader of this party.

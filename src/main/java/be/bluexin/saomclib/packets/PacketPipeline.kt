@@ -5,6 +5,7 @@ import be.bluexin.saomclib.except.NoConstructorException
 import be.bluexin.saomclib.except.UnknownPacketException
 import be.bluexin.saomclib.packets.PacketPipeline.registerMessage
 import be.bluexin.saomclib.packets.PacketPipeline.sendTo
+import be.bluexin.saomclib.sendPacket
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraftforge.fml.common.network.NetworkRegistry
@@ -39,6 +40,7 @@ object PacketPipeline {
     /**
      * Sends a packet to a specific player (from the server!)
      * @see net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendTo
+     * @see [sendPacket] helper method/shortcut
      */
     fun sendTo(message: IMessage, player: EntityPlayerMP) {
         if (player.connection != null) ntw.sendTo(message, player)

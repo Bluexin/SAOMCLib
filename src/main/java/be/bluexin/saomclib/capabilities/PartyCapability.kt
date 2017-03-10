@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference
  *
  * @author Bluexin
  */
-class PartyCapability : AbstractEntityCapability() { // TODO: sync client
+class PartyCapability : AbstractEntityCapability() {
 
     var party: IParty? = null
     private var invitedToImpl: WeakReference<IParty>? = null

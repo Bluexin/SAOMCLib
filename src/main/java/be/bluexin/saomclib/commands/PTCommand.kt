@@ -1,13 +1,13 @@
 package be.bluexin.saomclib.commands
 
 import be.bluexin.saomclib.capabilities.getPartyCapability
+import be.bluexin.saomclib.message
 import net.minecraft.command.CommandBase
 import net.minecraft.command.CommandException
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
-import net.minecraft.util.text.TextComponentTranslation
 
 
 /**
@@ -45,7 +45,8 @@ class PTCommand : CommandBase() {
             if (pt.invite(target)) {
                 target.getPartyCapability().invitedTo = pt
                 pt.invite(target)
-                player.sendMessage(TextComponentTranslation("commands.pt.invite.success", args[1]))
+                player.message("commands.pt.invite.success", args[1])
+                target.message("commands.pt.invited", player.displayNameString)
             } else throw CommandException("commands.pt.invite.alreadyPresent", args[1])
         } else throw CommandException("commands.pt.invite.notLeader", pt.leader?.displayNameString ?: "UNKNOWN")
     }
@@ -57,7 +58,7 @@ class PTCommand : CommandBase() {
         if (invitedTo.isInvited(player)) {
             invitedTo.addMember(player)
             cap.party = invitedTo
-            player.sendMessage(TextComponentTranslation("commands.pt.accept.success", invitedTo.leader?.displayNameString ?: "UNKNOWN"))
+            player.message("commands.pt.accept.success", invitedTo.leader?.displayNameString ?: "UNKNOWN")
         } else throw CommandException("commands.pt.accept.notInvited")
     }
 
@@ -67,7 +68,8 @@ class PTCommand : CommandBase() {
         cap.invitedTo = null
         if (invitedTo.isInvited(player)) {
             invitedTo.cancel(player)
-            player.sendMessage(TextComponentTranslation("commands.pt.decline.success", invitedTo.leader?.displayNameString ?: "UNKNOWN"))
+            player.message("commands.pt.decline.success", invitedTo.leader?.displayNameString ?: "UNKNOWN")
+            invitedTo.leader?.message("commands.pt.declined", player.displayNameString)
         } else throw CommandException("commands.pt.accept.notInvited")
     }
 
@@ -80,8 +82,8 @@ class PTCommand : CommandBase() {
             if (pt.isMember(target)) {
                 pt.removeMember(target)
                 target.getPartyCapability().party = null
-                player.sendMessage(TextComponentTranslation("commands.pt.kick.success", args[1]))
-                target.sendMessage(TextComponentTranslation("commands.pt.kick.notification", player.displayNameString))
+                player.message("commands.pt.kick.success", args[1])
+                target.message("commands.pt.kick.notification", player.displayNameString)
             }
         } else throw CommandException("commands.pt.kick.notLeader", pt.leader?.displayName ?: "UNKNOWN")
     }
@@ -95,8 +97,8 @@ class PTCommand : CommandBase() {
             if (pt.isInvited(target)) {
                 pt.cancel(target)
                 target.getPartyCapability().invitedTo = null
-                player.sendMessage(TextComponentTranslation("commands.pt.cancel.success", args[1]))
-                target.sendMessage(TextComponentTranslation("commands.pt.cancel.notification", player.displayNameString))
+                player.message("commands.pt.cancel.success", args[1])
+                target.message("commands.pt.cancel.notification", player.displayNameString)
             }
         } else throw CommandException("commands.pt.cancel.notLeader", pt.leader?.displayNameString ?: "UNKNOWN")
     }
@@ -107,14 +109,14 @@ class PTCommand : CommandBase() {
         cap.party = null
         if (pt.isMember(player)) {
             pt.removeMember(player)
-            player.sendMessage(TextComponentTranslation("commands.pt.leave.success", pt.leader?.displayNameString ?: "UNKNOWN"))
+            player.message("commands.pt.leave.success", pt.leader?.displayNameString ?: "UNKNOWN")
         } else throw CommandException("commands.pt.leave.notInPT")
     }
 
     private fun handlePrint(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
         val pt = player.getPartyCapability().party ?: throw CommandException("commands.pt.leave.notInPT")
         if (!pt.isParty) throw CommandException("commands.pt.leave.notInPT")
-        player.sendMessage(TextComponentTranslation("commands.pt.print.output", pt.leader?.displayNameString, pt.members.joinToString { it.displayNameString }))
+        player.message("commands.pt.print.output", pt.leader?.displayNameString ?: "UNKNOWN", pt.members.joinToString { it.displayNameString })
     }
 
     override fun getRequiredPermissionLevel() = 0

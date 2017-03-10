@@ -1,6 +1,6 @@
 package be.bluexin.saomclib.packets
 
-import be.bluexin.saomclib.LogHelper
+import be.bluexin.saomclib.*
 import be.bluexin.saomclib.capabilities.AbstractEntityCapability
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import io.netty.buffer.ByteBuf
@@ -9,7 +9,6 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.IThreadListener
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.fml.common.network.ByteBufUtils
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import java.util.*
@@ -35,15 +34,15 @@ class SyncEntityCapabilityPacket() : IMessage {
     }
 
     override fun fromBytes(buffer: ByteBuf) {
-        capabilityID = ByteBufUtils.readUTF8String(buffer)
-        data = ByteBufUtils.readTag(buffer)
-        targetUUID = UUID.fromString(ByteBufUtils.readUTF8String(buffer))
+        capabilityID = buffer.readString()
+        data = buffer.readTag()
+        targetUUID = UUID.fromString(buffer.readString())
     }
 
     override fun toBytes(buffer: ByteBuf) {
-        ByteBufUtils.writeUTF8String(buffer, capabilityID)
-        ByteBufUtils.writeTag(buffer, data)
-        ByteBufUtils.writeUTF8String(buffer, targetUUID.toString())
+        buffer.writeString(capabilityID)
+        buffer.writeTag(data)
+        buffer.writeString(targetUUID.toString())
     }
 
     companion object {

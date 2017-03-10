@@ -1,7 +1,7 @@
 package be.bluexin.saomclib.capabilities
 
-import be.bluexin.saomclib.packets.PacketPipeline
 import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
+import be.bluexin.saomclib.sendPacket
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayerMP
 import java.lang.ref.WeakReference
@@ -28,7 +28,7 @@ abstract class AbstractEntityCapability : AbstractCapability() {
      */
     open fun sync() {
         val ent = reference.get()
-        if (ent is EntityPlayerMP) PacketPipeline.sendTo(SyncEntityCapabilityPacket(this, ent), ent)
+        if (ent is EntityPlayerMP) ent.sendPacket(SyncEntityCapabilityPacket(this, ent))
     }
 
     open val shouldSyncOnDeath = true
