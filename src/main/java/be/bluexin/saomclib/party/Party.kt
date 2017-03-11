@@ -98,6 +98,9 @@ class Party(leader: EntityPlayer) : IParty {
         remove.forEach { invitesImpl.remove(it.key) }
     }
 
+    override val invited: List<EntityPlayer>
+        get() = invitesImpl.keys.toList()
+
     /**
      * Only call on server!
      */

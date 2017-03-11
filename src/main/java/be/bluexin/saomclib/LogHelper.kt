@@ -18,6 +18,8 @@ internal object LogHelper {
 
     fun logFatal(msg: String) = logger.fatal(msg)
 
+    fun logDebug(msg: String) = logger.debug(msg)
+
     fun log(e: Throwable) {
         val w = StringWriter()
         e.printStackTrace(PrintWriter(w))

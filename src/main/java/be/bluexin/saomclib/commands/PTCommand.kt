@@ -125,9 +125,45 @@ class PTCommand : CommandBase() {
     override fun checkPermission(server: MinecraftServer?, sender: ICommandSender) = sender is EntityPlayer
 
     override fun getTabCompletions(server: MinecraftServer, sender: ICommandSender, args: Array<out String>, pos: BlockPos?): MutableList<String> {
+        if (sender !is EntityPlayer) return mutableListOf()
+        val cap = sender.getPartyCapability()
         return when (args.size) {
-            1 -> CommandBase.getListOfStringsMatchingLastWord(args, "invite", "accept", "decline", "kick", "leave", "cancel", "print")
-            2 -> CommandBase.getListOfStringsMatchingLastWord(args, *server.onlinePlayerNames)
+            1 -> {
+                val l = mutableListOf("invite")
+                if (cap.party != null) {
+                    l.add("leave")
+                    l.add("print")
+                    if (cap.party?.leader == sender) {
+                        l.add("kick")
+                        l.add("cancel")
+                    }
+                }
+                if (cap.invitedTo != null) {
+                    l.add("accept")
+                    l.add("decline")
+                }
+                CommandBase.getListOfStringsMatchingLastWord(args, *l.toTypedArray())
+            }
+            2 -> {
+                val l = mutableListOf<String>()
+                when (args[1]) {
+                    "leave", "print", "accept", "decline" -> return mutableListOf()
+                    "invite" -> {
+                        val current = cap.party?.members?.map { it.name }
+                        val invited = cap.party?.invited?.map { it.name }
+                        l.addAll(server.onlinePlayerNames.filterNot { it == sender.name || current?.contains(it) ?: false || invited?.contains(it) ?: false })
+                    }
+                    "kick" -> {
+                        val ll = cap.party?.members?.filterNot { it == sender }?.map { it.name }
+                        if (ll != null) l.addAll(ll)
+                    }
+                    "cancel" -> {
+                        val ll = cap.party?.invited?.map { it.name }
+                        if (ll != null) l.addAll(ll)
+                    }
+                }
+                CommandBase.getListOfStringsMatchingLastWord(args, *l.toTypedArray())
+            }
             else -> mutableListOf()
         }
     }

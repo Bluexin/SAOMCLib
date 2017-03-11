@@ -60,9 +60,10 @@ class PTPacket() : IMessage {
             override fun handleClientPacket(player: EntityPlayer, message: PTPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
                 mainThread.addScheduledTask {
                     val p1 = player.world.getPlayerEntityByUUID(UUID.fromString(message.leader))
+                    LogHelper.logInfo("${player.displayNameString} received ${message.type} with p1 ${p1?.displayNameString}")
                     try {
                         when (message.type) {
-                            Type.ADD -> if (p1 != null) player.getPartyCapability().party?.addMember(p1)
+                            Type.ADD -> if (p1 != null) player.getPartyCapability().getOrCreatePT().addMember(p1)
                             Type.REMOVE -> if (p1 != null) player.getPartyCapability().party?.removeMember(p1)
                             Type.CLEAR -> player.getPartyCapability().clear()
                             Type.INVITE -> {
@@ -87,8 +88,9 @@ class PTPacket() : IMessage {
                             }
                         }
                     } catch (e: Exception) {
-                        LogHelper.logInfo("Suppressed an error.")
+                        LogHelper.logDebug("Suppressed an error.")
                     }
+                    LogHelper.logDebug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
                 }
 
                 return null

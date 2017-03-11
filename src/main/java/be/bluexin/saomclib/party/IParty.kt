@@ -106,7 +106,13 @@ interface IParty {
      * Gets whether the provided player is the leader of this party.
      *
      * @param player the player to check for leadership
+     * @return whether the player is leader
      */
     fun isLeader(player: EntityPlayer) = leader == player
+
+    /**
+     * Gets the list of invited players.
+     */
+    val invited: List<EntityPlayer>
 
 }
