@@ -4,10 +4,10 @@ import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.onServer
 import be.bluexin.saomclib.packets.PTPacket
 import be.bluexin.saomclib.sendPacket
+import cpw.mods.fml.common.network.simpleimpl.IMessage
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.world.World
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -80,7 +80,7 @@ class Party(leader: EntityPlayer) : IParty {
 
     override fun invite(player: EntityPlayer): Boolean {
         if (!isMember(player) && !isInvited(player)) {
-            invitesImpl.put(player, player.world.worldTime) // TODO: Using worldTime isn't too safe
+            invitesImpl.put(player, player.worldObj.worldTime) // TODO: Using worldTime isn't too safe
             world.get()?.onServer { (player as EntityPlayerMP).sendPacket(PTPacket(PTPacket.Companion.Type.INVITE, leader!!, members)) }
             return true
         }
@@ -111,7 +111,7 @@ class Party(leader: EntityPlayer) : IParty {
 
     init {
         membersImpl.put(leader, Unit)
-        this.world = WeakReference(leader.world)
+        this.world = WeakReference(leader.worldObj)
         this.leader = leader
     }
 }

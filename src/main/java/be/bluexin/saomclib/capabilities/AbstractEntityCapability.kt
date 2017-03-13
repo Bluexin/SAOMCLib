@@ -4,10 +4,14 @@ import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
 import be.bluexin.saomclib.sendPacket
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayerMP
+import net.minecraft.world.World
 import java.lang.ref.WeakReference
 
 /**
  * Part of saomclib by Bluexin.
+ *
+ * @sample be.bluexin.saomclib.example.SimpleCapability for a Kotlin example
+ * @sample be.bluexin.saomclib.example.JSimpleCapability for a Java example
  *
  * @author Bluexin
  */
@@ -15,9 +19,13 @@ abstract class AbstractEntityCapability : AbstractCapability() {
 
     protected lateinit var reference: WeakReference<Entity>
 
-    override fun setup(param: Any): AbstractCapability {
-        reference = WeakReference(param as Entity)
+    override fun setup(param: Entity): AbstractCapability {
         return this
+    }
+
+    override fun init(entity: Entity, world: World) {
+        reference = WeakReference(entity)
+        setup(entity)
     }
 
     /**

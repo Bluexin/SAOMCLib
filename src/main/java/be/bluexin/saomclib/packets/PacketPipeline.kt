@@ -6,17 +6,17 @@ import be.bluexin.saomclib.except.UnknownPacketException
 import be.bluexin.saomclib.packets.PacketPipeline.registerMessage
 import be.bluexin.saomclib.packets.PacketPipeline.sendTo
 import be.bluexin.saomclib.sendPacket
+import cpw.mods.fml.common.network.NetworkRegistry
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint
+import cpw.mods.fml.common.network.simpleimpl.IMessage
+import cpw.mods.fml.relauncher.Side
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
-import net.minecraftforge.fml.common.network.NetworkRegistry
-import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage
-import net.minecraftforge.fml.relauncher.Side
 import java.util.*
 
 /**
  * Packet Pipeline to be used.
- * Basic how-to: during [net.minecraftforge.fml.common.event.FMLPreInitializationEvent], register your custom packet with [registerMessage].
+ * Basic how-to: during [cpw.mods.fml.common.event.FMLPreInitializationEvent], register your custom packet with [registerMessage].
  * Then, whenever you need to, you can use [sendTo]-type methods in this class to send packets to a (or many) player(s), to the server, etc.
  *
  * @author Bluexin
@@ -39,46 +39,46 @@ object PacketPipeline {
 
     /**
      * Sends a packet to a specific player (from the server!)
-     * @see net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendTo
+     * @see cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendTo
      * @see [sendPacket] helper method/shortcut
      */
     fun sendTo(message: IMessage, player: EntityPlayerMP) {
-        if (player.connection != null) ntw.sendTo(message, player)
+        if (player.playerNetServerHandler != null) ntw.sendTo(message, player)
     }
 
     /**
      * Sends a packet to all the players (from the server!)
-     * @see net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToAll
+     * @see cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToAll
      */
     fun sendToAll(message: IMessage) = ntw.sendToAll(message)
 
     /**
      * Sends a packet to all the players around a certain [TargetPoint] (from the server!)
-     * @see net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToAllAround
+     * @see cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToAllAround
      */
     fun sendToAllAround(message: IMessage, point: TargetPoint) = ntw.sendToAllAround(message, point)
 
     /**
      * Sends a packet to all the players around certain coordinates, within range (from the server!)
-     * @see net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToAllAround
+     * @see cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToAllAround
      */
     fun sendToAllAround(message: IMessage, dimension: Int, x: Double, y: Double, z: Double, range: Double) = sendToAllAround(message, TargetPoint(dimension, x, y, z, range))
 
     /**
      * Sends a packet to all the players around certain player, within (from the server!)
-     * @see net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToAllAround
+     * @see cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToAllAround
      */
-    fun sendToAllAround(message: IMessage, player: EntityPlayer, range: Double) = sendToAllAround(message, player.world.provider.dimension, player.posX, player.posY, player.posZ, range)
+    fun sendToAllAround(message: IMessage, player: EntityPlayer, range: Double) = sendToAllAround(message, player.worldObj.provider.dimensionId, player.posX, player.posY, player.posZ, range)
 
     /**
      * Sends a packet to all the players in a certain dimension (from the server!)
-     * @see net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToDimension
+     * @see cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToDimension
      */
     fun sendToDimension(message: IMessage, dimensionId: Int) = ntw.sendToDimension(message, dimensionId)
 
     /**
      * Sends a packet to the server (from the client!)
-     * @see net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToServer
+     * @see cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper.sendToServer
      */
     fun sendToServer(message: IMessage) = ntw.sendToServer(message)
 

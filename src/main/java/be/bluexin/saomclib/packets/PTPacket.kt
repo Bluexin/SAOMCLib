@@ -5,11 +5,10 @@ import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.party.Party
 import be.bluexin.saomclib.readString
 import be.bluexin.saomclib.writeString
+import cpw.mods.fml.common.network.simpleimpl.IMessage
+import cpw.mods.fml.common.network.simpleimpl.MessageContext
 import io.netty.buffer.ByteBuf
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.IThreadListener
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import java.util.*
 
 /**
@@ -30,8 +29,8 @@ class PTPacket() : IMessage {
      */
     constructor(type: Type, leader: EntityPlayer, members: List<EntityPlayer>) : this() {
         this.type = type
-        this.leader = leader.cachedUniqueIdString
-        this.members = members.map { it.cachedUniqueIdString }
+        this.leader = leader.uniqueID.toString()
+        this.members = members.map { it.uniqueID.toString() }
     }
 
     override fun fromBytes(buf: ByteBuf) {
@@ -57,10 +56,9 @@ class PTPacket() : IMessage {
         }
 
         class Handler : AbstractClientPacketHandler<PTPacket>() {
-            override fun handleClientPacket(player: EntityPlayer, message: PTPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
-                mainThread.addScheduledTask {
-                    val p1 = player.world.getPlayerEntityByUUID(UUID.fromString(message.leader))
-                    LogHelper.logInfo("${player.displayNameString} received ${message.type} with p1 ${p1?.displayNameString}")
+            override fun handleClientPacket(player: EntityPlayer, message: PTPacket, ctx: MessageContext): IMessage? {
+                val p1 = player.worldObj.getPlayerEntityByUUID(UUID.fromString(message.leader))
+                LogHelper.logInfo("${player.displayName} received ${message.type} with p1 ${p1?.displayName}")
                     try {
                         when (message.type) {
                             Type.ADD -> if (p1 != null) player.getPartyCapability().getOrCreatePT().addMember(p1)
@@ -69,7 +67,7 @@ class PTPacket() : IMessage {
                             Type.INVITE -> {
                                 if (p1 != null) {
                                     val pt = Party(p1)
-                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
+                                    message.members.map { player.worldObj.getPlayerEntityByUUID(UUID.fromString(it)) }
                                             .filterNotNull().forEach { pt.addMember(it) }
                                     player.getPartyCapability().invitedTo = pt
                                 }
@@ -78,7 +76,7 @@ class PTPacket() : IMessage {
                             Type.JOIN -> {
                                 if (p1 != null) {
                                     val pt = Party(p1)
-                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
+                                    message.members.map { player.worldObj.getPlayerEntityByUUID(UUID.fromString(it)) }
                                             .filterNotNull().forEach { pt.addMember(it) }
                                     pt.addMember(player)
                                     val cap = player.getPartyCapability()
@@ -90,8 +88,8 @@ class PTPacket() : IMessage {
                     } catch (e: Exception) {
                         LogHelper.logDebug("Suppressed an error.")
                     }
-                    LogHelper.logDebug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
-                }
+                LogHelper.logDebug("${player.getPartyCapability().party?.leader?.displayName} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayName }}")
+
 
                 return null
             }

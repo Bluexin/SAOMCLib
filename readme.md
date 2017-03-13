@@ -9,7 +9,7 @@ To add this library to your dev workspace, add the following to your build.gradl
 ```groovy
 repositories {
 maven {
-url = "http://maven.bluexin.be/repository/releases/"
+url = "https://maven.bluexin.be/repository/releases/"
 }
 }
 
@@ -36,6 +36,16 @@ extraLines += ["PK: org/jetbrains/annotations be/bluexin/saomclib/shade/annotati
 }
 ```
 (an example can be found at [our build.gradle](build.gradle#L45))
+
+Please note that in mc 1.7.10, these lines are the following :
+```groovy
+minecraft {
+srgExtra "PK: kotlin be/bluexin/saomclib/shade/kotlin"
+srgExtra "PK: org/jetbrains/annotations be/bluexin/saomclib/shade/annotations"
+}
+```
+(I do not currently know about the other versions, if one doesn't work try the other one)
+
 
 Regarding your main mod class (annotated by @Mod), you can either make it a Kotlin class or object.
 When using an object (which there is no reason not to), you need to add the following anywhere in your object's declaration :

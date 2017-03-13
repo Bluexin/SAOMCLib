@@ -1,6 +1,6 @@
 package be.bluexin.saomclib.except
 
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage
+import cpw.mods.fml.common.network.simpleimpl.IMessage
 
 /**
  * Supertype of all exceptions linked to Packets.

@@ -4,9 +4,8 @@ import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.party.IParty
 import be.bluexin.saomclib.party.Party
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.common.capabilities.CapabilityInject
 import java.lang.ref.WeakReference
 
 /**
@@ -45,10 +44,13 @@ class PartyCapability : AbstractEntityCapability() {
 
     companion object {
         @Key val KEY = ResourceLocation(SAOMCLib.MODID, "party")
+    }
 
-        @CapabilityInject(PartyCapability::class)
-        lateinit var CAP_INSTANCE: Capability<PartyCapability>
+    override fun loadNBTData(compound: NBTTagCompound?) {
+    }
+
+    override fun saveNBTData(compound: NBTTagCompound?) {
     }
 }
 
-fun EntityPlayer.getPartyCapability() = this.getCapability(PartyCapability.CAP_INSTANCE, null)!!
+fun EntityPlayer.getPartyCapability() = this.getExtendedProperties(PartyCapability.KEY.toString()) as PartyCapability
