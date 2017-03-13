@@ -146,11 +146,12 @@ class PTCommand : CommandBase() {
             }
             2 -> {
                 val l = mutableListOf<String>()
-                when (args[1]) {
+                when (args[0]) {
                     "leave", "print", "accept", "decline" -> return mutableListOf()
                     "invite" -> {
                         val current = cap.party?.members?.map { it.name }
-                        l.addAll(server.onlinePlayerNames.filterNot { it == sender.name || current?.contains(it) ?: false })
+                        val invited = cap.party?.invited?.map { it.name }
+                        l.addAll(server.onlinePlayerNames.filterNot { it == sender.name || current?.contains(it) ?: false || invited?.contains(it) ?: false })
                     }
                     "kick" -> {
                         val ll = cap.party?.members?.filterNot { it == sender }?.map { it.name }

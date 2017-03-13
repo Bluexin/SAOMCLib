@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent
  *
  * @author Bluexin
  */
-@Mod(modid = SAOMCLib.MODID, name = "SAOMC Library", version = "1.0.5")
+@Mod(modid = SAOMCLib.MODID, name = "SAOMC Library", version = "1.0.5b")
 object SAOMCLib {
 
     const val MODID = "saomclib"

@@ -21,6 +21,7 @@ class Party(leader: EntityPlayer) : IParty {
     override fun addMember(member: EntityPlayer): Boolean {
         if (!isMember(member)) {
             world.get()?.onServer {
+                member.getPartyCapability().party?.removeMember(member)
                 sendToMembers(PTPacket(PTPacket.Companion.Type.ADD, member, listOf()))
                 (member as EntityPlayerMP).sendPacket(PTPacket(PTPacket.Companion.Type.JOIN, leader!!, members))
             }
