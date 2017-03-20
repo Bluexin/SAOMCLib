@@ -23,7 +23,7 @@ abstract class AbstractEntityCapability : AbstractCapability() {
         return this
     }
 
-    override fun init(entity: Entity, world: World) {
+    override fun init(entity: Entity, world: World?) {
         reference = WeakReference(entity)
         setup(entity)
     }
