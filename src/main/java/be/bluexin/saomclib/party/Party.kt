@@ -53,7 +53,7 @@ class Party(leader: EntityPlayer) : IParty {
                 if (isParty) leaderImpl = WeakReference(membersImpl.keys.first())
             } else if (isMember(value)) leaderImpl = WeakReference(value)
             else throw IllegalStateException("Target to be promoted isn't in the party!")
-            world.get()?.onServer { sendToMembers(PTPacket(PTPacket.Companion.Type.LEADER, leaderImpl!!.get(), listOf())) }
+            world.get()?.onServer { sendToMembers(PTPacket(PTPacket.Companion.Type.LEADER, leaderImpl!!.get()!!, listOf())) }
         }
 
     private var leaderImpl: WeakReference<EntityPlayer>? = null

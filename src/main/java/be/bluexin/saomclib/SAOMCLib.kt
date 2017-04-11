@@ -22,10 +22,11 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent
  *
  * @author Bluexin
  */
-@Mod(modid = SAOMCLib.MODID, name = "SAOMC Library", version = "1.0.5b")
+@Mod(modid = SAOMCLib.MODID, name = "SAOMC Library", version = "1.1", dependencies = SAOMCLib.DEPENDENCIES)
 object SAOMCLib {
 
     const val MODID = "saomclib"
+    const val DEPENDENCIES = "required-after:forgelin@[1.4.1,)"
 
     @Suppress("unused")
     @SidedProxy(clientSide = "be.bluexin.saomclib.proxy.ClientProxy", serverSide = "be.bluexin.saomclib.proxy.CommonProxy")
