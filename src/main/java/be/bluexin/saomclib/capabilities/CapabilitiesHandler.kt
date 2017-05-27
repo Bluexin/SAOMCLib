@@ -4,6 +4,7 @@ import be.bluexin.saomclib.except.*
 import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.nbt.NBTBase
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
@@ -164,7 +165,7 @@ object CapabilitiesHandler {
 
         override fun <R> getCapability(capability: Capability<R>, facing: EnumFacing?) = if (capability === this.capability) this.capability.cast<R>(instance) else null
 
-        override fun serializeNBT(): NBTBase = this.capability.storage.writeNBT(this.capability, this.instance, null)
+        override fun serializeNBT(): NBTBase = this.capability.storage.writeNBT(this.capability, this.instance, null)?: NBTTagCompound()
 
         override fun deserializeNBT(nbt: NBTBase) = this.capability.storage.readNBT(this.capability, this.instance, null, nbt)
     }

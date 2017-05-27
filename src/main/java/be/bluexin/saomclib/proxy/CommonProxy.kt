@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
  */
 internal open class CommonProxy {
 
-    open fun getPlayerEntity(ctx: MessageContext): EntityPlayer? = ctx.serverHandler.playerEntity
+    open fun getPlayerEntity(ctx: MessageContext): EntityPlayer = ctx.serverHandler.player
 
-    open fun getMinecraftThread(ctx: MessageContext): IThreadListener = ctx.serverHandler.playerEntity.mcServer
+    open fun getMinecraftThread(ctx: MessageContext): IThreadListener = ctx.serverHandler.player.mcServer
 }
