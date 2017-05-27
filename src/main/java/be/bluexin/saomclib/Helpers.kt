@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumHand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.TextComponentTranslation
 import net.minecraft.world.World
@@ -110,7 +111,7 @@ fun EntityPlayerMP.checkedPlaceBlock(pos: BlockPos, state: IBlockState): Boolean
     val world = this.entityWorld
     val before = BlockSnapshot.getBlockSnapshot(world, pos)
     world.setBlockState(pos, state)
-    val evt = BlockEvent.PlaceEvent(before, Blocks.AIR.defaultState, this, null)
+    val evt = BlockEvent.PlaceEvent(before, Blocks.AIR.defaultState, this, EnumHand.MAIN_HAND)
     MinecraftForge.EVENT_BUS.post(evt)
     if (evt.isCanceled) {
         world.restoringBlockSnapshots = true
