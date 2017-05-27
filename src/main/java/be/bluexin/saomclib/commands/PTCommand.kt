@@ -10,7 +10,6 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.math.BlockPos
 
-
 /**
  * Part of saomclib by Bluexin.
  *
@@ -18,7 +17,7 @@ import net.minecraft.util.math.BlockPos
  *
  * @author Bluexin
  */
-class PTCommand : CommandBase() {
+object PTCommand : CommandBase() {
     override fun getName() = "pt"
 
     override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String>) {

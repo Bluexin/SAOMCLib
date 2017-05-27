@@ -35,17 +35,12 @@ minecraft {
 repositories {
     mavenCentral()
     maven {
-        url "http://mvn.rx14.co.uk/shadowfacts/"
+        url "https://maven.bluexin.be/repository/releases/"
     }
 }
 
 dependencies {
     compile "net.shadowfacts:Forgelin:${forgelin_version}"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-}
-
-sourceSets {
-    main.java.srcDirs += 'src/main/java'
 }
 
 configurations {

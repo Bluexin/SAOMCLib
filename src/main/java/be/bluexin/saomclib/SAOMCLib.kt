@@ -48,7 +48,7 @@ object SAOMCLib {
 
     @Mod.EventHandler
     fun serverStart(e: FMLServerStartingEvent) {
-        e.registerServerCommand(PTCommand())
+        e.registerServerCommand(PTCommand)
     }
 
     @JvmStatic

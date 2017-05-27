@@ -32,10 +32,10 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 /**
  * Calls a profiled block, with given key.
  */
-inline fun profile(mc: Minecraft, key: String, body: () -> Unit) {
-    mc.mcProfiler.startSection(key)
-    body.invoke()
-    mc.mcProfiler.endSection()
+inline fun Minecraft.profile(key: String, body: () -> Unit) {
+    this.mcProfiler.startSection(key)
+    body()
+    this.mcProfiler.endSection()
 }
 
 /**
@@ -44,7 +44,7 @@ inline fun profile(mc: Minecraft, key: String, body: () -> Unit) {
  * @param body the block of code to execute only if the current side is client
  */
 inline infix fun World.onClient(body: () -> Unit) {
-    if (this.isRemote) body.invoke()
+    if (this.isRemote) body()
 }
 
 /**
@@ -53,7 +53,7 @@ inline infix fun World.onClient(body: () -> Unit) {
  * @param body the block of code to execute only if the current side is server
  */
 inline infix fun World.onServer(body: () -> Unit) {
-    if (!this.isRemote) body.invoke()
+    if (!this.isRemote) body()
 }
 
 /**
