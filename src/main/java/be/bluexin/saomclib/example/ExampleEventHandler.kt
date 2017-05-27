@@ -30,8 +30,8 @@ class ExampleEventHandler {
             LogHelper.logInfo("${e.entityLiving} attacked by ${e.source.entity}.")
             val rand: Int = (1000 * Math.random()).toInt()
             LogHelper.logInfo("Random: $rand.")
-            e.source.entity!!.getCapability(SimpleCapability.CAP_INSTANCE, null).num = rand
-            e.source.entity!!.getCapability(SimpleCapability.CAP_INSTANCE, null).sync()
+            e.source.entity!!.getCapability(SimpleCapability.CAP_INSTANCE, null)!!.num = rand
+            e.source.entity!!.getCapability(SimpleCapability.CAP_INSTANCE, null)!!.sync()
         }
     }
 }
