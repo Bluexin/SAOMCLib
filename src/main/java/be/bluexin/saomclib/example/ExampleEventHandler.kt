@@ -26,11 +26,11 @@ class ExampleEventHandler {
 
     @SubscribeEvent
     fun attackEntity(e: LivingAttackEvent) {
-        if (!e.entity.world.isRemote && e.source.entity is EntityPlayer) {
-            LogHelper.logInfo("${e.entityLiving} attacked by ${e.source.entity}.")
+        if (!e.entity.world.isRemote && e.source.trueSource is EntityPlayer) {
+            LogHelper.logInfo("${e.entityLiving} attacked by ${e.source.trueSource}.")
             val rand: Int = (1000 * Math.random()).toInt()
             LogHelper.logInfo("Random: $rand.")
-            val cap = e.source.entity!!.getCapability(SimpleCapability.CAP_INSTANCE, null)?:return
+            val cap = e.source.trueSource!!.getCapability(SimpleCapability.CAP_INSTANCE, null)?:return
             cap.num = rand
             cap.sync()
         }
