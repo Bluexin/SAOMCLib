@@ -1,6 +1,5 @@
 package be.bluexin.saomclib.packets
 
-import be.bluexin.saomclib.LogHelper
 import be.bluexin.saomclib.SAOMCLib
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.IThreadListener
@@ -53,7 +52,7 @@ abstract class AbstractPacketHandler<T : IMessage> : IMessageHandler<T, IMessage
             return if (ctx.side.isClient) handleClientPacket(player, message, ctx, SAOMCLib.proxy.getMinecraftThread(ctx))
             else handleServerPacket(player, message, ctx, SAOMCLib.proxy.getMinecraftThread(ctx))
         } else {
-            LogHelper.logInfo("Received packet before player got initialized.")
+            SAOMCLib.LOGGER.info("Received packet before player got initialized.")
             Thread({ Thread.sleep(1000); onMessage(message, ctx) }).start()
             return null
         }

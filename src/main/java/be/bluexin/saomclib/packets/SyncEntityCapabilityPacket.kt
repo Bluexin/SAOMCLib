@@ -53,7 +53,7 @@ class SyncEntityCapabilityPacket() : IMessage {
                     try {
                         cap.readNBT(player.world.loadedEntityList.filter { it.uniqueID == message.targetUUID }.single().getCapability(cap, null), null, message.data)
                     } catch (e: Exception) {
-                        LogHelper.logInfo("Suppressed an error.")
+                        SAOMCLib.LOGGER.info("Suppressed an error.")
                     }
                 }
 

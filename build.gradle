@@ -19,7 +19,7 @@ apply plugin: "maven"
 apply plugin: 'kotlin'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = mc_version + '-' + mod_version
+version = "${mc_version}-${mod_version}"
 group = "be.bluexin"
 archivesBaseName = "saomc-lib"
 
@@ -27,9 +27,13 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = mc_version + '-' + forge_version
+    version = "${mc_version}-${forge_version}"
     runDir = "run"
-    mappings = mappings_version
+    mappings = "${mappings_version}"
+
+    replace "@VERSION@", project.version
+    replaceIn "SAOMCLib.kt"
+    useDepAts = true
 }
 
 repositories {
@@ -39,12 +43,12 @@ repositories {
         url "https://maven.bluexin.be/repository/releases/"
     }
     maven {
-        url "http://mvn.rx14.co.uk/shadowfacts/"
+        url "http://maven.shadowfacts.net/"
     }
 }
 
 dependencies {
-    compile "net.shadowfacts:Forgelin:${forgelin_version}"
+    compile group: "net.shadowfacts", name: "Forgelin", version: forgelin_version
 }
 
 configurations {

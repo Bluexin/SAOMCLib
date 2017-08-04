@@ -1,9 +1,12 @@
 package be.bluexin.saomclib.party
 
 import be.bluexin.saomclib.capabilities.getPartyCapability
+import be.bluexin.saomclib.onClient
 import be.bluexin.saomclib.onServer
-import be.bluexin.saomclib.packets.PTPacket
+import be.bluexin.saomclib.packets.PTC2SPacket
+import be.bluexin.saomclib.packets.PTS2CPacket
 import be.bluexin.saomclib.sendPacket
+import be.bluexin.saomclib.sentPacketToServer
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.world.World
@@ -19,27 +22,36 @@ import java.util.*
 class Party(leader: EntityPlayer) : IParty {
 
     override fun addMember(member: EntityPlayer): Boolean {
-        if (!isMember(member)) {
-            world.get()?.onServer {
+        world.get()?.onServer {
+            if (!isMember(member)) {
                 member.getPartyCapability().party?.removeMember(member)
-                sendToMembers(PTPacket(PTPacket.Companion.Type.ADD, member, listOf()))
-                (member as EntityPlayerMP).sendPacket(PTPacket(PTPacket.Companion.Type.JOIN, leader!!, members))
+                sendToMembers(PTS2CPacket(PTS2CPacket.Companion.Type.ADD, member, listOf()))
+                (member as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Companion.Type.JOIN, leader!!, members))
+                membersImpl.put(member, Unit)
+                invitesImpl.remove(member)
+                return true
             }
-            membersImpl.put(member, Unit)
-            invitesImpl.remove(member)
-            return true
+            return false
+        }
+        world.get()?.onClient {
+            leader!!.sentPacketToServer(PTC2SPacket(PTC2SPacket.Companion.Type.JOIN, leader!!, member))
         }
 
         return false
     }
 
     override fun removeMember(member: EntityPlayer) = if (membersImpl.remove(member) != null) {
-        if (member == leader) leader = null
         world.get()?.onServer {
-            sendToMembers(PTPacket(PTPacket.Companion.Type.REMOVE, member, listOf()))
-            (member as EntityPlayerMP).sendPacket(PTPacket(PTPacket.Companion.Type.CLEAR, member, listOf()))
+            if (member == leader) leader = null
+            sendToMembers(PTS2CPacket(PTS2CPacket.Companion.Type.REMOVE, member, listOf()))
+            (member as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Companion.Type.CLEAR, member, listOf()))
+
+            if (!isParty) dissolve()
         }
-        if (!isParty) dissolve()
+        world.get()?.onClient {
+            leader!!.sentPacketToServer(PTC2SPacket(PTC2SPacket.Companion.Type.REMOVE, leader!!, member))
+        }
+
         true
     } else false
 
@@ -53,7 +65,8 @@ class Party(leader: EntityPlayer) : IParty {
                 if (isParty) leaderImpl = WeakReference(membersImpl.keys.first())
             } else if (isMember(value)) leaderImpl = WeakReference(value)
             else throw IllegalStateException("Target to be promoted isn't in the party!")
-            world.get()?.onServer { sendToMembers(PTPacket(PTPacket.Companion.Type.LEADER, leaderImpl!!.get()!!, listOf())) }
+            world.get()?.onServer { sendToMembers(PTS2CPacket(PTS2CPacket.Companion.Type.LEADER, leaderImpl!!.get()!!, listOf())) }
+            world.get()?.onClient { leader!!.sentPacketToServer(PTC2SPacket(PTC2SPacket.Companion.Type.LEADER, leaderImpl!!.get()!!, null)) }
         }
 
     private var leaderImpl: WeakReference<EntityPlayer>? = null
@@ -65,9 +78,12 @@ class Party(leader: EntityPlayer) : IParty {
     private val world: WeakReference<World>
 
     override fun dissolve() {
-        members.forEach { it.getPartyCapability().clear() }
-        if (leader != null) world.get()?.onServer { sendToMembers(PTPacket(PTPacket.Companion.Type.CLEAR, leader!!, listOf())) }
-        membersImpl.clear()
+        world.get()?.onServer {
+            members.forEach { it.getPartyCapability().clear() }
+            if (leader != null) sendToMembers(PTS2CPacket(PTS2CPacket.Companion.Type.CLEAR, leader!!, listOf()))
+            membersImpl.clear()
+        }
+        world.get()?.onClient { leader!!.sentPacketToServer(PTC2SPacket(PTC2SPacket.Companion.Type.CLEAR, leader!!, null)) }
     }
 
     override val size: Int
@@ -79,16 +95,21 @@ class Party(leader: EntityPlayer) : IParty {
     override fun isMember(player: EntityPlayer) = membersImpl.contains(player)
 
     override fun invite(player: EntityPlayer): Boolean {
-        if (!isMember(player) && !isInvited(player)) {
-            invitesImpl.put(player, player.world.worldTime) // TODO: Using worldTime isn't too safe
-            world.get()?.onServer { (player as EntityPlayerMP).sendPacket(PTPacket(PTPacket.Companion.Type.INVITE, leader!!, members)) }
-            return true
+        world.get()?.onServer {
+            if (!isMember(player) && !isInvited(player)) {
+                invitesImpl.put(player, player.world.worldTime) // TODO: Using worldTime isn't too safe
+                (player as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Companion.Type.INVITE, leader!!, members))
+                return true
+            }
+            else return false
         }
+        world.get()?.onClient { leader!!.sentPacketToServer(PTC2SPacket(PTC2SPacket.Companion.Type.INVITE, leader!!, player)) }
         return false
     }
 
     override fun cancel(player: EntityPlayer) = if (invitesImpl.remove(player) != null) {
-        world.get()?.onServer { (player as EntityPlayerMP).sendPacket(PTPacket(PTPacket.Companion.Type.CLEAR, player, listOf())) }
+        world.get()?.onServer { (player as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Companion.Type.CLEAR, player, listOf())) }
+        world.get()?.onClient { player.sentPacketToServer(PTC2SPacket(PTC2SPacket.Companion.Type.CLEAR, player, null)) }
         true
     } else false
 

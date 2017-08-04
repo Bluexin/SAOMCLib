@@ -39,25 +39,25 @@ internal class EventHandler {
 
     @SubscribeEvent
     fun cloneEvent(evt: PlayerEvent.Clone) {
-        LogHelper.logInfo("${evt.entityPlayer} cloned.")
+        SAOMCLib.LOGGER.info("${evt.entityPlayer} cloned.")
         if (!evt.entityPlayer.world.isRemote) CapabilitiesHandler.restoreEntitiesDeath(evt.entity, evt.original)
     }
 
     @SubscribeEvent
     fun respawnEvent(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent) {
-        LogHelper.logInfo("${evt.player} respawned.")
+        SAOMCLib.LOGGER.info("${evt.player} respawned.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDeath(evt.player)
     }
 
     @SubscribeEvent
     fun playerChangeDimension(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent) {
-        LogHelper.logInfo("${evt.player} changed dimension.")
+        SAOMCLib.LOGGER.info("${evt.player} changed dimension.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDimension(evt.player)
     }
 
     @SubscribeEvent
     fun playerConnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent) {
-        LogHelper.logInfo("${evt.player} logged in.")
+        SAOMCLib.LOGGER.info("${evt.player} logged in.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesLogin(evt.player)
     }
 
