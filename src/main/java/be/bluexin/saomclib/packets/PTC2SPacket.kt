@@ -3,9 +3,11 @@ package be.bluexin.saomclib.packets
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.readString
+import be.bluexin.saomclib.sendPacket
 import be.bluexin.saomclib.writeString
 import io.netty.buffer.ByteBuf
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.util.IThreadListener
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
@@ -46,7 +48,8 @@ class PTC2SPacket(): IMessage {
             CLEAR,
             INVITE,
             LEADER,
-            JOIN
+            JOIN,
+            REQUEST
         }
 
         class Handler : AbstractServerPacketHandler<PTC2SPacket>() {
@@ -63,6 +66,9 @@ class PTC2SPacket(): IMessage {
                                 Type.INVITE -> party.invite(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                                 Type.LEADER -> party.leader == p1
                                 Type.JOIN -> party.addMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
+                                Type.REQUEST -> {
+                                    (player as EntityPlayerMP).sendPacket((PTS2CPacket(PTS2CPacket.Companion.Type.ADD, p1, p1.getPartyCapability().getOrCreatePT().members)))
+                                }
                             }
                         }
                     } catch (e: Exception) {
