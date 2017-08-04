@@ -3,7 +3,7 @@
     "modid": "saomclib",
     "name": "SAOMC Library",
     "description": "Common stuff to handle networking and capabilities with forge (much more to come).",
-    "version": "${mod_version}",
+    "version": "${version}",
     "mcversion": "${mcversion}",
     "url": "",
     "updateUrl": "",
