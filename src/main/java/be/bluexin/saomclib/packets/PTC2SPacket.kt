@@ -42,7 +42,6 @@ class PTC2SPacket(): IMessage {
     
     companion object {
         enum class Type {
-            ADD,
             REMOVE,
             CLEAR,
             INVITE,
@@ -59,7 +58,6 @@ class PTC2SPacket(): IMessage {
                         if (p1 != null) {
                             val party = p1.getPartyCapability().getOrCreatePT()
                             when (message.type) {
-                                Type.ADD -> party.addMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                                 Type.REMOVE -> party.removeMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                                 Type.CLEAR -> p1.getPartyCapability().clear()
                                 Type.INVITE -> party.invite(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
