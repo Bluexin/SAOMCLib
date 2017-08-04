@@ -38,10 +38,10 @@ class PartyCapability : AbstractEntityCapability() {
     }
 
     // TODO: properly do this
-    override val shouldSyncOnDeath = false
-    override val shouldSyncOnDimensionChange = false
+    override val shouldSyncOnDeath = true
+    override val shouldSyncOnDimensionChange = true
     override val shouldRestoreOnDeath = true
-    override val shouldSendOnLogin = false
+    override val shouldSendOnLogin = true
 
     companion object {
         @Key val KEY = ResourceLocation(SAOMCLib.MODID, "party")
