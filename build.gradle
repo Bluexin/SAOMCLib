@@ -31,9 +31,9 @@ minecraft {
     runDir = "run"
     mappings = "${mappings_version}"
 
-    replace "@VERSION@", project.version
-    replaceIn "SAOMCLib.kt"
-    useDepAts = true
+    //replace "@VERSION@", project.version
+    //replaceIn "SAOMCLib.kt"
+    //useDepAts = true
 }
 
 repositories {
