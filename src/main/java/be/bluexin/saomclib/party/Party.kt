@@ -35,6 +35,7 @@ class Party(leader: EntityPlayer) : IParty {
         }
         world.get()?.onClient {
             leader!!.sentPacketToServer(PTC2SPacket(PTC2SPacket.Companion.Type.JOIN, leader!!, member))
+            return true
         }
 
         return false
@@ -103,7 +104,10 @@ class Party(leader: EntityPlayer) : IParty {
             }
             else return false
         }
-        world.get()?.onClient { leader!!.sentPacketToServer(PTC2SPacket(PTC2SPacket.Companion.Type.INVITE, leader!!, player)) }
+        world.get()?.onClient {
+            leader!!.sentPacketToServer(PTC2SPacket(PTC2SPacket.Companion.Type.INVITE, leader!!, player))
+            return true
+        }
         return false
     }
 
