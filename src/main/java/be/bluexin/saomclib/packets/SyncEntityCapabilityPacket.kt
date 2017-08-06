@@ -21,11 +21,10 @@ import java.util.*
  */
 class SyncEntityCapabilityPacket() : IMessage {
 
+    private lateinit var capabilityID: String
     private lateinit var data: NBTTagCompound
     private lateinit var targetUUID: UUID
-    private lateinit var capabilityID: String
 
-    @Suppress("unused")
     constructor(capability: AbstractEntityCapability, target: Entity) : this() {
         val rl = CapabilitiesHandler.getID(capability.javaClass)
         this.capabilityID = rl.toString()
