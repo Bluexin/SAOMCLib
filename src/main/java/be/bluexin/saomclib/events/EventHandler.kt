@@ -1,15 +1,20 @@
-package be.bluexin.saomclib
+package be.bluexin.saomclib.events
 
+import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
+import net.minecraftforge.client.ClientCommandHandler
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.living.LivingEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
 /**
  *
@@ -33,8 +38,6 @@ internal class EventHandler {
     @SubscribeEvent
     fun livingTick(e: LivingEvent.LivingUpdateEvent) {
         // TODO: Ticking capabilities?
-//        if (e.entityLiving.hasCapability(RenderCapability.RENDER_CAPABILITY, null))
-//            RenderCapability.get(e.entityLiving).colorStateHandler.tick()
     }
 
     @SubscribeEvent
@@ -56,10 +59,19 @@ internal class EventHandler {
     }
 
     @SubscribeEvent
-    fun playerConnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent) {
-        SAOMCLib.LOGGER.info("${evt.player} logged in.")
-        if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesLogin(evt.player)
+    fun clientConnectedToServer(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
+        Minecraft.getMinecraft().addScheduledTask {
+            MinecraftForge.EVENT_BUS.register(JoinServerEvent)
+        }
     }
+
+    /*
+    @SubscribeEvent
+    fun playerConnect(evt: FMLNetworkEvent.ClientConnectedToServerEvent){
+        SAOMCLib.LOGGER.info("Logged in, requesting sync packet")
+        SAOMCLib.LOGGER.info("Player: " + Minecraft.getMinecraft().player)
+        ClientCommandHandler.instance.executeCommand(Minecraft.getMinecraft().player, SAOMCLib.MODID + " sync")
+    }*/
 
     @SubscribeEvent
     fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
