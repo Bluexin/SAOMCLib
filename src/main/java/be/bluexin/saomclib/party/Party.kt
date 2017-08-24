@@ -97,12 +97,11 @@ class Party(leader: EntityPlayer) : IParty {
 
     override fun invite(player: EntityPlayer): Boolean {
         world.get()?.onServer {
-            if (!isMember(player) && !isInvited(player)) {
+            return if (!isMember(player) && !isInvited(player)) {
                 invitesImpl.put(player, player.world.worldTime) // TODO: Using worldTime isn't too safe
                 (player as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Companion.Type.INVITE, leader!!, members))
-                return true
-            }
-            else return false
+                true
+            } else false
         }
         world.get()?.onClient {
             leader!!.sentPacketToServer(PTC2SPacket(PTC2SPacket.Companion.Type.INVITE, leader!!, player))

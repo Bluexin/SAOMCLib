@@ -151,7 +151,7 @@ object PTCommand : CommandBase() {
                     "invite" -> {
                         val current = cap.party?.members?.map { it.name }
                         val invited = cap.party?.invited?.map { it.name }
-                        l.addAll(server.onlinePlayerNames.filterNot { it == sender.name || current?.contains(it) ?: false || invited?.contains(it) ?: false })
+                        l.addAll(server.onlinePlayerNames.filterNot { it == sender.name || current?.contains(it) == true || invited?.contains(it) == true })
                     }
                     "kick" -> {
                         val ll = cap.party?.members?.filterNot { it == sender }?.map { it.name }

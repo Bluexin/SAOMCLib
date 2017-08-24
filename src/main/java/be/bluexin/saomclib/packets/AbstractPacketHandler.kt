@@ -48,13 +48,13 @@ abstract class AbstractPacketHandler<T : IMessage> : IMessageHandler<T, IMessage
 
     final override fun onMessage(message: T, ctx: MessageContext): IMessage? {
         val player = SAOMCLib.proxy.getPlayerEntity(ctx)
-        if (player != null) {
-            return if (ctx.side.isClient) handleClientPacket(player, message, ctx, SAOMCLib.proxy.getMinecraftThread(ctx))
+        return if (player != null) {
+            if (ctx.side.isClient) handleClientPacket(player, message, ctx, SAOMCLib.proxy.getMinecraftThread(ctx))
             else handleServerPacket(player, message, ctx, SAOMCLib.proxy.getMinecraftThread(ctx))
         } else {
             SAOMCLib.LOGGER.info("Received packet before player got initialized.")
             Thread({ Thread.sleep(1000); onMessage(message, ctx) }).start()
-            return null
+            null
         }
     }
 }

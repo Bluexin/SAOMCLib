@@ -4,7 +4,6 @@ import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.NoStorage
 import be.bluexin.saomclib.capabilities.PartyCapability
 import be.bluexin.saomclib.commands.CommandBase
-import be.bluexin.saomclib.commands.PTCommand
 import be.bluexin.saomclib.events.EventHandler
 import be.bluexin.saomclib.packets.PTS2CPacket
 import be.bluexin.saomclib.packets.PacketPipeline

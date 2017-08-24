@@ -50,7 +50,7 @@ class SyncEntityCapabilityPacket() : IMessage {
                 mainThread.addScheduledTask {
                     val cap = CapabilitiesHandler.getEntityCapability(ResourceLocation(message.capabilityID))
                     try {
-                        cap.readNBT(player.world.loadedEntityList.filter { it.uniqueID == message.targetUUID }.single().getCapability(cap, null), null, message.data)
+                        cap.readNBT(player.world.loadedEntityList.single { it.uniqueID == message.targetUUID }.getCapability(cap, null), null, message.data)
                     } catch (e: Exception) {
                         SAOMCLib.LOGGER.info("Suppressed an error.")
                     }

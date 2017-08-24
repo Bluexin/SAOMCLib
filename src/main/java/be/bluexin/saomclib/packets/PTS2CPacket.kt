@@ -4,11 +4,9 @@ import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.party.Party
 import be.bluexin.saomclib.readString
-import be.bluexin.saomclib.sendPacket
 import be.bluexin.saomclib.writeString
 import io.netty.buffer.ByteBuf
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.util.IThreadListener
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
@@ -71,16 +69,14 @@ class PTS2CPacket() : IMessage {
                                 Type.CLEAR -> player.getPartyCapability().clear()
                                 Type.INVITE -> {
                                     val pt = Party(p1)
-                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
-                                            .filterNotNull().forEach { pt.addMember(it) }
+                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
                                     player.getPartyCapability().invitedTo = pt
 
                                 }
                                 Type.LEADER -> player.getPartyCapability().party?.leader = p1
                                 Type.JOIN -> {
                                     val pt = Party(p1)
-                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
-                                            .filterNotNull().forEach { pt.addMember(it) }
+                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
                                     pt.addMember(player)
                                     val cap = player.getPartyCapability()
                                     cap.party = pt

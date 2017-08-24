@@ -22,8 +22,8 @@ class PartyCapability : AbstractEntityCapability() {
     var invitedTo: IParty?
         get() = invitedToImpl?.get()
         set(value) {
-            if (value != null) invitedToImpl = WeakReference(value)
-            else invitedToImpl = null
+            invitedToImpl = if (value != null) WeakReference(value)
+            else null
         }
 
     fun getOrCreatePT(): IParty {

@@ -8,7 +8,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
-import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.living.LivingEvent
@@ -64,14 +63,6 @@ internal class EventHandler {
             MinecraftForge.EVENT_BUS.register(JoinServerEvent)
         }
     }
-
-    /*
-    @SubscribeEvent
-    fun playerConnect(evt: FMLNetworkEvent.ClientConnectedToServerEvent){
-        SAOMCLib.LOGGER.info("Logged in, requesting sync packet")
-        SAOMCLib.LOGGER.info("Player: " + Minecraft.getMinecraft().player)
-        ClientCommandHandler.instance.executeCommand(Minecraft.getMinecraft().player, SAOMCLib.MODID + " sync")
-    }*/
 
     @SubscribeEvent
     fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
