@@ -1,6 +1,5 @@
 package be.bluexin.saomclib.example
 
-import be.bluexin.saomclib.LogHelper
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.AbstractEntityCapability
 import be.bluexin.saomclib.capabilities.Key
@@ -20,13 +19,13 @@ class SimpleCapability : AbstractEntityCapability() {
 
     var num: Int = 0
         set(value) {
-            LogHelper.logInfo("Set num to $value for ${reference.get()} on remote=${reference.get()?.world?.isRemote}.")
+            SAOMCLib.LOGGER.info("Set num to $value for ${reference.get()} on remote=${reference.get()?.world?.isRemote}.")
             field = value
         }
 
     override fun setup(param: Any): SimpleCapability {
         super.setup(param)
-        LogHelper.logInfo("Set up for ${param.javaClass}")
+        SAOMCLib.LOGGER.info("Set up for ${param.javaClass}")
         return this
     }
 
@@ -41,13 +40,13 @@ class SimpleCapability : AbstractEntityCapability() {
             override fun writeNBT(capability: Capability<SimpleCapability>, instance: SimpleCapability, side: EnumFacing?): NBTBase {
                 val tag = NBTTagCompound()
                 tag.setInteger("num", instance.num)
-                LogHelper.logInfo("Writing ${instance.num} on remote=${instance.reference.get()?.world?.isRemote}.")
+                SAOMCLib.LOGGER.info("Writing ${instance.num} on remote=${instance.reference.get()?.world?.isRemote}.")
                 return tag
             }
 
             override fun readNBT(capability: Capability<SimpleCapability>, instance: SimpleCapability, side: EnumFacing?, nbt: NBTBase?) {
                 instance.num = (nbt as NBTTagCompound).getInteger("num")
-                LogHelper.logInfo("Reading ${instance.num} on remote=${instance.reference.get()?.world?.isRemote}.")
+                SAOMCLib.LOGGER.info("Reading ${instance.num} on remote=${instance.reference.get()?.world?.isRemote}.")
             }
 
         }

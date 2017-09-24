@@ -21,11 +21,10 @@ import java.util.*
  */
 class SyncEntityCapabilityPacket() : IMessage {
 
+    private lateinit var capabilityID: String
     private lateinit var data: NBTTagCompound
     private lateinit var targetUUID: UUID
-    private lateinit var capabilityID: String
 
-    @Suppress("unused")
     constructor(capability: AbstractEntityCapability, target: Entity) : this() {
         val rl = CapabilitiesHandler.getID(capability.javaClass)
         this.capabilityID = rl.toString()
@@ -51,9 +50,9 @@ class SyncEntityCapabilityPacket() : IMessage {
                 mainThread.addScheduledTask {
                     val cap = CapabilitiesHandler.getEntityCapability(ResourceLocation(message.capabilityID))
                     try {
-                        cap.readNBT(player.world.loadedEntityList.filter { it.uniqueID == message.targetUUID }.single().getCapability(cap, null), null, message.data)
+                        cap.readNBT(player.world.loadedEntityList.single { it.uniqueID == message.targetUUID }.getCapability(cap, null), null, message.data)
                     } catch (e: Exception) {
-                        LogHelper.logInfo("Suppressed an error.")
+                        SAOMCLib.LOGGER.info("Suppressed an error.")
                     }
                 }
 

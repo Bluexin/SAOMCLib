@@ -22,8 +22,8 @@ class PartyCapability : AbstractEntityCapability() {
     var invitedTo: IParty?
         get() = invitedToImpl?.get()
         set(value) {
-            if (value != null) invitedToImpl = WeakReference(value)
-            else invitedToImpl = null
+            invitedToImpl = if (value != null) WeakReference(value)
+            else null
         }
 
     fun getOrCreatePT(): IParty {
@@ -38,10 +38,10 @@ class PartyCapability : AbstractEntityCapability() {
     }
 
     // TODO: properly do this
-    override val shouldSyncOnDeath = false
-    override val shouldSyncOnDimensionChange = false
+    override val shouldSyncOnDeath = true
+    override val shouldSyncOnDimensionChange = true
     override val shouldRestoreOnDeath = true
-    override val shouldSendOnLogin = false
+    override val shouldSendOnLogin = true
 
     companion object {
         @Key val KEY = ResourceLocation(SAOMCLib.MODID, "party")

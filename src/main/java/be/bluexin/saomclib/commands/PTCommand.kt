@@ -21,9 +21,9 @@ object PTCommand : CommandBase() {
     override fun getName() = "pt"
 
     override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String>) {
-        if (args.isEmpty()) throw WrongUsageException(getUsage(sender))
         if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
-        when (args[0]) {
+        if (args.size <= 1) throw WrongUsageException(getUsage(sender))
+        when (args[1]) {
             "invite" -> handleInvite(server, sender, args)
             "accept" -> handleAccept(server, sender, args)
             "decline" -> handleDecline(server, sender, args)
@@ -31,6 +31,7 @@ object PTCommand : CommandBase() {
             "leave" -> handleLeave(server, sender, args)
             "cancel" -> handleCancel(server, sender, args)
             "print" -> handlePrint(server, sender, args)
+            else -> throw WrongUsageException(getUsage(sender))
         }
     }
 
@@ -127,7 +128,7 @@ object PTCommand : CommandBase() {
         if (sender !is EntityPlayer) return mutableListOf()
         val cap = sender.getPartyCapability()
         return when (args.size) {
-            1 -> {
+            2 -> {
                 val l = mutableListOf("invite")
                 if (cap.party != null) {
                     l.add("leave")
@@ -143,14 +144,14 @@ object PTCommand : CommandBase() {
                 }
                 CommandBase.getListOfStringsMatchingLastWord(args, *l.toTypedArray())
             }
-            2 -> {
+            3 -> {
                 val l = mutableListOf<String>()
                 when (args[0]) {
                     "leave", "print", "accept", "decline" -> return mutableListOf()
                     "invite" -> {
                         val current = cap.party?.members?.map { it.name }
                         val invited = cap.party?.invited?.map { it.name }
-                        l.addAll(server.onlinePlayerNames.filterNot { it == sender.name || current?.contains(it) ?: false || invited?.contains(it) ?: false })
+                        l.addAll(server.onlinePlayerNames.filterNot { it == sender.name || current?.contains(it) == true || invited?.contains(it) == true })
                     }
                     "kick" -> {
                         val ll = cap.party?.members?.filterNot { it == sender }?.map { it.name }

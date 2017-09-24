@@ -121,7 +121,7 @@ object CapabilitiesHandler {
     internal fun registerWorld(event: AttachCapabilitiesEvent<World>) = worldzz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
     private fun getKey(clazz: Class<out AbstractCapability>) = try {
-        clazz.declaredFields.filter { it.isAnnotationPresent(Key::class.java) }.single().apply { this.isAccessible = true }.get(null) as ResourceLocation
+        clazz.declaredFields.single { it.isAnnotationPresent(Key::class.java) }.apply { this.isAccessible = true }.get(null) as ResourceLocation
     } catch (e: ClassCastException) {
         throw WrongTypeException(clazz, "Key", Key::class.java, e)
     } catch (e: NullPointerException) {
@@ -136,7 +136,7 @@ object CapabilitiesHandler {
 
     private fun <T : AbstractCapability> getCapability(clazz: Class<out T>) = try {
         @Suppress("UNCHECKED_CAST")
-        clazz.declaredFields.filter { it.isAnnotationPresent(CapabilityInject::class.java) }.single().apply { this.isAccessible = true }.get(null) as Capability<T>
+        clazz.declaredFields.single { it.isAnnotationPresent(CapabilityInject::class.java) }.apply { this.isAccessible = true }.get(null) as Capability<T>
     } catch (e: ClassCastException) {
         throw WrongTypeException(clazz, "capability instance", CapabilityInject::class.java, e)
     } catch (e: NullPointerException) {
@@ -155,11 +155,7 @@ object CapabilitiesHandler {
     }
 
     private class CapabilitySerializableImpl<T : AbstractCapability>(private val clazz: Class<out T>, private val capability: Capability<T>, arg: Any) : ICapabilitySerializable<NBTBase> {
-        private val instance: T
-
-        init {
-            instance = getInstance(this.clazz, arg)
-        }
+        private val instance: T = getInstance(this.clazz, arg)
 
         override fun hasCapability(capability: Capability<*>, facing: EnumFacing?) = capability === this.capability
 

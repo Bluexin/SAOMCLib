@@ -2,7 +2,8 @@
 #(this command allows for proper evaluations as defined by String.format(), not a simplified version)
 
 
-commands.pt.usage=/pt invite|kick|cancel|accept|decline|leave
+commands.saomc.usage=/saomc pt
+commands.pt.usage=/saomc pt invite|kick|cancel|accept|decline|leave
 commands.pt.playeronly=The PT commands can only be used by players.
 commands.pt.print.output=%1$s's party: %2$s
 

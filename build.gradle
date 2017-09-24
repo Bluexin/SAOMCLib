@@ -39,8 +39,9 @@ repositories {
     maven {
         url "https://maven.bluexin.be/repository/releases/"
     }
+
     maven {
-        url "http://mvn.rx14.co.uk/shadowfacts/"
+        url "http://maven.shadowfacts.net/"
     }
 }
 

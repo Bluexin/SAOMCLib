@@ -1,6 +1,5 @@
 package be.bluexin.saomclib.example;
 
-import be.bluexin.saomclib.LogHelper;
 import be.bluexin.saomclib.SAOMCLib;
 import be.bluexin.saomclib.capabilities.AbstractCapability;
 import be.bluexin.saomclib.capabilities.AbstractEntityCapability;
@@ -33,7 +32,7 @@ public class JSimpleCapability extends AbstractEntityCapability {
     @Override
     public AbstractCapability setup(@NotNull Object param) {
         super.setup(param);
-        LogHelper.INSTANCE.logInfo("Set up for " + param.getClass());
+        SAOMCLib.INSTANCE.getLOGGER().info("Set up for " + param.getClass());
         return this;
     }
 
@@ -43,7 +42,7 @@ public class JSimpleCapability extends AbstractEntityCapability {
             NBTTagCompound tag = new NBTTagCompound();
             tag.setInteger("num", instance.num);
             Entity ref = instance.reference.get();
-            LogHelper.INSTANCE.logInfo("Writing " + instance.num + " on remote=" + (ref == null ? "null" : ref.world.isRemote) + '.');
+            SAOMCLib.INSTANCE.getLOGGER().info("Writing " + instance.num + " on remote=" + (ref == null ? "null" : ref.world.isRemote) + '.');
             return tag;
         }
 
@@ -51,7 +50,7 @@ public class JSimpleCapability extends AbstractEntityCapability {
         public void readNBT(Capability<JSimpleCapability> capability, JSimpleCapability instance, EnumFacing side, NBTBase nbt) {
             instance.num = ((NBTTagCompound) nbt).getInteger("num");
             Entity ref = instance.reference.get();
-            LogHelper.INSTANCE.logInfo("Reading " + instance.num + " on remote=" + (ref == null ? "null" : ref.world.isRemote) + '.');
+            SAOMCLib.INSTANCE.getLOGGER().info("Reading " + instance.num + " on remote=" + (ref == null ? "null" : ref.world.isRemote) + '.');
         }
     }
 }

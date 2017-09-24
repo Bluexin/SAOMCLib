@@ -1,6 +1,6 @@
 package be.bluexin.saomclib.packets
 
-import be.bluexin.saomclib.LogHelper
+import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.party.Party
 import be.bluexin.saomclib.readString
@@ -17,7 +17,7 @@ import java.util.*
  *
  * @author Bluexin
  */
-class PTPacket() : IMessage {
+class PTS2CPacket() : IMessage {
 
     private lateinit var type: Type
     private lateinit var leader: String
@@ -56,41 +56,39 @@ class PTPacket() : IMessage {
             JOIN
         }
 
-        class Handler : AbstractClientPacketHandler<PTPacket>() {
-            override fun handleClientPacket(player: EntityPlayer, message: PTPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
+        class Handler : AbstractClientPacketHandler<PTS2CPacket>() {
+            override fun handleClientPacket(player: EntityPlayer, message: PTS2CPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
                 mainThread.addScheduledTask {
                     val p1 = player.world.getPlayerEntityByUUID(UUID.fromString(message.leader))
-                    LogHelper.logInfo("${player.displayNameString} received ${message.type} with p1 ${p1?.displayNameString}")
+                    SAOMCLib.LOGGER.info("${player.displayNameString} received ${message.type} with p1 ${p1?.displayNameString}")
                     try {
-                        when (message.type) {
-                            Type.ADD -> if (p1 != null) player.getPartyCapability().getOrCreatePT().addMember(p1)
-                            Type.REMOVE -> if (p1 != null) player.getPartyCapability().party?.removeMember(p1)
-                            Type.CLEAR -> player.getPartyCapability().clear()
-                            Type.INVITE -> {
-                                if (p1 != null) {
+                        if (p1 != null){
+                            when (message.type) {
+                                Type.ADD -> player.getPartyCapability().getOrCreatePT().addMember(p1)
+                                Type.REMOVE -> player.getPartyCapability().party?.removeMember(p1)
+                                Type.CLEAR -> player.getPartyCapability().clear()
+                                Type.INVITE -> {
                                     val pt = Party(p1)
-                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
-                                            .filterNotNull().forEach { pt.addMember(it) }
+                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
                                     player.getPartyCapability().invitedTo = pt
+
                                 }
-                            }
-                            Type.LEADER -> if (p1 != null) player.getPartyCapability().party?.leader = p1
-                            Type.JOIN -> {
-                                if (p1 != null) {
+                                Type.LEADER -> player.getPartyCapability().party?.leader = p1
+                                Type.JOIN -> {
                                     val pt = Party(p1)
-                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
-                                            .filterNotNull().forEach { pt.addMember(it) }
+                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
                                     pt.addMember(player)
                                     val cap = player.getPartyCapability()
                                     cap.party = pt
                                     cap.invitedTo = null
+
                                 }
                             }
                         }
                     } catch (e: Exception) {
-                        LogHelper.logDebug("Suppressed an error.")
+                        SAOMCLib.LOGGER.debug("Suppressed an error.")
                     }
-                    LogHelper.logDebug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
+                    SAOMCLib.LOGGER.debug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
                 }
 
                 return null
