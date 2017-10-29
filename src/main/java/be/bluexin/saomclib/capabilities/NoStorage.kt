@@ -13,7 +13,7 @@ import net.minecraftforge.common.capabilities.Capability
  * @author Bluexin
  */
 class NoStorage<T> : Capability.IStorage<T> {
-    override fun writeNBT(capability: Capability<T>?, instance: T, side: EnumFacing?) = NBTTagCompound()
+    override fun writeNBT(capability: Capability<T>, instance: T, side: EnumFacing?) = NBTTagCompound()
 
-    override fun readNBT(capability: Capability<T>?, instance: T, side: EnumFacing?, nbt: NBTBase?) = Unit
+    override fun readNBT(capability: Capability<T>, instance: T, side: EnumFacing?, nbt: NBTBase) = Unit
 }

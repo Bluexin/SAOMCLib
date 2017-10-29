@@ -11,8 +11,16 @@ import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.util.IThreadListener
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import java.util.*
 
+/**
+ * Used to send party data
+ * Client -> Server
+ *
+ * @author Bluexin
+ */
 class PTC2SPacket(): IMessage {
 
     private lateinit var type: Type
@@ -56,7 +64,6 @@ class PTC2SPacket(): IMessage {
             override fun handleServerPacket(player: EntityPlayer, message: PTC2SPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
                 mainThread.addScheduledTask {
                     val p1 = player.world.getPlayerEntityByUUID(UUID.fromString(message.player))
-                    SAOMCLib.LOGGER.info("${player.displayNameString} received ${message.type} with p1 ${p1?.displayNameString}")
                     try {
                         if (p1 != null) {
                             val party = p1.getPartyCapability().getOrCreatePT()
@@ -67,7 +74,7 @@ class PTC2SPacket(): IMessage {
                                 Type.LEADER -> party.leader == p1
                                 Type.JOIN -> party.addMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                                 Type.REQUEST -> {
-                                    (player as EntityPlayerMP).sendPacket((PTS2CPacket(PTS2CPacket.Companion.Type.ADD, p1, p1.getPartyCapability().getOrCreatePT().members)))
+                                    (player as EntityPlayerMP).sendPacket(SyncEntityCapabilityPacket(player.getPartyCapability(), player))
                                 }
                             }
                         }

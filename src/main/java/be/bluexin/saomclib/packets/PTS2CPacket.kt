@@ -60,28 +60,30 @@ class PTS2CPacket() : IMessage {
             override fun handleClientPacket(player: EntityPlayer, message: PTS2CPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
                 mainThread.addScheduledTask {
                     val p1 = player.world.getPlayerEntityByUUID(UUID.fromString(message.leader))
-                    SAOMCLib.LOGGER.info("${player.displayNameString} received ${message.type} with p1 ${p1?.displayNameString}")
+                    SAOMCLib.LOGGER.debug("${player.displayNameString} received ${message.type} with p1 ${p1?.displayNameString}")
                     try {
-                        if (p1 != null){
-                            when (message.type) {
-                                Type.ADD -> player.getPartyCapability().getOrCreatePT().addMember(p1)
-                                Type.REMOVE -> player.getPartyCapability().party?.removeMember(p1)
-                                Type.CLEAR -> player.getPartyCapability().clear()
-                                Type.INVITE -> {
+                        when (message.type) {
+                            Type.ADD -> if (p1 != null) player.getPartyCapability().getOrCreatePT().addMember(p1)
+                            Type.REMOVE -> if (p1 != null) player.getPartyCapability().party?.removeMember(p1)
+                            Type.CLEAR -> player.getPartyCapability().clear()
+                            Type.INVITE -> {
+                                if (p1 != null) {
                                     val pt = Party(p1)
-                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
+                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
+                                            .filterNotNull().forEach { pt.addMember(it) }
                                     player.getPartyCapability().invitedTo = pt
-
                                 }
-                                Type.LEADER -> player.getPartyCapability().party?.leader = p1
-                                Type.JOIN -> {
+                            }
+                            Type.LEADER -> if (p1 != null) player.getPartyCapability().party?.leader = p1
+                            Type.JOIN -> {
+                                if (p1 != null) {
                                     val pt = Party(p1)
-                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
+                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
+                                            .filterNotNull().forEach { pt.addMember(it) }
                                     pt.addMember(player)
                                     val cap = player.getPartyCapability()
                                     cap.party = pt
                                     cap.invitedTo = null
-
                                 }
                             }
                         }

@@ -9,13 +9,17 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.IThreadListener
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.fml.common.network.ByteBufUtils
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import java.util.*
 
 /**
  * Syncs a capability for an Entity.
  * Huge capabilities should be either split into smaller ones, or handled manually in separate packets.
+ * Should only ever be called server side
  *
  * @author Bluexin
  */
@@ -27,9 +31,9 @@ class SyncEntityCapabilityPacket() : IMessage {
 
     constructor(capability: AbstractEntityCapability, target: Entity) : this() {
         val rl = CapabilitiesHandler.getID(capability.javaClass)
-        this.capabilityID = rl.toString()
-        this.data = CapabilitiesHandler.getEntityCapability(rl).writeNBT(capability, null) as NBTTagCompound
-        this.targetUUID = target.uniqueID
+        capabilityID = rl.toString()
+        data = CapabilitiesHandler.getEntityCapability(rl).writeNBT(capability, null) as NBTTagCompound
+        targetUUID = target.uniqueID
     }
 
     override fun fromBytes(buffer: ByteBuf) {

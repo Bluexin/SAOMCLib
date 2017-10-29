@@ -5,6 +5,7 @@ import be.bluexin.saomclib.capabilities.NoStorage
 import be.bluexin.saomclib.capabilities.PartyCapability
 import be.bluexin.saomclib.commands.CommandBase
 import be.bluexin.saomclib.events.EventHandler
+import be.bluexin.saomclib.packets.PTC2SPacket
 import be.bluexin.saomclib.packets.PTS2CPacket
 import be.bluexin.saomclib.packets.PacketPipeline
 import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
@@ -29,7 +30,7 @@ import org.apache.logging.log4j.Logger
 object SAOMCLib {
 
     const val MODID = "saomclib"
-    const val VERSION = "1.2.0.5"
+    const val VERSION = "1.2.0.6"
     const val DEPENDENCIES = "required-after:forgelin@[1.5.1,)"
 
     @Suppress("unused")
@@ -41,9 +42,10 @@ object SAOMCLib {
     @Mod.EventHandler
     fun preInit(e: FMLPreInitializationEvent) {
         MinecraftForge.EVENT_BUS.register(EventHandler())
-        PacketPipeline.registerMessage(SyncEntityCapabilityPacket::class.java, SyncEntityCapabilityPacket.Companion.Handler::class.java)
-        PacketPipeline.registerMessage(PTS2CPacket::class.java, PTS2CPacket.Companion.Handler::class.java)
         CapabilitiesHandler.registerEntityCapability(PartyCapability::class.java, NoStorage<PartyCapability>(), { it is EntityPlayer })
+        PacketPipeline.registerMessage(PTC2SPacket::class.java, PTC2SPacket.Companion.Handler::class.java)
+        PacketPipeline.registerMessage(PTS2CPacket::class.java, PTS2CPacket.Companion.Handler::class.java)
+        PacketPipeline.registerMessage(SyncEntityCapabilityPacket::class.java, SyncEntityCapabilityPacket.Companion.Handler::class.java)
     }
 
     @Mod.EventHandler

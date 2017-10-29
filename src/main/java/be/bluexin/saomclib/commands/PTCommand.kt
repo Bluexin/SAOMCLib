@@ -1,5 +1,6 @@
 package be.bluexin.saomclib.commands
 
+import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.message
 import net.minecraft.command.CommandBase
@@ -22,8 +23,9 @@ object PTCommand : CommandBase() {
 
     override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String>) {
         if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
-        if (args.size <= 1) throw WrongUsageException(getUsage(sender))
-        when (args[1]) {
+        if (args.isEmpty()) throw WrongUsageException(getUsage(sender))
+        SAOMCLib.LOGGER.info("args: " + args[0])
+        when (args[0]) {
             "invite" -> handleInvite(server, sender, args)
             "accept" -> handleAccept(server, sender, args)
             "decline" -> handleDecline(server, sender, args)
@@ -43,7 +45,7 @@ object PTCommand : CommandBase() {
         if (target == player) throw CommandException("commands.pt.invite.self")
         val pt = player.getPartyCapability().getOrCreatePT()
         if (pt.isLeader(player)) {
-            if (pt.invite(target)) {
+            if (!pt.isInvited(target)) {
                 target.getPartyCapability().invitedTo = pt
                 pt.invite(target)
                 player.message("commands.pt.invite.success", args[1])
@@ -128,7 +130,7 @@ object PTCommand : CommandBase() {
         if (sender !is EntityPlayer) return mutableListOf()
         val cap = sender.getPartyCapability()
         return when (args.size) {
-            2 -> {
+            1 -> {
                 val l = mutableListOf("invite")
                 if (cap.party != null) {
                     l.add("leave")
@@ -144,14 +146,14 @@ object PTCommand : CommandBase() {
                 }
                 CommandBase.getListOfStringsMatchingLastWord(args, *l.toTypedArray())
             }
-            3 -> {
+            2 -> {
                 val l = mutableListOf<String>()
                 when (args[0]) {
                     "leave", "print", "accept", "decline" -> return mutableListOf()
                     "invite" -> {
                         val current = cap.party?.members?.map { it.name }
                         val invited = cap.party?.invited?.map { it.name }
-                        l.addAll(server.onlinePlayerNames.filterNot { it == sender.name || current?.contains(it) == true || invited?.contains(it) == true })
+                        l.addAll(server.onlinePlayerNames.filterNot { it == sender.name || current?.contains(it) ?: false || invited?.contains(it) ?: false })
                     }
                     "kick" -> {
                         val ll = cap.party?.members?.filterNot { it == sender }?.map { it.name }
@@ -167,4 +169,5 @@ object PTCommand : CommandBase() {
             else -> mutableListOf()
         }
     }
+
 }

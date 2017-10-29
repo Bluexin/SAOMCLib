@@ -1,5 +1,6 @@
 package be.bluexin.saomclib.commands
 
+import be.bluexin.saomclib.SAOMCLib
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
@@ -20,7 +21,7 @@ object CommandBase : CommandBase() {
         if (args.isEmpty()) throw WrongUsageException(PTCommand.getUsage(sender))
         if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
         when (args[0]) {
-            "pt" -> PTCommand.execute(server, sender, args)
+            "pt" -> PTCommand.execute(server, sender, args.copyOfRange(1, args.size))
             "sync" -> SyncCMD.execute(server, sender, args)
         }
     }
@@ -33,14 +34,13 @@ object CommandBase : CommandBase() {
                 val l = mutableListOf("pt")
                 CommandBase.getListOfStringsMatchingLastWord(args, *l.toTypedArray())
             }
-            2 -> {
+            else -> {
                 val l = mutableListOf<String>()
                 when (args[0]) {
-                    "pt" -> return PTCommand.getTabCompletions(server, sender, args, pos)
+                    "pt" -> return PTCommand.getTabCompletions(server, sender, args.copyOfRange(1, args.size), pos)
                 }
                 CommandBase.getListOfStringsMatchingLastWord(args, *l.toTypedArray())
             }
-            else -> mutableListOf()
         }
     }
 }
