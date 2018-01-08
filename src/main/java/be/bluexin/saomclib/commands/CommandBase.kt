@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.math.BlockPos
 
+// TODO: improve registering and handling of commands
 object CommandBase : CommandBase() {
 
     override fun getName() = "saomc"

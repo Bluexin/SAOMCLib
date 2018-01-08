@@ -72,6 +72,8 @@ interface IParty {
      */
     fun isMember(player: EntityPlayer): Boolean
 
+    operator fun contains(player: EntityPlayer) = isMember(player)
+
     /**
      * Invite someone to this party.
      *

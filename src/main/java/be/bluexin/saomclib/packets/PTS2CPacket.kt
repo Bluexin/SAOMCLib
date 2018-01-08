@@ -2,7 +2,6 @@ package be.bluexin.saomclib.packets
 
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
-import be.bluexin.saomclib.party.Party
 import be.bluexin.saomclib.readString
 import be.bluexin.saomclib.writeString
 import io.netty.buffer.ByteBuf
@@ -46,16 +45,16 @@ class PTS2CPacket() : IMessage {
         buf.writeString(members.joinToString(separator = " ") { it })
     }
 
-    companion object {
-        enum class Type {
-            ADD,
-            REMOVE,
-            CLEAR,
-            INVITE,
-            LEADER,
-            JOIN
-        }
+    enum class Type {
+        ADD,
+        REMOVE,
+        CLEAR,
+        INVITE,
+        LEADER,
+        JOIN
+    }
 
+    companion object {
         class Handler : AbstractClientPacketHandler<PTS2CPacket>() {
             override fun handleClientPacket(player: EntityPlayer, message: PTS2CPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
                 mainThread.addScheduledTask {
@@ -68,18 +67,16 @@ class PTS2CPacket() : IMessage {
                             Type.CLEAR -> player.getPartyCapability().clear()
                             Type.INVITE -> {
                                 if (p1 != null) {
-                                    val pt = Party(p1)
-                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
-                                            .filterNotNull().forEach { pt.addMember(it) }
+                                    val pt = p1.getPartyCapability().getOrCreatePT()
+                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
                                     player.getPartyCapability().invitedTo = pt
                                 }
                             }
                             Type.LEADER -> if (p1 != null) player.getPartyCapability().party?.leader = p1
                             Type.JOIN -> {
                                 if (p1 != null) {
-                                    val pt = Party(p1)
-                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
-                                            .filterNotNull().forEach { pt.addMember(it) }
+                                    val pt = p1.getPartyCapability().getOrCreatePT()
+                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
                                     pt.addMember(player)
                                     val cap = player.getPartyCapability()
                                     cap.party = pt

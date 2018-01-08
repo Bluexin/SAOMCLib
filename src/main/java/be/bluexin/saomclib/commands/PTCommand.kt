@@ -46,7 +46,6 @@ object PTCommand : CommandBase() {
         val pt = player.getPartyCapability().getOrCreatePT()
         if (pt.isLeader(player)) {
             if (!pt.isInvited(target)) {
-                target.getPartyCapability().invitedTo = pt
                 pt.invite(target)
                 player.message("commands.pt.invite.success", args[1])
                 target.message("commands.pt.invited", player.displayNameString)
@@ -57,10 +56,8 @@ object PTCommand : CommandBase() {
     private fun handleAccept(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
         val cap = player.getPartyCapability()
         val invitedTo = cap.invitedTo ?: throw CommandException("commands.pt.accept.notInvited")
-        cap.invitedTo = null
         if (invitedTo.isInvited(player)) {
             invitedTo.addMember(player)
-            cap.party = invitedTo
             player.message("commands.pt.accept.success", invitedTo.leader?.displayNameString ?: "UNKNOWN")
         } else throw CommandException("commands.pt.accept.notInvited")
     }
@@ -72,7 +69,7 @@ object PTCommand : CommandBase() {
         if (invitedTo.isInvited(player)) {
             invitedTo.cancel(player)
             player.message("commands.pt.decline.success", invitedTo.leader?.displayNameString ?: "UNKNOWN")
-            invitedTo.leader?.message("commands.pt.declined", player.displayNameString)
+            invitedTo.leader?.message("commands.pt.declined", player.displayNameString) // TODO: remove this (should be handled by onReceive)
         } else throw CommandException("commands.pt.accept.notInvited")
     }
 
@@ -84,7 +81,6 @@ object PTCommand : CommandBase() {
             val target = getPlayer(server, player, args[1]) // Player not found will interrupt execution
             if (pt.isMember(target)) {
                 pt.removeMember(target)
-                target.getPartyCapability().party = null
                 player.message("commands.pt.kick.success", args[1])
                 target.message("commands.pt.kick.notification", player.displayNameString)
             }
@@ -99,7 +95,6 @@ object PTCommand : CommandBase() {
             val target = getPlayer(server, player, args[1]) // Player not found will interrupt execution
             if (pt.isInvited(target)) {
                 pt.cancel(target)
-                target.getPartyCapability().invitedTo = null
                 player.message("commands.pt.cancel.success", args[1])
                 target.message("commands.pt.cancel.notification", player.displayNameString)
             }
@@ -109,7 +104,6 @@ object PTCommand : CommandBase() {
     private fun handleLeave(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
         val cap = player.getPartyCapability()
         val pt = cap.party ?: throw CommandException("commands.pt.leave.notInPT")
-        cap.party = null
         if (pt.isMember(player)) {
             pt.removeMember(player)
             player.message("commands.pt.leave.success", pt.leader?.displayNameString ?: "UNKNOWN")

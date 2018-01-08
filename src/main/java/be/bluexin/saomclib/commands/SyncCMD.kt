@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.math.BlockPos
 
+// TODO: remove
 object SyncCMD : CommandBase() {
     override fun getName() = "sync"
     override fun getUsage(sender: ICommandSender?) = "commands.sync.usage"

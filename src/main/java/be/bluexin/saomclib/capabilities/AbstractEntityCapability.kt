@@ -28,7 +28,7 @@ abstract class AbstractEntityCapability : AbstractCapability() {
      */
     open fun sync() {
         val ent = reference.get()
-        (ent as? EntityPlayerMP)?.sendPacket(SyncEntityCapabilityPacket(this, ent!!))
+        (ent as? EntityPlayerMP)?.sendPacket(SyncEntityCapabilityPacket(this, ent))
     }
 
     open val shouldSyncOnDeath = true

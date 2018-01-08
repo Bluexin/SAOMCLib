@@ -18,7 +18,7 @@ internal open class CommonProxy {
     open fun preInit(){
     }
 
-    open fun getPlayerEntity(ctx: MessageContext): EntityPlayer = ctx.serverHandler.player
+    open fun getPlayerEntity(ctx: MessageContext): EntityPlayer? = ctx.serverHandler.player
 
     open fun getMinecraftThread(ctx: MessageContext): IThreadListener = ctx.serverHandler.player.mcServer
 }
