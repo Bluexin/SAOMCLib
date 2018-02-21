@@ -38,4 +38,15 @@ abstract class AbstractEntityCapability : AbstractCapability() {
     open val shouldRestoreOnDeath = true
 
     open val shouldSendOnLogin = true
+
+    /**
+     * Called to restore the capability upon death.
+     * Only called on the server by the lib, forcing this call should respect that.
+     * If you set your storage properly, this implementation should be plenty.
+     * Provided for more customization.
+     * Called before the default handler. To prevent the default handler, return false.
+     *
+     * @return true if the default handler should still proceed
+     */
+    open fun restore(entity: Entity, original: Entity) = true
 }

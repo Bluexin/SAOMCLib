@@ -106,7 +106,9 @@ object CapabilitiesHandler {
 
     internal fun syncEntitiesDeath(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDeath }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
 
-    internal fun restoreEntitiesDeath(entity: Entity, original: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldRestoreOnDeath }?.forEach { it.value.capability.readNBT(entity.getCapability(it.value.capability, null), null, it.value.capability.writeNBT(original.getCapability(it.value.capability, null), null)) }
+    internal fun restoreEntitiesDeath(entity: Entity, original: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldRestoreOnDeath }?.forEach {
+        if ((entity.getCapability(it.value.capability, null) as AbstractEntityCapability).restore(entity, original)) it.value.capability.readNBT(entity.getCapability(it.value.capability, null), null, it.value.capability.writeNBT(original.getCapability(it.value.capability, null), null))
+    }
 
     internal fun syncEntitiesDimension(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDimensionChange }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
 
@@ -161,7 +163,8 @@ object CapabilitiesHandler {
 
         override fun <R> getCapability(capability: Capability<R>, facing: EnumFacing?) = if (capability === this.capability) this.capability.cast<R>(instance) else null
 
-        override fun serializeNBT(): NBTBase = this.capability.storage.writeNBT(this.capability, this.instance, null)?: NBTTagCompound()
+        override fun serializeNBT(): NBTBase = this.capability.storage.writeNBT(this.capability, this.instance, null)
+                ?: NBTTagCompound()
 
         override fun deserializeNBT(nbt: NBTBase) = this.capability.storage.readNBT(this.capability, this.instance, null, nbt)
     }
@@ -170,7 +173,8 @@ object CapabilitiesHandler {
 
     internal fun getItemCapabilityImpl(id: ResourceLocation) = itemzz!![id] ?: throw IDNotFoundException(id)
 
-    internal fun getTileEntityCapabilityImpl(id: ResourceLocation) = tileEntitiezz!![id] ?: throw IDNotFoundException(id)
+    internal fun getTileEntityCapabilityImpl(id: ResourceLocation) = tileEntitiezz!![id]
+            ?: throw IDNotFoundException(id)
 
     internal fun getWorldCapabilityImpl(id: ResourceLocation) = worldzz!![id] ?: throw IDNotFoundException(id)
 

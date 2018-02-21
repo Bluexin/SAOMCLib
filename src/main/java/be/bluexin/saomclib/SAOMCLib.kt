@@ -1,7 +1,6 @@
 package be.bluexin.saomclib
 
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
-import be.bluexin.saomclib.capabilities.NoStorage
 import be.bluexin.saomclib.capabilities.PartyCapability
 import be.bluexin.saomclib.commands.CommandBase
 import be.bluexin.saomclib.events.EventHandler
@@ -42,7 +41,7 @@ object SAOMCLib {
     @Mod.EventHandler
     fun preInit(e: FMLPreInitializationEvent) {
         MinecraftForge.EVENT_BUS.register(EventHandler())
-        CapabilitiesHandler.registerEntityCapability(PartyCapability::class.java, NoStorage<PartyCapability>(), { it is EntityPlayer })
+        CapabilitiesHandler.registerEntityCapability(PartyCapability::class.java, PartyCapability.PartyStorage, { it is EntityPlayer })
         PacketPipeline.registerMessage(PTC2SPacket::class.java, PTC2SPacket.Companion.Handler::class.java)
         PacketPipeline.registerMessage(PTS2CPacket::class.java, PTS2CPacket.Companion.Handler::class.java)
         PacketPipeline.registerMessage(SyncEntityCapabilityPacket::class.java, SyncEntityCapabilityPacket.Companion.Handler::class.java)

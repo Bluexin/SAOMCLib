@@ -9,11 +9,8 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.IThreadListener
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.fml.common.network.ByteBufUtils
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
 import java.util.*
 
 /**
@@ -56,7 +53,8 @@ class SyncEntityCapabilityPacket() : IMessage {
                     try {
                         cap.readNBT(player.world.loadedEntityList.single { it.uniqueID == message.targetUUID }.getCapability(cap, null), null, message.data)
                     } catch (e: Exception) {
-                        SAOMCLib.LOGGER.info("Suppressed an error.")
+                        SAOMCLib.LOGGER.info("[SyncEntityCapabilityPacket] Suppressed an error.")
+                        e.printStackTrace()
                     }
                 }
 

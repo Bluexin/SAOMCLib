@@ -27,10 +27,10 @@ class PTS2CPacket() : IMessage {
      * @param leader the leader of the party, or the member to add (depending on type of packet)
      * @param members the party list (may be empty when not required by [type]
      */
-    constructor(type: Type, leader: EntityPlayer, members: List<EntityPlayer>) : this() {
+    constructor(type: Type, leader: EntityPlayer, members: Sequence<EntityPlayer>) : this() {
         this.type = type
         this.leader = leader.cachedUniqueIdString
-        this.members = members.map { it.cachedUniqueIdString }
+        this.members = members.map { it.cachedUniqueIdString }.toList()
     }
 
     override fun fromBytes(buf: ByteBuf) {
@@ -85,7 +85,8 @@ class PTS2CPacket() : IMessage {
                             }
                         }
                     } catch (e: Exception) {
-                        SAOMCLib.LOGGER.debug("Suppressed an error.")
+                        SAOMCLib.LOGGER.debug("[PTS2CPacket] Suppressed an error.")
+                        e.printStackTrace()
                     }
                     SAOMCLib.LOGGER.debug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
                 }

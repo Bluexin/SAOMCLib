@@ -3,7 +3,11 @@ package be.bluexin.saomclib.capabilities
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.party.IParty
 import be.bluexin.saomclib.party.Party
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.nbt.NBTBase
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.capabilities.CapabilityInject
@@ -37,6 +41,14 @@ class PartyCapability : AbstractEntityCapability() {
         invitedTo = null
     }
 
+    override fun restore(entity: Entity, original: Entity): Boolean {
+        val old = original.getCapability(CAP_INSTANCE, null)?: return true
+        this.party = old.party
+        this.invitedTo = old.invitedTo
+
+        return false
+    }
+
     override val shouldSyncOnDeath = true
     override val shouldSyncOnDimensionChange = true
     override val shouldRestoreOnDeath = true
@@ -47,6 +59,31 @@ class PartyCapability : AbstractEntityCapability() {
 
         @CapabilityInject(PartyCapability::class)
         lateinit var CAP_INSTANCE: Capability<PartyCapability>
+    }
+
+    object PartyStorage: Capability.IStorage<PartyCapability> {
+        override fun readNBT(capability: Capability<PartyCapability>, instance: PartyCapability, side: EnumFacing?, nbt: NBTBase) {
+            val nbtTagCompound = nbt as? NBTTagCompound?: return
+
+            if (nbtTagCompound.hasKey("party")) {
+                val pt = instance.getOrCreatePT()
+                pt.readNBT(nbtTagCompound.getCompoundTag("party"))
+            } else instance.party = null
+            if (nbtTagCompound.hasKey("invited")) {
+                val pt = Party(instance.reference.get() as EntityPlayer)
+                pt.readNBT(nbtTagCompound.getCompoundTag("invited"))
+                instance.invitedTo = pt
+            } else instance.invitedTo = null
+        }
+
+        override fun writeNBT(capability: Capability<PartyCapability>, instance: PartyCapability, side: EnumFacing?): NBTBase {
+            val nbt = NBTTagCompound()
+
+            if (instance.party != null) nbt.setTag("party", instance.party!!.writeNBT())
+            if (instance.invitedTo != null) nbt.setTag("invited", instance.invitedTo!!.writeNBT())
+
+            return nbt
+        }
     }
 }
 

@@ -71,7 +71,8 @@ class PTC2SPacket(): IMessage {
                             else -> {}
                         }
                     } catch (e: Exception) {
-                        SAOMCLib.LOGGER.debug("Suppressed an error.") // FIXME: very pro :ok_hand:
+                        SAOMCLib.LOGGER.debug("[PTC2SPacket] Suppressed an error.") // FIXME: very pro :ok_hand:
+                        e.printStackTrace()
                     }
                     SAOMCLib.LOGGER.debug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
                 }

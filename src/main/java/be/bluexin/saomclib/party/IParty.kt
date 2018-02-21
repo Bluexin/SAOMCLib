@@ -1,6 +1,7 @@
 package be.bluexin.saomclib.party
 
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.nbt.NBTTagCompound
 
 /**
  * Part of saomclib.
@@ -28,12 +29,12 @@ interface IParty {
     fun removeMember(member: EntityPlayer): Boolean
 
     /**
-     * Gets a list containing all the members of this party.
-     * Returned list safety (concurrency, mutability, ...) is up to implementation details.
+     * Gets a sequence containing all the members of this party.
+     * Returned sequence safety (concurrency, mutability, ...) is up to implementation details.
      *
      * @return all the members in this party
      */
-    val members: List<EntityPlayer>
+    val members: Sequence<EntityPlayer>
 
     /**
      * Gets the leader of this party.
@@ -115,6 +116,9 @@ interface IParty {
     /**
      * Gets the list of invited players.
      */
-    val invited: List<EntityPlayer>
+    val invited: Sequence<EntityPlayer>
 
+    fun readNBT(nbt: NBTTagCompound)
+
+    fun writeNBT(): NBTTagCompound
 }
