@@ -111,9 +111,19 @@ object PTCommand : CommandBase() {
     }
 
     private fun handlePrint(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
-        val pt = player.getPartyCapability().party ?: throw CommandException("commands.pt.leave.notInPT")
-        if (!pt.isParty) throw CommandException("commands.pt.leave.notInPT")
-        player.message("commands.pt.print.output", pt.leader?.displayNameString ?: "UNKNOWN", pt.members.joinToString { it.displayNameString })
+        val cap = player.getPartyCapability()
+        val pt = cap.party
+        val invited = cap.invitedTo
+        var ok = false
+        if (pt?.isParty == true) {
+            ok = true
+            player.message("commands.pt.print.output", pt.leader?.displayNameString ?: "UNKNOWN", pt.members.joinToString { it.displayNameString })
+        }
+        if (invited?.isParty == true) {
+           ok = true
+            player.message("commands.pt.print.output", invited.leader?.displayNameString ?: "UNKNOWN", invited.members.joinToString { it.displayNameString })
+        }
+        if (!ok) throw CommandException("commands.pt.leave.notInPT")
     }
 
     override fun getRequiredPermissionLevel() = 0

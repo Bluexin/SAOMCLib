@@ -24,7 +24,6 @@ import java.util.*
  * @author Bluexin
  */
 class Party(leader: EntityPlayer) : IParty {
-
     override fun addMember(member: EntityPlayer): Boolean {
         if (!isMember(member)) {
             world.get()?.onServer {
@@ -197,5 +196,13 @@ class Party(leader: EntityPlayer) : IParty {
         membersImpl[leader] = Unit
         this.world = WeakReference(leader.world)
         this.leader = leader
+    }
+
+    override fun fixPostDeath(oldPlayer: EntityPlayer, newPlayer: EntityPlayer) {
+        if (membersImpl.remove(oldPlayer) != null) membersImpl[newPlayer] = Unit
+        val t = invitesImpl.remove(oldPlayer)
+        if (t != null) invitesImpl[newPlayer] = t
+
+        syncMembers()
     }
 }

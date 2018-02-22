@@ -46,6 +46,9 @@ class PartyCapability : AbstractEntityCapability() {
         this.party = old.party
         this.invitedTo = old.invitedTo
 
+        this.party?.fixPostDeath(original as EntityPlayer, entity as EntityPlayer)
+        this.invitedTo?.fixPostDeath(original as EntityPlayer, entity as EntityPlayer)
+
         return false
     }
 

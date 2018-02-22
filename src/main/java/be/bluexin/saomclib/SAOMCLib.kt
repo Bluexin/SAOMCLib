@@ -40,7 +40,7 @@ object SAOMCLib {
 
     @Mod.EventHandler
     fun preInit(e: FMLPreInitializationEvent) {
-        MinecraftForge.EVENT_BUS.register(EventHandler())
+        MinecraftForge.EVENT_BUS.register(EventHandler)
         CapabilitiesHandler.registerEntityCapability(PartyCapability::class.java, PartyCapability.PartyStorage, { it is EntityPlayer })
         PacketPipeline.registerMessage(PTC2SPacket::class.java, PTC2SPacket.Companion.Handler::class.java)
         PacketPipeline.registerMessage(PTS2CPacket::class.java, PTS2CPacket.Companion.Handler::class.java)

@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
+import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.living.LivingEvent
@@ -20,7 +21,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
  * @author Bluexin
  */
-internal class EventHandler {
+internal object EventHandler {
 
     @SubscribeEvent
     fun attachEntityCapabilities(event: AttachCapabilitiesEvent<Entity>) = CapabilitiesHandler.registerEntity(event)
@@ -55,6 +56,20 @@ internal class EventHandler {
     fun playerChangeDimension(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent) {
         SAOMCLib.LOGGER.info("${evt.player} changed dimension.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDimension(evt.player)
+    }
+
+    @SubscribeEvent
+    fun renderDebugText(evt: RenderGameOverlayEvent.Text) {
+        if (!Minecraft.getMinecraft().gameSettings.showDebugInfo) return
+        val ptcap = Minecraft.getMinecraft().player.getPartyCapability()
+        evt.left.add("Party: ${ptcap.party}")
+        if (ptcap.party != null) {
+            evt.left.add(ptcap.party!!.members.joinToString{ it.displayNameString })
+        }
+        evt.left.add("Invited: ${ptcap.invitedTo}")
+        if (ptcap.invitedTo != null) {
+            evt.left.add(ptcap.invitedTo!!.members.joinToString { it.displayNameString })
+        }
     }
 
     @SubscribeEvent

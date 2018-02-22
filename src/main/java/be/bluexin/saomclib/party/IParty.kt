@@ -121,4 +121,10 @@ interface IParty {
     fun readNBT(nbt: NBTTagCompound)
 
     fun writeNBT(): NBTTagCompound
+
+    /**
+     * Fix a party after a player's death.
+     * For the unaware, the EntityPlayer instance is different after resurrection.
+     */
+    fun fixPostDeath(oldPlayer: EntityPlayer, newPlayer: EntityPlayer)
 }
