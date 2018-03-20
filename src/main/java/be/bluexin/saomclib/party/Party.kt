@@ -1,6 +1,7 @@
 package be.bluexin.saomclib.party
 
 import be.bluexin.saomclib.capabilities.getPartyCapability
+import be.bluexin.saomclib.events.PartyEvent
 import be.bluexin.saomclib.onClient
 import be.bluexin.saomclib.onServer
 import be.bluexin.saomclib.packets.PTC2SPacket
@@ -14,6 +15,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraft.world.World
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import java.lang.ref.WeakReference
 import java.util.*
@@ -44,6 +46,7 @@ class Party(leader: EntityPlayer) : IParty {
                 membersImpl[member] = Unit
                 invitesImpl.remove(member)
             }
+            MinecraftForge.EVENT_BUS.post(PartyEvent.Join(this, member))
             return true
         }
         return false
@@ -59,6 +62,7 @@ class Party(leader: EntityPlayer) : IParty {
         world.get()?.onClient {
             PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.REMOVE, member))
         }
+        MinecraftForge.EVENT_BUS.post(PartyEvent.Leave(this, member))
         if (!isParty) dissolve()
         true
     } else false
@@ -80,6 +84,7 @@ class Party(leader: EntityPlayer) : IParty {
                 world.get()?.onClient {
                     PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.LEADER, leaderImpl?.get()))
                 }
+                MinecraftForge.EVENT_BUS.post(PartyEvent.LeaderChanged(this, player))
             }
         }
 
@@ -96,6 +101,7 @@ class Party(leader: EntityPlayer) : IParty {
         members.forEach { it.getPartyCapability().clear() }
         if (leader != null) world.get()?.onServer { sendToMembers(PTS2CPacket(PTS2CPacket.Type.CLEAR, leader!!, sequenceOf())) }
         membersImpl.clear()
+        MinecraftForge.EVENT_BUS.post(PartyEvent.Disbanded(this))
     }
 
     override val size: Int
@@ -119,6 +125,7 @@ class Party(leader: EntityPlayer) : IParty {
             world.get()?.onClient {
                 PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.INVITE, player))
             }
+            MinecraftForge.EVENT_BUS.post(PartyEvent.Invited(this, player))
             return true
         }
         return false
@@ -133,6 +140,7 @@ class Party(leader: EntityPlayer) : IParty {
         world.get()?.onClient {
             PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.CANCEL, player))
         }
+        MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCanceled(this, player))
         true
     } else false
 

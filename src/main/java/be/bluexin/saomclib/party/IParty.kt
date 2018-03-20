@@ -1,5 +1,6 @@
 package be.bluexin.saomclib.party
 
+import be.bluexin.saomclib.events.PartyEvent
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 
@@ -15,6 +16,8 @@ interface IParty {
      * Adds a member to this party.
      * Reaction to already present member is up to implementation details.
      *
+     * Should fire [PartyEvent.Join] when successful, both on client and server.
+     *
      * @param member the member to add
      * @return whether the operation was successful (typically whether the player was already present, or following hypothetical size limit)
      */
@@ -22,6 +25,8 @@ interface IParty {
 
     /**
      * Removes a member from this party.
+     *
+     * Should fire [PartyEvent.Leave] when successful, both on client and server.
      *
      * @param member the member to remove
      * @return whether the operation was successful
@@ -40,12 +45,16 @@ interface IParty {
      * Gets the leader of this party.
      * Returned reference safety (concurrency, mutability, ...) is up to implementation details.
      *
+     * Should fire [PartyEvent.LeaderChanged] when set, both on client and server.
+     *
      * @return the leader of this party.
      */
     var leader: EntityPlayer?
 
     /**
      * Dissolves this party, aka removing all the members.
+     *
+     * Should fire [PartyEvent.Disbanded] when successful, both on client and server.
      */
     fun dissolve()
 
@@ -78,12 +87,16 @@ interface IParty {
     /**
      * Invite someone to this party.
      *
+     * Should fire [PartyEvent.Invited] when successful, both on client and server.
+     *
      * @param player the player to invite
      */
     fun invite(player: EntityPlayer): Boolean
 
     /**
      * Cancel a party invite.
+     *
+     * Should fire [PartyEvent.InviteCanceled] when successful, both on client and server.
      *
      * @param player the player who's invite is to cancel
      * @return whether the cancel was successful
