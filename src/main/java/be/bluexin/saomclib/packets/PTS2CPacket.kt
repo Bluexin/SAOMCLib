@@ -68,7 +68,7 @@ class PTS2CPacket() : IMessage {
                             Type.INVITE -> {
                                 if (p1 != null) {
                                     val pt = p1.getPartyCapability().getOrCreatePT()
-                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
+                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.invite(it) }
                                     player.getPartyCapability().invitedTo = pt
                                 }
                             }
