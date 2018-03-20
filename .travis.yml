@@ -1,7 +1,7 @@
 language: java
 install:
   - ./gradlew setupCIWorkspace
-  -  sed -i 's:^[ \t]*build_number[ \t]*=\([ \t]*.*\)$:build_number=\1-SNAPSHOT:' build.properties
+  -  sed -i 's:^[ \t]*mod_version[ \t]*=\([ \t]*.*\)$:mod_version=\1-SNAPSHOT:' build.properties
 script:
   - ./gradlew build
 before_cache:
