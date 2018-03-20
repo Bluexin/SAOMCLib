@@ -5,6 +5,7 @@ gradle-app.setting
 
 # GMCP plugin
 /minecraft
+run/
 
 # eclipse
 .settings
