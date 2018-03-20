@@ -117,11 +117,13 @@ object PTCommand : CommandBase() {
         var ok = false
         if (pt?.isParty == true) {
             ok = true
-            player.message("commands.pt.print.output", pt.leader?.displayNameString ?: "UNKNOWN", pt.members.joinToString { it.displayNameString })
+            player.message("commands.pt.print.output", pt.leader?.displayNameString
+                    ?: "UNKNOWN", pt.members.joinToString { it.displayNameString })
         }
         if (invited?.isParty == true) {
-           ok = true
-            player.message("commands.pt.print.output", invited.leader?.displayNameString ?: "UNKNOWN", invited.members.joinToString { it.displayNameString })
+            ok = true
+            player.message("commands.pt.print.output", invited.leader?.displayNameString
+                    ?: "UNKNOWN", invited.members.joinToString { it.displayNameString })
         }
         if (!ok) throw CommandException("commands.pt.leave.notInPT")
     }

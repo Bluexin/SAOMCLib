@@ -27,6 +27,7 @@ class Party(leader: EntityPlayer) : IParty {
     override fun addMember(member: EntityPlayer): Boolean {
         if (!isMember(member)) {
             world.get()?.onServer {
+                println("Adding ${member.displayNameString} to ${leader?.displayNameString}'s party.")
                 membersImpl[member] = Unit
                 invitesImpl.remove(member)
                 val cap = member.getPartyCapability()
@@ -37,6 +38,7 @@ class Party(leader: EntityPlayer) : IParty {
                 }
                 (member as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.JOIN, leader!!, members))
                 syncMembers()
+                println("Done. Members: ${members.joinToString { it.displayNameString }}. Invited: ${invited.joinToString { it.displayNameString }}. Leader: ${leader?.displayNameString}")
             }
             world.get()?.onClient {
                 membersImpl[member] = Unit
@@ -50,6 +52,7 @@ class Party(leader: EntityPlayer) : IParty {
     override fun removeMember(member: EntityPlayer) = if (membersImpl.remove(member) != null) {
         if (member == leader) leader = null
         world.get()?.onServer {
+            member.getPartyCapability().clear()
             (member as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.CLEAR, member, sequenceOf()))
             syncMembers()
         }
@@ -68,7 +71,7 @@ class Party(leader: EntityPlayer) : IParty {
         set(player) {
             if (player == null) {
                 @Suppress("RecursivePropertyAccessor")
-                if (isParty) leader = membersImpl.keys.first()
+                if (isParty) leader = members.first { it != leader }
             } else if (player in this && !isLeader(player)) {
                 leaderImpl = WeakReference(player)
                 world.get()?.onServer {
@@ -89,6 +92,7 @@ class Party(leader: EntityPlayer) : IParty {
     private val world: WeakReference<World>
 
     override fun dissolve() {
+        println("Dissolving ${leader?.displayNameString}'s party.")
         members.forEach { it.getPartyCapability().clear() }
         if (leader != null) world.get()?.onServer { sendToMembers(PTS2CPacket(PTS2CPacket.Type.CLEAR, leader!!, sequenceOf())) }
         membersImpl.clear()
@@ -107,8 +111,10 @@ class Party(leader: EntityPlayer) : IParty {
             player.getPartyCapability().invitedTo = this
             invitesImpl[player] = player.world.worldTime // TODO: Using worldTime isn't too safe
             world.get()?.onServer {
+                println("Inviting ${player.displayNameString} to ${leader?.displayNameString}'s party.")
                 (player as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.INVITE, leader!!, members))
                 syncMembers()
+                println("Done. Members: ${members.joinToString { it.displayNameString }}. Invited: ${invited.joinToString { it.displayNameString }}. Leader: ${leader?.displayNameString}")
             }
             world.get()?.onClient {
                 PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.INVITE, player))
@@ -153,7 +159,7 @@ class Party(leader: EntityPlayer) : IParty {
     }
 
     override fun readNBT(nbt: NBTTagCompound) {
-        val w = world.get()?: return
+        val w = world.get() ?: return
         val sid = NBTTagString("").id.toInt()
         val membersTag = nbt.getTagList("members", sid)
         val invitesTag = nbt.getTagList("invites", sid)
@@ -161,14 +167,14 @@ class Party(leader: EntityPlayer) : IParty {
         membersTag.asSequence().mapNotNull {
             w.getPlayerEntityByUUID(UUID.fromString((it as NBTTagString).string))
         }.forEach {
-                    membersImpl[it] = Unit
-                }
+            membersImpl[it] = Unit
+        }
         invitesImpl.clear()
         invitesTag.asSequence().mapNotNull {
             world.get()?.getPlayerEntityByUUID(UUID.fromString((it as NBTTagString).string))
         }.forEach {
-                    invitesImpl[it] = w.worldTime
-                }
+            invitesImpl[it] = w.worldTime
+        }
         with(w.getPlayerEntityByUUID(UUID.fromString(nbt.getString("leader")))) {
             if (this != null) leaderImpl = WeakReference(this)
         }
@@ -185,7 +191,7 @@ class Party(leader: EntityPlayer) : IParty {
         }
 
         val nbt = NBTTagCompound()
-        nbt.setString("leader", leader?.cachedUniqueIdString?: "")
+        nbt.setString("leader", leader?.cachedUniqueIdString ?: "")
         nbt.setTag("members", membersTag)
         nbt.setTag("invites", invitesTag)
 
@@ -196,6 +202,7 @@ class Party(leader: EntityPlayer) : IParty {
         membersImpl[leader] = Unit
         this.world = WeakReference(leader.world)
         this.leader = leader
+        syncMembers()
     }
 
     override fun fixPostDeath(oldPlayer: EntityPlayer, newPlayer: EntityPlayer) {
