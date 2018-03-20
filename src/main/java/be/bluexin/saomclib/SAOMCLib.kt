@@ -25,12 +25,13 @@ import org.apache.logging.log4j.Logger
  *
  * @author Bluexin
  */
+@Suppress("KDocUnresolvedReference")
 @Mod(modid = SAOMCLib.MODID, name = "SAOMC Library", version = SAOMCLib.VERSION, dependencies = SAOMCLib.DEPENDENCIES)
 object SAOMCLib {
 
     const val MODID = "saomclib"
-    const val VERSION = "1.2.0.7"
-    const val DEPENDENCIES = "required-after:forgelin@[1.5.1,)"
+    const val VERSION = "1.2.1.0"
+    const val DEPENDENCIES = "required-after:forgelin@[1.6.0,)"
 
     @Suppress("unused")
     @SidedProxy(clientSide = "be.bluexin.saomclib.proxy.ClientProxy", serverSide = "be.bluexin.saomclib.proxy.CommonProxy")
