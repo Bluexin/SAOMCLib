@@ -1,8 +1,7 @@
 package be.bluexin.saomclib.packets
 
-import be.bluexin.saomclib.LogHelper
+import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
-import be.bluexin.saomclib.party.Party
 import be.bluexin.saomclib.readString
 import be.bluexin.saomclib.writeString
 import io.netty.buffer.ByteBuf
@@ -17,7 +16,7 @@ import java.util.*
  *
  * @author Bluexin
  */
-class PTPacket() : IMessage {
+class PTS2CPacket() : IMessage {
 
     private lateinit var type: Type
     private lateinit var leader: String
@@ -28,10 +27,10 @@ class PTPacket() : IMessage {
      * @param leader the leader of the party, or the member to add (depending on type of packet)
      * @param members the party list (may be empty when not required by [type]
      */
-    constructor(type: Type, leader: EntityPlayer, members: List<EntityPlayer>) : this() {
+    constructor(type: Type, leader: EntityPlayer, members: Sequence<EntityPlayer>) : this() {
         this.type = type
         this.leader = leader.cachedUniqueIdString
-        this.members = members.map { it.cachedUniqueIdString }
+        this.members = members.map { it.cachedUniqueIdString }.toList()
     }
 
     override fun fromBytes(buf: ByteBuf) {
@@ -46,21 +45,21 @@ class PTPacket() : IMessage {
         buf.writeString(members.joinToString(separator = " ") { it })
     }
 
-    companion object {
-        enum class Type {
-            ADD,
-            REMOVE,
-            CLEAR,
-            INVITE,
-            LEADER,
-            JOIN
-        }
+    enum class Type {
+        ADD,
+        REMOVE,
+        CLEAR,
+        INVITE,
+        LEADER,
+        JOIN
+    }
 
-        class Handler : AbstractClientPacketHandler<PTPacket>() {
-            override fun handleClientPacket(player: EntityPlayer, message: PTPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
+    companion object {
+        class Handler : AbstractClientPacketHandler<PTS2CPacket>() {
+            override fun handleClientPacket(player: EntityPlayer, message: PTS2CPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
                 mainThread.addScheduledTask {
                     val p1 = player.world.getPlayerEntityByUUID(UUID.fromString(message.leader))
-                    LogHelper.logInfo("${player.displayNameString} received ${message.type} with p1 ${p1?.displayNameString}")
+                    SAOMCLib.LOGGER.debug("${player.displayNameString} received ${message.type} with p1 ${p1?.displayNameString}")
                     try {
                         when (message.type) {
                             Type.ADD -> if (p1 != null) player.getPartyCapability().getOrCreatePT().addMember(p1)
@@ -68,18 +67,16 @@ class PTPacket() : IMessage {
                             Type.CLEAR -> player.getPartyCapability().clear()
                             Type.INVITE -> {
                                 if (p1 != null) {
-                                    val pt = Party(p1)
-                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
-                                            .filterNotNull().forEach { pt.addMember(it) }
+                                    val pt = p1.getPartyCapability().getOrCreatePT()
+                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
                                     player.getPartyCapability().invitedTo = pt
                                 }
                             }
                             Type.LEADER -> if (p1 != null) player.getPartyCapability().party?.leader = p1
                             Type.JOIN -> {
                                 if (p1 != null) {
-                                    val pt = Party(p1)
-                                    message.members.map { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }
-                                            .filterNotNull().forEach { pt.addMember(it) }
+                                    val pt = p1.getPartyCapability().getOrCreatePT()
+                                    message.members.mapNotNull { player.world.getPlayerEntityByUUID(UUID.fromString(it)) }.forEach { pt.addMember(it) }
                                     pt.addMember(player)
                                     val cap = player.getPartyCapability()
                                     cap.party = pt
@@ -88,9 +85,10 @@ class PTPacket() : IMessage {
                             }
                         }
                     } catch (e: Exception) {
-                        LogHelper.logDebug("Suppressed an error.")
+                        SAOMCLib.LOGGER.debug("[PTS2CPacket] Suppressed an error.")
+                        e.printStackTrace()
                     }
-                    LogHelper.logDebug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
+                    SAOMCLib.LOGGER.debug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
                 }
 
                 return null

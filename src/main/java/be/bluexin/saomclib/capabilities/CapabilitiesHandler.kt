@@ -4,6 +4,7 @@ import be.bluexin.saomclib.except.*
 import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.nbt.NBTBase
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
@@ -105,7 +106,9 @@ object CapabilitiesHandler {
 
     internal fun syncEntitiesDeath(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDeath }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
 
-    internal fun restoreEntitiesDeath(entity: Entity, original: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldRestoreOnDeath }?.forEach { it.value.capability.readNBT(entity.getCapability(it.value.capability, null), null, it.value.capability.writeNBT(original.getCapability(it.value.capability, null), null)) }
+    internal fun restoreEntitiesDeath(entity: Entity, original: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldRestoreOnDeath }?.forEach {
+        if ((entity.getCapability(it.value.capability, null) as AbstractEntityCapability).restore(entity, original)) it.value.capability.readNBT(entity.getCapability(it.value.capability, null), null, it.value.capability.writeNBT(original.getCapability(it.value.capability, null), null))
+    }
 
     internal fun syncEntitiesDimension(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDimensionChange }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
 
@@ -120,7 +123,7 @@ object CapabilitiesHandler {
     internal fun registerWorld(event: AttachCapabilitiesEvent<World>) = worldzz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
     private fun getKey(clazz: Class<out AbstractCapability>) = try {
-        clazz.declaredFields.filter { it.isAnnotationPresent(Key::class.java) }.single().apply { this.isAccessible = true }.get(null) as ResourceLocation
+        clazz.declaredFields.single { it.isAnnotationPresent(Key::class.java) }.apply { this.isAccessible = true }.get(null) as ResourceLocation
     } catch (e: ClassCastException) {
         throw WrongTypeException(clazz, "Key", Key::class.java, e)
     } catch (e: NullPointerException) {
@@ -135,7 +138,7 @@ object CapabilitiesHandler {
 
     private fun <T : AbstractCapability> getCapability(clazz: Class<out T>) = try {
         @Suppress("UNCHECKED_CAST")
-        clazz.declaredFields.filter { it.isAnnotationPresent(CapabilityInject::class.java) }.single().apply { this.isAccessible = true }.get(null) as Capability<T>
+        clazz.declaredFields.single { it.isAnnotationPresent(CapabilityInject::class.java) }.apply { this.isAccessible = true }.get(null) as Capability<T>
     } catch (e: ClassCastException) {
         throw WrongTypeException(clazz, "capability instance", CapabilityInject::class.java, e)
     } catch (e: NullPointerException) {
@@ -154,17 +157,14 @@ object CapabilitiesHandler {
     }
 
     private class CapabilitySerializableImpl<T : AbstractCapability>(private val clazz: Class<out T>, private val capability: Capability<T>, arg: Any) : ICapabilitySerializable<NBTBase> {
-        private val instance: T
-
-        init {
-            instance = getInstance(this.clazz, arg)
-        }
+        private val instance: T = getInstance(this.clazz, arg)
 
         override fun hasCapability(capability: Capability<*>, facing: EnumFacing?) = capability === this.capability
 
         override fun <R> getCapability(capability: Capability<R>, facing: EnumFacing?) = if (capability === this.capability) this.capability.cast<R>(instance) else null
 
         override fun serializeNBT(): NBTBase = this.capability.storage.writeNBT(this.capability, this.instance, null)
+                ?: NBTTagCompound()
 
         override fun deserializeNBT(nbt: NBTBase) = this.capability.storage.readNBT(this.capability, this.instance, null, nbt)
     }
@@ -173,7 +173,8 @@ object CapabilitiesHandler {
 
     internal fun getItemCapabilityImpl(id: ResourceLocation) = itemzz!![id] ?: throw IDNotFoundException(id)
 
-    internal fun getTileEntityCapabilityImpl(id: ResourceLocation) = tileEntitiezz!![id] ?: throw IDNotFoundException(id)
+    internal fun getTileEntityCapabilityImpl(id: ResourceLocation) = tileEntitiezz!![id]
+            ?: throw IDNotFoundException(id)
 
     internal fun getWorldCapabilityImpl(id: ResourceLocation) = worldzz!![id] ?: throw IDNotFoundException(id)
 

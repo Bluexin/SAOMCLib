@@ -1,6 +1,7 @@
 package be.bluexin.saomclib.party
 
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.nbt.NBTTagCompound
 
 /**
  * Part of saomclib.
@@ -28,12 +29,12 @@ interface IParty {
     fun removeMember(member: EntityPlayer): Boolean
 
     /**
-     * Gets a list containing all the members of this party.
-     * Returned list safety (concurrency, mutability, ...) is up to implementation details.
+     * Gets a sequence containing all the members of this party.
+     * Returned sequence safety (concurrency, mutability, ...) is up to implementation details.
      *
      * @return all the members in this party
      */
-    val members: List<EntityPlayer>
+    val members: Sequence<EntityPlayer>
 
     /**
      * Gets the leader of this party.
@@ -71,6 +72,8 @@ interface IParty {
      * @return whether the provided player is in this party
      */
     fun isMember(player: EntityPlayer): Boolean
+
+    operator fun contains(player: EntityPlayer) = isMember(player)
 
     /**
      * Invite someone to this party.
@@ -113,6 +116,15 @@ interface IParty {
     /**
      * Gets the list of invited players.
      */
-    val invited: List<EntityPlayer>
+    val invited: Sequence<EntityPlayer>
 
+    fun readNBT(nbt: NBTTagCompound)
+
+    fun writeNBT(): NBTTagCompound
+
+    /**
+     * Fix a party after a player's death.
+     * For the unaware, the EntityPlayer instance is different after resurrection.
+     */
+    fun fixPostDeath(oldPlayer: EntityPlayer, newPlayer: EntityPlayer)
 }

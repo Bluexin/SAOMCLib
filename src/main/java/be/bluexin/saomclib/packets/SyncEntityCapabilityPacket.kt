@@ -16,21 +16,21 @@ import java.util.*
 /**
  * Syncs a capability for an Entity.
  * Huge capabilities should be either split into smaller ones, or handled manually in separate packets.
+ * Should only ever be called server side
  *
  * @author Bluexin
  */
 class SyncEntityCapabilityPacket() : IMessage {
 
+    private lateinit var capabilityID: String
     private lateinit var data: NBTTagCompound
     private lateinit var targetUUID: UUID
-    private lateinit var capabilityID: String
 
-    @Suppress("unused")
     constructor(capability: AbstractEntityCapability, target: Entity) : this() {
         val rl = CapabilitiesHandler.getID(capability.javaClass)
-        this.capabilityID = rl.toString()
-        this.data = CapabilitiesHandler.getEntityCapability(rl).writeNBT(capability, null) as NBTTagCompound
-        this.targetUUID = target.uniqueID
+        capabilityID = rl.toString()
+        data = CapabilitiesHandler.getEntityCapability(rl).writeNBT(capability, null) as NBTTagCompound
+        targetUUID = target.uniqueID
     }
 
     override fun fromBytes(buffer: ByteBuf) {
@@ -51,9 +51,10 @@ class SyncEntityCapabilityPacket() : IMessage {
                 mainThread.addScheduledTask {
                     val cap = CapabilitiesHandler.getEntityCapability(ResourceLocation(message.capabilityID))
                     try {
-                        cap.readNBT(player.world.loadedEntityList.filter { it.uniqueID == message.targetUUID }.single().getCapability(cap, null), null, message.data)
+                        cap.readNBT(player.world.loadedEntityList.single { it.uniqueID == message.targetUUID }.getCapability(cap, null), null, message.data)
                     } catch (e: Exception) {
-                        LogHelper.logInfo("Suppressed an error.")
+                        SAOMCLib.LOGGER.info("[SyncEntityCapabilityPacket] Suppressed an error.")
+                        e.printStackTrace()
                     }
                 }
 
