@@ -52,6 +52,18 @@ class Party(leader: EntityPlayer) : IParty {
         return false
     }
 
+    override fun acceptInvite(player: EntityPlayer): Boolean {
+        if (isInvited(player)) {
+            world.get()?.onClient {
+                PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.JOIN, player))
+            }
+
+            return true
+        }
+
+        return false
+    }
+
     override fun removeMember(member: EntityPlayer) = if (membersImpl.remove(member) != null) {
         if (member == leader) leader = null
         world.get()?.onServer {

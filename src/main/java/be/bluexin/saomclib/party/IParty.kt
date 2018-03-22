@@ -24,6 +24,14 @@ interface IParty {
     fun addMember(member: EntityPlayer): Boolean
 
     /**
+     * Accepts a party invite.
+     *
+     * @param player the player accepting the invite
+     * @return whether the operation was successful
+     */
+    fun acceptInvite(player: EntityPlayer): Boolean
+
+    /**
      * Removes a member from this party.
      *
      * Should fire [PartyEvent.Leave] when successful, both on client and server.
