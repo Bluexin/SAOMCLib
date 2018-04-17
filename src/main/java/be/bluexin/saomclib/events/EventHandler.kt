@@ -5,7 +5,7 @@ import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
-import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -27,7 +27,7 @@ internal object EventHandler {
     fun attachEntityCapabilities(event: AttachCapabilitiesEvent<Entity>) = CapabilitiesHandler.registerEntity(event)
 
     @SubscribeEvent
-    fun attachItemCapabilities(event: AttachCapabilitiesEvent<Item>) = CapabilitiesHandler.registerItem(event)
+    fun attachItemCapabilities(event: AttachCapabilitiesEvent<ItemStack>) = CapabilitiesHandler.registerItem(event)
 
     @SubscribeEvent
     fun attachTECapabilities(event: AttachCapabilitiesEvent<TileEntity>) = CapabilitiesHandler.registerTE(event)

@@ -2,7 +2,7 @@ package be.bluexin.saomclib.capabilities
 
 import be.bluexin.saomclib.except.*
 import net.minecraft.entity.Entity
-import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
@@ -30,6 +30,7 @@ object CapabilitiesHandler {
     private var itemzz: HashMap<ResourceLocation, CapabilityStorage>? = null
     private var worldz: ArrayList<Pair<Class<out AbstractCapability>, (Any) -> Boolean>>? = ArrayList()
     private var worldzz: HashMap<ResourceLocation, CapabilityStorage>? = null
+    // TODO: add Village & Chunk
 
     /**
      * Register a capability to registry for all subtypes of Entity.
@@ -40,7 +41,7 @@ object CapabilitiesHandler {
     }
 
     /**
-     * Register a capability to registry for all subtypes of Item.
+     * Register a capability to registry for all subtypes of ItemStack.
      */
     fun <T : AbstractCapability> registerItemCapability(clazz: Class<T>, storage: Capability.IStorage<T>, assignable: (Any) -> Boolean) {
         itemz?.add(Pair(clazz, assignable)) ?: throw WrongPhaseException(clazz)
@@ -69,7 +70,7 @@ object CapabilitiesHandler {
     fun getEntityCapability(id: ResourceLocation) = entitiezz!![id]?.capability ?: throw IDNotFoundException(id)
 
     /**
-     * Queries a Item Capability based on it's ID, or throws an [IDNotFoundException] if no capability was found.
+     * Queries a ItemStack Capability based on it's ID, or throws an [IDNotFoundException] if no capability was found.
      */
     fun getItemCapability(id: ResourceLocation) = itemzz!![id]?.capability ?: throw IDNotFoundException(id)
 
@@ -116,7 +117,7 @@ object CapabilitiesHandler {
 
     internal fun registerEntity(event: AttachCapabilitiesEvent<Entity>) = entitiezz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
-    internal fun registerItem(event: AttachCapabilitiesEvent<Item>) = itemzz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
+    internal fun registerItem(event: AttachCapabilitiesEvent<ItemStack>) = itemzz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
     internal fun registerTE(event: AttachCapabilitiesEvent<TileEntity>) = tileEntitiezz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
