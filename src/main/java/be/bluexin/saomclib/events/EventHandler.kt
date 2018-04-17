@@ -82,6 +82,6 @@ internal object EventHandler {
     @SubscribeEvent
     fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
         evt.player.getPartyCapability().clear()
-    }
+    } // TODO: remove from existing parties, including invites & sync result
 
 }

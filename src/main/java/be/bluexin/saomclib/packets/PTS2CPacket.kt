@@ -42,7 +42,7 @@ class PTS2CPacket() : IMessage {
     override fun toBytes(buf: ByteBuf) {
         buf.writeInt(type.ordinal)
         buf.writeString(leader)
-        buf.writeString(members.joinToString(separator = " ") { it })
+        buf.writeString(members.joinToString(separator = " "))
     }
 
     enum class Type {

@@ -207,7 +207,7 @@ class Party(leader: EntityPlayer) : IParty {
         }
         val invitesTag = NBTTagList()
         invited.forEach {
-            membersTag.appendTag(NBTTagString(it.cachedUniqueIdString))
+            invitesTag.appendTag(NBTTagString(it.cachedUniqueIdString))
         }
 
         val nbt = NBTTagCompound()

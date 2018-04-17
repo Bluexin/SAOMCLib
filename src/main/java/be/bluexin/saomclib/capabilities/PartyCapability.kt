@@ -1,6 +1,7 @@
 package be.bluexin.saomclib.capabilities
 
 import be.bluexin.saomclib.SAOMCLib
+import be.bluexin.saomclib.events.PartyEvent
 import be.bluexin.saomclib.party.IParty
 import be.bluexin.saomclib.party.Party
 import net.minecraft.entity.Entity
@@ -9,6 +10,7 @@ import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.capabilities.CapabilityInject
 import java.lang.ref.WeakReference
@@ -26,8 +28,13 @@ class PartyCapability : AbstractEntityCapability() {
     var invitedTo: IParty?
         get() = invitedToImpl?.get()
         set(value) {
-            invitedToImpl = if (value != null) WeakReference(value)
+            val oldValue = invitedTo
+            invitedToImpl = if (value != null) {
+                WeakReference(value)
+            }
             else null
+            if (value != null) MinecraftForge.EVENT_BUS.post(PartyEvent.Invited(value, reference.get() as EntityPlayer))
+            else if (oldValue != null) MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCanceled(oldValue, reference.get() as EntityPlayer))
         }
 
     fun getOrCreatePT(): IParty {
