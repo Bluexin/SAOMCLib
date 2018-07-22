@@ -1,5 +1,6 @@
 package be.bluexin.saomclib.commands
 
+import be.bluexin.saomclib.BlockPos
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.message
@@ -9,7 +10,6 @@ import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
-import net.minecraft.util.math.BlockPos
 
 /**
  * Part of saomclib by Bluexin.
@@ -19,41 +19,41 @@ import net.minecraft.util.math.BlockPos
  * @author Bluexin
  */
 object PTCommand : CommandBase() {
-    override fun getName() = "pt"
+    override fun getCommandName() = "pt"
 
-    override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String>) {
+    override fun processCommand(sender: ICommandSender, args: Array<out String>) {
         if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
-        if (args.isEmpty()) throw WrongUsageException(getUsage(sender))
+        if (args.isEmpty()) throw WrongUsageException(getCommandUsage(sender))
         SAOMCLib.LOGGER.info("args: " + args[0])
         when (args[0]) {
-            "invite" -> handleInvite(server, sender, args)
-            "accept" -> handleAccept(server, sender, args)
-            "decline" -> handleDecline(server, sender, args)
-            "kick" -> handleKick(server, sender, args)
-            "leave" -> handleLeave(server, sender, args)
-            "cancel" -> handleCancel(server, sender, args)
-            "print" -> handlePrint(server, sender, args)
-            else -> throw WrongUsageException(getUsage(sender))
+            "invite" -> handleInvite( sender, args)
+            "accept" -> handleAccept(sender, args)
+            "decline" -> handleDecline(sender, args)
+            "kick" -> handleKick(sender, args)
+            "leave" -> handleLeave(sender, args)
+            "cancel" -> handleCancel(sender, args)
+            "print" -> handlePrint(sender, args)
+            else -> throw WrongUsageException(getCommandUsage(sender))
         }
     }
 
-    override fun getUsage(sender: ICommandSender?) = "commands.pt.usage"
+    override fun getCommandUsage(sender: ICommandSender?) = "commands.pt.usage"
 
-    private fun handleInvite(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
+    private fun handleInvite(player: EntityPlayer, args: Array<out String>) {
         if (args.size < 2) throw WrongUsageException("commands.pt.invite.usage")
-        val target = getPlayer(server, player, args[1]) // Player not found will interrupt execution
+        val target = getPlayer(player, args[1]) // Player not found will interrupt execution
         if (target == player) throw CommandException("commands.pt.invite.self")
         val pt = player.getPartyCapability().getOrCreatePT()
         if (pt.isLeader(player)) {
             if (!pt.isInvited(target)) {
                 pt.invite(target)
                 player.message("commands.pt.invite.success", args[1])
-                target.message("commands.pt.invited", player.displayNameString)
+                target.message("commands.pt.invited", player.displayName)
             } else throw CommandException("commands.pt.invite.alreadyPresent", args[1])
         } else throw CommandException("commands.pt.invite.notLeader", pt.leader?.displayNameString ?: "UNKNOWN")
     }
 
-    private fun handleAccept(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
+    private fun handleAccept(player: EntityPlayer, args: Array<out String>) {
         val cap = player.getPartyCapability()
         val invitedTo = cap.invitedTo ?: throw CommandException("commands.pt.accept.notInvited")
         if (invitedTo.isInvited(player)) {
@@ -62,7 +62,7 @@ object PTCommand : CommandBase() {
         } else throw CommandException("commands.pt.accept.notInvited")
     }
 
-    private fun handleDecline(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
+    private fun handleDecline(player: EntityPlayer, args: Array<out String>) {
         val cap = player.getPartyCapability()
         val invitedTo = cap.invitedTo ?: throw CommandException("commands.pt.accept.notInvited")
         cap.invitedTo = null
@@ -73,12 +73,12 @@ object PTCommand : CommandBase() {
         } else throw CommandException("commands.pt.accept.notInvited")
     }
 
-    private fun handleKick(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
+    private fun handleKick(player: EntityPlayer, args: Array<out String>) {
         if (args.size < 2) throw WrongUsageException("commands.pt.kick.usage")
         val cap = player.getPartyCapability()
         val pt = cap.getOrCreatePT()
         if (pt.leader == player) {
-            val target = getPlayer(server, player, args[1]) // Player not found will interrupt execution
+            val target = getPlayer(player, args[1]) // Player not found will interrupt execution
             if (pt.isMember(target)) {
                 pt.removeMember(target)
                 player.message("commands.pt.kick.success", args[1])
@@ -87,12 +87,12 @@ object PTCommand : CommandBase() {
         } else throw CommandException("commands.pt.kick.notLeader", pt.leader?.displayName ?: "UNKNOWN")
     }
 
-    private fun handleCancel(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
+    private fun handleCancel(player: EntityPlayer, args: Array<out String>) {
         if (args.size < 2) throw WrongUsageException("commands.pt.cancel.usage")
         val cap = player.getPartyCapability()
         val pt = cap.getOrCreatePT()
         if (pt.leader == player) {
-            val target = getPlayer(server, player, args[1]) // Player not found will interrupt execution
+            val target = getPlayer(player, args[1]) // Player not found will interrupt execution
             if (pt.isInvited(target)) {
                 pt.cancel(target)
                 player.message("commands.pt.cancel.success", args[1])
@@ -101,7 +101,7 @@ object PTCommand : CommandBase() {
         } else throw CommandException("commands.pt.cancel.notLeader", pt.leader?.displayNameString ?: "UNKNOWN")
     }
 
-    private fun handleLeave(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
+    private fun handleLeave(player: EntityPlayer, args: Array<out String>) {
         val cap = player.getPartyCapability()
         val pt = cap.party ?: throw CommandException("commands.pt.leave.notInPT")
         if (pt.isMember(player)) {
@@ -110,7 +110,7 @@ object PTCommand : CommandBase() {
         } else throw CommandException("commands.pt.leave.notInPT")
     }
 
-    private fun handlePrint(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
+    private fun handlePrint(player: EntityPlayer, args: Array<out String>) {
         val cap = player.getPartyCapability()
         val pt = cap.party
         val invited = cap.invitedTo
@@ -132,7 +132,7 @@ object PTCommand : CommandBase() {
 
     override fun checkPermission(server: MinecraftServer?, sender: ICommandSender) = sender is EntityPlayer
 
-    override fun getTabCompletions(server: MinecraftServer, sender: ICommandSender, args: Array<out String>, pos: BlockPos?): MutableList<String> {
+    override fun addTabCompletionOptions(sender: ICommandSender, args: Array<out String>): MutableList<String> {
         if (sender !is EntityPlayer) return mutableListOf()
         val cap = sender.getPartyCapability()
         return when (args.size) {
@@ -150,7 +150,8 @@ object PTCommand : CommandBase() {
                     l.add("accept")
                     l.add("decline")
                 }
-                CommandBase.getListOfStringsMatchingLastWord(args, *l.toTypedArray())
+                @Suppress("UNCHECKED_CAST")
+                CommandBase.getListOfStringsMatchingLastWord(args, *l.toTypedArray()) as MutableList<String>
             }
             2 -> {
                 val l = mutableListOf<String>()
@@ -159,7 +160,7 @@ object PTCommand : CommandBase() {
                     "invite" -> {
                         val current = cap.party?.members?.map { it.name }
                         val invited = cap.party?.invited?.map { it.name }
-                        l.addAll(server.onlinePlayerNames.filterNot { it == sender.name || current?.contains(it) ?: false || invited?.contains(it) ?: false })
+                        l.addAll(MinecraftServer.getServer().allUsernames.filterNot { it == sender.commandSenderName || current?.contains(it) ?: false || invited?.contains(it) ?: false })
                     }
                     "kick" -> {
                         val ll = cap.party?.members?.filterNot { it == sender }?.map { it.name }
@@ -170,7 +171,8 @@ object PTCommand : CommandBase() {
                         if (ll != null) l.addAll(ll)
                     }
                 }
-                CommandBase.getListOfStringsMatchingLastWord(args, *l.toTypedArray())
+                @Suppress("UNCHECKED_CAST")
+                CommandBase.getListOfStringsMatchingLastWord(args, *l.toTypedArray()) as MutableList<String>
             }
             else -> mutableListOf()
         }

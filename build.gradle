@@ -12,13 +12,13 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 apply plugin: "maven"
 apply plugin: 'kotlin'
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'forge'
 
 version = mc_version + '-' + mod_version
 group = "be.bluexin"

@@ -1,13 +1,12 @@
 package be.bluexin.saomclib.packets
 
 import be.bluexin.saomclib.SAOMCLib
+import cpw.mods.fml.common.network.simpleimpl.IMessage
+import cpw.mods.fml.common.network.simpleimpl.IMessageHandler
+import cpw.mods.fml.common.network.simpleimpl.MessageContext
+import cpw.mods.fml.relauncher.Side
+import cpw.mods.fml.relauncher.SideOnly
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.IThreadListener
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
 
 /**
  * Abstract class for handling packets.
@@ -34,7 +33,7 @@ abstract class AbstractPacketHandler<T : IMessage> : IMessageHandler<T, IMessage
      * @param mainThread to be used when performing tasks on the world
      */
     @SideOnly(Side.CLIENT)
-    abstract fun handleClientPacket(player: EntityPlayer, message: T, ctx: MessageContext, mainThread: IThreadListener): IMessage?
+    abstract fun handleClientPacket(player: EntityPlayer, message: T, ctx: MessageContext): IMessage?
 
     /**
      * Handle receiving the packet on the Server side.
@@ -44,13 +43,13 @@ abstract class AbstractPacketHandler<T : IMessage> : IMessageHandler<T, IMessage
      * @param ctx the context the packet is received in
      * @param mainThread to be used when performing tasks on the world
      */
-    abstract fun handleServerPacket(player: EntityPlayer, message: T, ctx: MessageContext, mainThread: IThreadListener): IMessage?
+    abstract fun handleServerPacket(player: EntityPlayer, message: T, ctx: MessageContext): IMessage?
 
     final override fun onMessage(message: T, ctx: MessageContext): IMessage? {
         val player = SAOMCLib.proxy.getPlayerEntity(ctx)
         return if (player != null) {
-            if (ctx.side.isClient) handleClientPacket(player, message, ctx, SAOMCLib.proxy.getMinecraftThread(ctx))
-            else handleServerPacket(player, message, ctx, SAOMCLib.proxy.getMinecraftThread(ctx))
+            if (ctx.side.isClient) handleClientPacket(player, message, ctx)
+            else handleServerPacket(player, message, ctx)
         } else {
             SAOMCLib.LOGGER.info("Received packet before player got initialized.")
             Thread({ Thread.sleep(1000); onMessage(message, ctx) }).start()

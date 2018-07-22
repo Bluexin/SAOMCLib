@@ -1,16 +1,13 @@
 package be.bluexin.saomclib.packets
 
-import be.bluexin.saomclib.SAOMCLib
+import be.bluexin.saomclib.*
 import be.bluexin.saomclib.capabilities.getPartyCapability
-import be.bluexin.saomclib.readString
-import be.bluexin.saomclib.sendPacket
-import be.bluexin.saomclib.writeString
+import cpw.mods.fml.common.network.simpleimpl.IMessage
+import cpw.mods.fml.common.network.simpleimpl.MessageContext
 import io.netty.buffer.ByteBuf
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
-import net.minecraft.util.IThreadListener
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import java.util.*
 
 /**
@@ -19,7 +16,7 @@ import java.util.*
  *
  * @author Bluexin
  */
-class PTC2SPacket(): IMessage {
+class PTC2SPacket() : IMessage {
 
     private lateinit var type: Type
     private lateinit var member: String
@@ -54,28 +51,28 @@ class PTC2SPacket(): IMessage {
 
     companion object {
         class Handler : AbstractServerPacketHandler<PTC2SPacket>() {
-            override fun handleServerPacket(player: EntityPlayer, message: PTC2SPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
-                mainThread.addScheduledTask {
-                    try {
-                        val party = player.getPartyCapability().getOrCreatePT()
-                        if (party.leader == player) when (message.type) {
-                            Type.REMOVE -> party.removeMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
-                            Type.INVITE -> party.invite(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
-                            Type.LEADER -> party.leader == player.world.getPlayerEntityByUUID(UUID.fromString(message.member))
-                            Type.JOIN -> party.addMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
-                            Type.REQUEST -> (player as EntityPlayerMP).sendPacket(SyncEntityCapabilityPacket(player.getPartyCapability(), player))
-                            Type.CANCEL -> party.cancel(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
-                        } else if (party.isInvited(player)) when (message.type) {
-                            Type.CANCEL -> party.cancel(player)
-                            Type.JOIN -> party.addMember(player)
-                            else -> {}
+            override fun handleServerPacket(player: EntityPlayer, message: PTC2SPacket, ctx: MessageContext): IMessage? {
+                try {
+                    val party = player.getPartyCapability().getOrCreatePT()
+                    if (party.leader == player) when (message.type) {
+                        Type.REMOVE -> party.removeMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
+                        Type.INVITE -> party.invite(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
+                        Type.LEADER -> party.leader == player.world.getPlayerEntityByUUID(UUID.fromString(message.member))
+                        Type.JOIN -> party.addMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
+                        Type.REQUEST -> (player as EntityPlayerMP).sendPacket(SyncEntityCapabilityPacket(player.getPartyCapability(), player))
+                        Type.CANCEL -> party.cancel(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
+                    } else if (party.isInvited(player)) when (message.type) {
+                        Type.CANCEL -> party.cancel(player)
+                        Type.JOIN -> party.addMember(player)
+                        else -> {
                         }
-                    } catch (e: Exception) {
-                        SAOMCLib.LOGGER.debug("[PTC2SPacket] Suppressed an error.") // FIXME: very pro :ok_hand:
-                        e.printStackTrace()
                     }
-                    SAOMCLib.LOGGER.debug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
+                } catch (e: Exception) {
+                    SAOMCLib.LOGGER.debug("[PTC2SPacket] Suppressed an error.") // FIXME: very pro :ok_hand:
+                    e.printStackTrace()
                 }
+                SAOMCLib.LOGGER.debug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
+
                 return null
             }
 

@@ -3,14 +3,15 @@ package be.bluexin.saomclib.packets
 import be.bluexin.saomclib.*
 import be.bluexin.saomclib.capabilities.AbstractEntityCapability
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
+import cpw.mods.fml.common.network.simpleimpl.IMessage
 import io.netty.buffer.ByteBuf
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.IThreadListener
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
+import cpw.mods.fml.common.network.simpleimpl.IMessage
+import cpw.mods.fml.common.network.simpleimpl.MessageContext
 import java.util.*
 
 /**

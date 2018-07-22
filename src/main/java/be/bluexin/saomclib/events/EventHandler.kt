@@ -3,6 +3,9 @@ package be.bluexin.saomclib.events
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
+import be.bluexin.saomclib.world
+import cpw.mods.fml.common.eventhandler.SubscribeEvent
+import cpw.mods.fml.common.network.FMLNetworkEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
@@ -10,11 +13,8 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.living.LivingEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
 /**
  *
@@ -47,13 +47,13 @@ internal object EventHandler {
     }
 
     @SubscribeEvent
-    fun respawnEvent(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent) {
+    fun respawnEvent(evt: cpw.mods.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent) {
         SAOMCLib.LOGGER.info("${evt.player} respawned.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDeath(evt.player)
     }
 
     @SubscribeEvent
-    fun playerChangeDimension(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent) {
+    fun playerChangeDimension(evt: cpw.mods.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent) {
         SAOMCLib.LOGGER.info("${evt.player} changed dimension.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDimension(evt.player)
     }
@@ -61,7 +61,7 @@ internal object EventHandler {
     @SubscribeEvent
     fun renderDebugText(evt: RenderGameOverlayEvent.Text) {
         if (!Minecraft.getMinecraft().gameSettings.showDebugInfo) return
-        val ptcap = Minecraft.getMinecraft().player.getPartyCapability()
+        val ptcap = Minecraft.getMinecraft().thePlayer.getPartyCapability()
         evt.left.add("Party: ${ptcap.party}")
         if (ptcap.party != null) {
             evt.left.add(ptcap.party!!.members.joinToString { it.displayNameString })
@@ -80,7 +80,7 @@ internal object EventHandler {
     }
 
     @SubscribeEvent
-    fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
+    fun playerDisconnect(evt: cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
         evt.player.getPartyCapability().clear()
     } // TODO: remove from existing parties, including invites & sync result
 

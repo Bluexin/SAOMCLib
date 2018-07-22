@@ -1,14 +1,13 @@
 package be.bluexin.saomclib.party
 
+import be.bluexin.saomclib.*
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.events.PartyEvent
-import be.bluexin.saomclib.onClient
-import be.bluexin.saomclib.onServer
 import be.bluexin.saomclib.packets.PTC2SPacket
 import be.bluexin.saomclib.packets.PTS2CPacket
 import be.bluexin.saomclib.packets.PacketPipeline
 import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
-import be.bluexin.saomclib.sendPacket
+import cpw.mods.fml.common.network.simpleimpl.IMessage
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.nbt.NBTTagCompound
@@ -16,7 +15,6 @@ import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraft.world.World
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import java.lang.ref.WeakReference
 import java.util.*
 

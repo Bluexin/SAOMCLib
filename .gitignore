@@ -18,6 +18,8 @@ bin
 out
 *.idea
 *.iml
+*.ipr
+*.iws
 
 # random stuff
 /repo/

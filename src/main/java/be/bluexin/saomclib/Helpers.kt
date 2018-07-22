@@ -1,25 +1,21 @@
 package be.bluexin.saomclib
 
 import be.bluexin.saomclib.packets.PacketPipeline
+import cpw.mods.fml.common.FMLCommonHandler
+import cpw.mods.fml.common.network.ByteBufUtils
+import cpw.mods.fml.common.network.simpleimpl.IMessage
 import io.netty.buffer.ByteBuf
-import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.EnumHand
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.text.TextComponentTranslation
+import net.minecraft.util.ChatComponentTranslation
 import net.minecraft.world.World
 import net.minecraftforge.common.ForgeHooks
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.util.BlockSnapshot
 import net.minecraftforge.event.world.BlockEvent
-import net.minecraftforge.fml.common.FMLCommonHandler
-import net.minecraftforge.fml.common.network.ByteBufUtils
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 
 /**
  * Part of saomclib by Bluexin.
@@ -84,7 +80,7 @@ fun ByteBuf.readTag() = ByteBufUtils.readTag(this)!!
 /**
  * Send a translated text message to a [EntityPlayer].
  */
-fun EntityPlayer.message(str: String, vararg args: Any) = this.sendMessage(TextComponentTranslation(str, *args))
+fun EntityPlayer.message(str: String, vararg args: Any) = this.addChatMessage(ChatComponentTranslation(str, *args))
 
 /**
  * Send a packet to a player.
@@ -101,18 +97,18 @@ fun EntityPlayer.sentPacketToServer(packet: IMessage) = PacketPipeline.sendToSer
  * @author Bluexin, Tencao
  */
 fun EntityPlayerMP.hasBreakPermission(pos: BlockPos) = this.hasEditPermission(pos)
-        && ForgeHooks.onBlockBreakEvent(this.entityWorld, this.interactionManager.gameType, this, pos) != -1
+        && !ForgeHooks.onBlockBreakEvent(this.entityWorld, this.theItemInWorldManager.gameType, this, pos.x, pos.y, pos.z).isCanceled
 
 fun EntityPlayerMP.hasEditPermission(pos: BlockPos) =
-        !FMLCommonHandler.instance().minecraftServerInstance.isBlockProtected(this.entityWorld, pos, this)
-                && EnumFacing.VALUES.any { this.canPlayerEdit(pos, it, null) }
+        !FMLCommonHandler.instance().minecraftServerInstance.isBlockProtected(this.entityWorld, pos.x, pos.y, pos.z, this)
+                && /*EnumFacing.values().any {*/ this.canPlayerEdit(0, 0, 0, 0, null) /*}*/ // The arguments are ignored u_u
 
 fun EntityPlayerMP.checkedPlaceBlock(pos: BlockPos, state: IBlockState): Boolean {
     if (!this.hasEditPermission(pos)) return false
     val world = this.entityWorld
-    val before = BlockSnapshot.getBlockSnapshot(world, pos)
-    world.setBlockState(pos, state)
-    val evt = BlockEvent.PlaceEvent(before, Blocks.AIR.defaultState, this, EnumHand.MAIN_HAND)
+    val before = BlockSnapshot.getBlockSnapshot(world, pos.x, pos.y, pos.z)
+    world.setBlock(pos.x, pos.y, pos.z, state.block, state.meta, 3)
+    val evt = BlockEvent.PlaceEvent(before, Blocks.air, this)
     MinecraftForge.EVENT_BUS.post(evt)
     if (evt.isCanceled) {
         world.restoringBlockSnapshots = true

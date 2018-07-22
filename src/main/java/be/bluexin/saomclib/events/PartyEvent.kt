@@ -1,8 +1,8 @@
 package be.bluexin.saomclib.events
 
 import be.bluexin.saomclib.party.IParty
+import cpw.mods.fml.common.eventhandler.Event
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraftforge.fml.common.eventhandler.Event
 
 /**
  * Party-related events.

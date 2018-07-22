@@ -1,9 +1,10 @@
 package be.bluexin.saomclib.example
 
 import be.bluexin.saomclib.SAOMCLib
+import be.bluexin.saomclib.world
+import cpw.mods.fml.common.eventhandler.SubscribeEvent
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.event.entity.living.LivingAttackEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Part of saomclib by Bluexin.
@@ -26,11 +27,11 @@ class ExampleEventHandler {
 
     @SubscribeEvent
     fun attackEntity(e: LivingAttackEvent) {
-        if (!e.entity.world.isRemote && e.source.trueSource is EntityPlayer) {
-            SAOMCLib.LOGGER.info("${e.entityLiving} attacked by ${e.source.trueSource}.")
+        if (!e.entity.world.isRemote && e.source.sourceOfDamage is EntityPlayer) {
+            SAOMCLib.LOGGER.info("${e.entityLiving} attacked by ${e.source.sourceOfDamage}.")
             val rand: Int = (1000 * Math.random()).toInt()
             SAOMCLib.LOGGER.info("Random: $rand.")
-            val cap = e.source.trueSource!!.getCapability(SimpleCapability.CAP_INSTANCE, null)?:return
+            val cap = e.source.sourceOfDamage!!.getCapability(SimpleCapability.CAP_INSTANCE, null)?:return
             cap.num = rand
             cap.sync()
         }
