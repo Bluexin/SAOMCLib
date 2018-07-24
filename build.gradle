@@ -39,19 +39,15 @@ repositories {
     maven {
         url "https://maven.bluexin.be/repository/releases/"
     }
-
-    maven {
-        url "http://maven.shadowfacts.net/"
-    }
-}
-
-dependencies {
-    compile "net.shadowfacts:Forgelin:${forgelin_version}"
 }
 
 configurations {
     shade
     compile.extendsFrom shade
+}
+
+dependencies {
+    shade "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 processResources {
