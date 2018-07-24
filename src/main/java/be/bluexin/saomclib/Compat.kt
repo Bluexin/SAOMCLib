@@ -32,6 +32,9 @@ inline val Entity.cachedUniqueIdString: String
 inline val EntityPlayer.displayNameString: String
     get() = this.displayName
 
+inline val EntityPlayer.name: String
+    get() = this.commandSenderName
+
 private val field_tagList = ReflectionHelper.findField(NBTTagList::class.java, "field_74747_a", "tagList").also {
     it.isAccessible = true
 }

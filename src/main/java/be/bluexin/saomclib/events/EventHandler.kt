@@ -1,19 +1,17 @@
 package be.bluexin.saomclib.events
 
 import be.bluexin.saomclib.SAOMCLib
+import be.bluexin.saomclib.capabilities.CapabilitiesExtendedProperty
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
+import be.bluexin.saomclib.displayNameString
 import be.bluexin.saomclib.world
 import cpw.mods.fml.common.eventhandler.SubscribeEvent
 import cpw.mods.fml.common.network.FMLNetworkEvent
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.Entity
-import net.minecraft.item.ItemStack
-import net.minecraft.tileentity.TileEntity
-import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.event.entity.living.LivingEvent
+import net.minecraftforge.event.entity.EntityEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 
 /**
@@ -23,7 +21,16 @@ import net.minecraftforge.event.entity.player.PlayerEvent
  */
 internal object EventHandler {
 
+
+
     @SubscribeEvent
+    fun entityConstructingEvent(event: EntityEvent.EntityConstructing) {
+        if (event.entity.getExtendedProperties(CapabilitiesExtendedProperty.KEY) == null) {
+            event.entity.registerExtendedProperties(CapabilitiesExtendedProperty.KEY, CapabilitiesExtendedProperty())
+        }
+    }
+
+    /*@SubscribeEvent
     fun attachEntityCapabilities(event: AttachCapabilitiesEvent<Entity>) = CapabilitiesHandler.registerEntity(event)
 
     @SubscribeEvent
@@ -33,12 +40,12 @@ internal object EventHandler {
     fun attachTECapabilities(event: AttachCapabilitiesEvent<TileEntity>) = CapabilitiesHandler.registerTE(event)
 
     @SubscribeEvent
-    fun attachWorldCapabilities(event: AttachCapabilitiesEvent<World>) = CapabilitiesHandler.registerWorld(event)
+    fun attachWorldCapabilities(event: AttachCapabilitiesEvent<World>) = CapabilitiesHandler.registerWorld(event)*/
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     fun livingTick(e: LivingEvent.LivingUpdateEvent) {
         // TODO: Ticking capabilities?
-    }
+    }*/
 
     @SubscribeEvent
     fun cloneEvent(evt: PlayerEvent.Clone) {

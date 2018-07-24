@@ -3,15 +3,14 @@ package be.bluexin.saomclib.packets
 import be.bluexin.saomclib.*
 import be.bluexin.saomclib.capabilities.AbstractEntityCapability
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
+import be.bluexin.saomclib.capabilities.getCapability
 import cpw.mods.fml.common.network.simpleimpl.IMessage
+import cpw.mods.fml.common.network.simpleimpl.MessageContext
 import io.netty.buffer.ByteBuf
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.IThreadListener
 import net.minecraft.util.ResourceLocation
-import cpw.mods.fml.common.network.simpleimpl.IMessage
-import cpw.mods.fml.common.network.simpleimpl.MessageContext
 import java.util.*
 
 /**
@@ -48,15 +47,14 @@ class SyncEntityCapabilityPacket() : IMessage {
 
     companion object {
         class Handler : AbstractClientPacketHandler<SyncEntityCapabilityPacket>() {
-            override fun handleClientPacket(player: EntityPlayer, message: SyncEntityCapabilityPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
-                mainThread.addScheduledTask {
-                    val cap = CapabilitiesHandler.getEntityCapability(ResourceLocation(message.capabilityID))
-                    try {
-                        cap.readNBT(player.world.loadedEntityList.single { it.uniqueID == message.targetUUID }.getCapability(cap, null), null, message.data)
-                    } catch (e: Exception) {
-                        SAOMCLib.LOGGER.info("[SyncEntityCapabilityPacket] Suppressed an error.")
-                        e.printStackTrace()
-                    }
+            override fun handleClientPacket(player: EntityPlayer, message: SyncEntityCapabilityPacket, ctx: MessageContext): IMessage? {
+                val cap = CapabilitiesHandler.getEntityCapability(ResourceLocation(message.capabilityID))
+                try {
+                    @Suppress("UNCHECKED_CAST")
+                    cap.readNBT((player.world.loadedEntityList as List<Entity>).single { it.uniqueID == message.targetUUID }.getCapability(cap, null)!!, null, message.data)
+                } catch (e: Exception) {
+                    SAOMCLib.LOGGER.info("[SyncEntityCapabilityPacket] Suppressed an error.")
+                    e.printStackTrace()
                 }
 
                 return null

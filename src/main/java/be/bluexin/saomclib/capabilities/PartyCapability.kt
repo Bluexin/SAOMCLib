@@ -1,6 +1,7 @@
 package be.bluexin.saomclib.capabilities
 
 import be.bluexin.saomclib.SAOMCLib
+import be.bluexin.saomclib.displayNameString
 import be.bluexin.saomclib.events.PartyEvent
 import be.bluexin.saomclib.party.IParty
 import be.bluexin.saomclib.party.Party
@@ -11,8 +12,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.common.capabilities.CapabilityInject
 import java.lang.ref.WeakReference
 
 /**

@@ -2,15 +2,10 @@ package be.bluexin.saomclib.capabilities
 
 import be.bluexin.saomclib.except.*
 import net.minecraft.entity.Entity
-import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
-import net.minecraft.world.World
-import net.minecraftforge.common.capabilities.*
-import net.minecraftforge.event.AttachCapabilitiesEvent
 import java.util.*
 
 @Suppress("unused")
@@ -24,45 +19,45 @@ object CapabilitiesHandler {
 
     private var entitiez: ArrayList<Pair<Class<out AbstractEntityCapability>, (Any) -> Boolean>>? = ArrayList()
     private var entitiezz: HashMap<ResourceLocation, CapabilityStorage>? = null
-    private var tileEntitiez: ArrayList<Pair<Class<out AbstractCapability>, (Any) -> Boolean>>? = ArrayList()
+    /*private var tileEntitiez: ArrayList<Pair<Class<out AbstractCapability>, (Any) -> Boolean>>? = ArrayList()
     private var tileEntitiezz: HashMap<ResourceLocation, CapabilityStorage>? = null
     private var itemz: ArrayList<Pair<Class<out AbstractCapability>, (Any) -> Boolean>>? = ArrayList()
     private var itemzz: HashMap<ResourceLocation, CapabilityStorage>? = null
     private var worldz: ArrayList<Pair<Class<out AbstractCapability>, (Any) -> Boolean>>? = ArrayList()
     private var worldzz: HashMap<ResourceLocation, CapabilityStorage>? = null
-    // TODO: add Village & Chunk
+    // TODO: add Village & Chunk*/ // 1.7.10 only supports capabilities on Entity
 
     /**
      * Register a capability to registry for all subtypes of Entity.
      */
     fun <T : AbstractEntityCapability> registerEntityCapability(clazz: Class<T>, storage: Capability.IStorage<T>, assignable: (Any) -> Boolean) {
         entitiez?.add(Pair(clazz, assignable)) ?: throw WrongPhaseException(clazz)
-        CapabilityManager.INSTANCE.register(clazz, storage, clazz)
+        CapabilityManager.register(clazz, storage, clazz::newInstance)
     }
 
     /**
      * Register a capability to registry for all subtypes of ItemStack.
      */
-    fun <T : AbstractCapability> registerItemCapability(clazz: Class<T>, storage: Capability.IStorage<T>, assignable: (Any) -> Boolean) {
+    /*fun <T : AbstractCapability> registerItemCapability(clazz: Class<T>, storage: Capability.IStorage<T>, assignable: (Any) -> Boolean) {
         itemz?.add(Pair(clazz, assignable)) ?: throw WrongPhaseException(clazz)
-        CapabilityManager.INSTANCE.register(clazz, storage, clazz)
-    }
+        CapabilityManager.register(clazz, storage, clazz::newInstance)
+    }*/
 
     /**
      * Register a capability to registry for all subtypes of TileEntity.
      */
-    fun <T : AbstractCapability> registerTECapability(clazz: Class<T>, storage: Capability.IStorage<T>, assignable: (Any) -> Boolean) {
+    /*fun <T : AbstractCapability> registerTECapability(clazz: Class<T>, storage: Capability.IStorage<T>, assignable: (Any) -> Boolean) {
         tileEntitiez?.add(Pair(clazz, assignable)) ?: throw WrongPhaseException(clazz)
-        CapabilityManager.INSTANCE.register(clazz, storage, clazz)
-    }
+        CapabilityManager.register(clazz, storage, clazz::newInstance)
+    }*/
 
     /**
      * Register a capability to registry for all subtypes of World.
      */
-    fun <T : AbstractCapability> registerWorldCapability(clazz: Class<T>, storage: Capability.IStorage<T>, assignable: (Any) -> Boolean) {
+    /*fun <T : AbstractCapability> registerWorldCapability(clazz: Class<T>, storage: Capability.IStorage<T>, assignable: (Any) -> Boolean) {
         worldz?.add(Pair(clazz, assignable)) ?: throw WrongPhaseException(clazz)
-        CapabilityManager.INSTANCE.register(clazz, storage, clazz)
-    }
+        CapabilityManager.register(clazz, storage, clazz::newInstance)
+    }*/
 
     /**
      * Queries a Entity Capability based on it's [id], or throws an [IDNotFoundException] if no capability was found.
@@ -72,17 +67,17 @@ object CapabilitiesHandler {
     /**
      * Queries a ItemStack Capability based on it's ID, or throws an [IDNotFoundException] if no capability was found.
      */
-    fun getItemCapability(id: ResourceLocation) = itemzz!![id]?.capability ?: throw IDNotFoundException(id)
+//    fun getItemCapability(id: ResourceLocation) = itemzz!![id]?.capability ?: throw IDNotFoundException(id)
 
     /**
      * Queries a TE Capability based on it's ID, or throws an [IDNotFoundException] if no capability was found.
      */
-    fun getTileEntityCapability(id: ResourceLocation) = tileEntitiezz!![id]?.capability ?: throw IDNotFoundException(id)
+//    fun getTileEntityCapability(id: ResourceLocation) = tileEntitiezz!![id]?.capability ?: throw IDNotFoundException(id)
 
     /**
      * Queries a TE Capability based on it's ID, or throws an [IDNotFoundException] if no capability was found.
      */
-    fun getWorldCapability(id: ResourceLocation) = worldzz!![id]?.capability ?: throw IDNotFoundException(id)
+//    fun getWorldCapability(id: ResourceLocation) = worldzz!![id]?.capability ?: throw IDNotFoundException(id)
 
     /**
      * Gets the ID of a Capability.
@@ -94,7 +89,7 @@ object CapabilitiesHandler {
         entitiezz = HashMap(entitiez?.size ?: 0, 1F)
         entitiez?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { entitiezz!!.put(getID(it.clazz), it) }
         entitiez = null
-        itemzz = HashMap(itemz?.size ?: 0, 1F)
+        /*itemzz = HashMap(itemz?.size ?: 0, 1F)
         itemz?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { itemzz!!.put(getID(it.clazz), it) }
         itemz = null
         tileEntitiezz = HashMap(tileEntitiez?.size ?: 0, 1F)
@@ -102,26 +97,26 @@ object CapabilitiesHandler {
         tileEntitiez = null
         worldzz = HashMap(worldz?.size ?: 0, 1F)
         worldz?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { worldzz!!.put(getID(it.clazz), it) }
-        worldz = null
+        worldz = null*/
     }
 
     internal fun syncEntitiesDeath(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDeath }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
 
     internal fun restoreEntitiesDeath(entity: Entity, original: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldRestoreOnDeath }?.forEach {
-        if ((entity.getCapability(it.value.capability, null) as AbstractEntityCapability).restore(entity, original)) it.value.capability.readNBT(entity.getCapability(it.value.capability, null), null, it.value.capability.writeNBT(original.getCapability(it.value.capability, null), null))
+        if ((entity.getCapability(it.value.capability, null) as AbstractEntityCapability).restore(entity, original)) it.value.capability.readNBT(entity.getCapability(it.value.capability, null)!!, null, it.value.capability.writeNBT(original.getCapability(it.value.capability, null)!!, null))
     }
 
     internal fun syncEntitiesDimension(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDimensionChange }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
 
     internal fun syncEntitiesLogin(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSendOnLogin }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
 
-    internal fun registerEntity(event: AttachCapabilitiesEvent<Entity>) = entitiezz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
+    internal fun registerEntity(entity: Entity) = entitiezz?.filter { it.value.shouldRegister(entity) }?.forEach { entity.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, entity)) }
 
-    internal fun registerItem(event: AttachCapabilitiesEvent<ItemStack>) = itemzz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
+//    internal fun registerItem(event: AttachCapabilitiesEvent<ItemStack>) = itemzz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
-    internal fun registerTE(event: AttachCapabilitiesEvent<TileEntity>) = tileEntitiezz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
+//    internal fun registerTE(event: AttachCapabilitiesEvent<TileEntity>) = tileEntitiezz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
-    internal fun registerWorld(event: AttachCapabilitiesEvent<World>) = worldzz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
+//    internal fun registerWorld(event: AttachCapabilitiesEvent<World>) = worldzz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
     private fun getKey(clazz: Class<out AbstractCapability>) = try {
         clazz.declaredFields.single { it.isAnnotationPresent(Key::class.java) }.apply { this.isAccessible = true }.get(null) as ResourceLocation
@@ -172,15 +167,15 @@ object CapabilitiesHandler {
 
     internal fun getEntityCapabilityImpl(id: ResourceLocation) = entitiezz!![id] ?: throw IDNotFoundException(id)
 
-    internal fun getItemCapabilityImpl(id: ResourceLocation) = itemzz!![id] ?: throw IDNotFoundException(id)
+//    internal fun getItemCapabilityImpl(id: ResourceLocation) = itemzz!![id] ?: throw IDNotFoundException(id)
 
-    internal fun getTileEntityCapabilityImpl(id: ResourceLocation) = tileEntitiezz!![id]
-            ?: throw IDNotFoundException(id)
+//    internal fun getTileEntityCapabilityImpl(id: ResourceLocation) = tileEntitiezz!![id]
+//            ?: throw IDNotFoundException(id)
 
-    internal fun getWorldCapabilityImpl(id: ResourceLocation) = worldzz!![id] ?: throw IDNotFoundException(id)
+//    internal fun getWorldCapabilityImpl(id: ResourceLocation) = worldzz!![id] ?: throw IDNotFoundException(id)
 
     internal data class CapabilityStorage(val key: ResourceLocation, val capability: Capability<AbstractCapability>, val clazz: Class<out AbstractCapability>, private val assignable: (Any) -> Boolean) {
-        fun shouldRegister(arg: Any) = isAssignable(arg) && !(arg as ICapabilityProvider).hasCapability(capability, null)
+        fun shouldRegister(arg: Any) = isAssignable(arg) && !((arg as? Entity)?.hasCapability(capability, null) ?: true)
         fun isAssignable(arg: Any) = assignable.invoke(arg)
     }
 }

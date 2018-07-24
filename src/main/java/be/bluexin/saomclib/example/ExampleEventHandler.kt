@@ -1,6 +1,7 @@
 package be.bluexin.saomclib.example
 
 import be.bluexin.saomclib.SAOMCLib
+import be.bluexin.saomclib.capabilities.getCapability
 import be.bluexin.saomclib.world
 import cpw.mods.fml.common.eventhandler.SubscribeEvent
 import net.minecraft.entity.player.EntityPlayer

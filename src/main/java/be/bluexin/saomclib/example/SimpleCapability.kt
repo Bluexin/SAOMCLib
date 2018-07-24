@@ -2,13 +2,14 @@ package be.bluexin.saomclib.example
 
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.AbstractEntityCapability
+import be.bluexin.saomclib.capabilities.Capability
+import be.bluexin.saomclib.capabilities.CapabilityInject
 import be.bluexin.saomclib.capabilities.Key
+import be.bluexin.saomclib.world
 import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.common.capabilities.CapabilityInject
 
 /**
  * Part of saomclib by Bluexin.
@@ -44,7 +45,7 @@ class SimpleCapability : AbstractEntityCapability() {
                 return tag
             }
 
-            override fun readNBT(capability: Capability<SimpleCapability>, instance: SimpleCapability, side: EnumFacing?, nbt: NBTBase?) {
+            override fun readNBT(capability: Capability<SimpleCapability>, instance: SimpleCapability, side: EnumFacing?, nbt: NBTBase) {
                 instance.num = (nbt as NBTTagCompound).getInteger("num")
                 SAOMCLib.LOGGER.info("Reading ${instance.num} on remote=${instance.reference.get()?.world?.isRemote}.")
             }

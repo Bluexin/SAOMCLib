@@ -1,16 +1,12 @@
 package be.bluexin.saomclib.example;
 
 import be.bluexin.saomclib.SAOMCLib;
-import be.bluexin.saomclib.capabilities.AbstractCapability;
-import be.bluexin.saomclib.capabilities.AbstractEntityCapability;
-import be.bluexin.saomclib.capabilities.Key;
+import be.bluexin.saomclib.capabilities.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -37,20 +33,21 @@ public class JSimpleCapability extends AbstractEntityCapability {
     }
 
     public static class Storage implements Capability.IStorage<JSimpleCapability> {
+        @NotNull
         @Override
-        public NBTBase writeNBT(Capability<JSimpleCapability> capability, JSimpleCapability instance, EnumFacing side) {
+        public NBTBase writeNBT(@NotNull Capability<JSimpleCapability> capability, JSimpleCapability instance, EnumFacing side) {
             NBTTagCompound tag = new NBTTagCompound();
             tag.setInteger("num", instance.num);
             Entity ref = instance.reference.get();
-            SAOMCLib.INSTANCE.getLOGGER().info("Writing " + instance.num + " on remote=" + (ref == null ? "null" : ref.world.isRemote) + '.');
+            SAOMCLib.INSTANCE.getLOGGER().info("Writing " + instance.num + " on remote=" + (ref == null ? "null" : ref.worldObj.isRemote) + '.');
             return tag;
         }
 
         @Override
-        public void readNBT(Capability<JSimpleCapability> capability, JSimpleCapability instance, EnumFacing side, NBTBase nbt) {
+        public void readNBT(@NotNull Capability<JSimpleCapability> capability, JSimpleCapability instance, EnumFacing side, NBTBase nbt) {
             instance.num = ((NBTTagCompound) nbt).getInteger("num");
             Entity ref = instance.reference.get();
-            SAOMCLib.INSTANCE.getLOGGER().info("Reading " + instance.num + " on remote=" + (ref == null ? "null" : ref.world.isRemote) + '.');
+            SAOMCLib.INSTANCE.getLOGGER().info("Reading " + instance.num + " on remote=" + (ref == null ? "null" : ref.worldObj.isRemote) + '.');
         }
     }
 }

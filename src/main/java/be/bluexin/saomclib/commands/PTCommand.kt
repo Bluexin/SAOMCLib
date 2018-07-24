@@ -1,9 +1,10 @@
 package be.bluexin.saomclib.commands
 
-import be.bluexin.saomclib.BlockPos
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
+import be.bluexin.saomclib.displayNameString
 import be.bluexin.saomclib.message
+import be.bluexin.saomclib.name
 import net.minecraft.command.CommandBase
 import net.minecraft.command.CommandException
 import net.minecraft.command.ICommandSender
@@ -130,7 +131,7 @@ object PTCommand : CommandBase() {
 
     override fun getRequiredPermissionLevel() = 0
 
-    override fun checkPermission(server: MinecraftServer?, sender: ICommandSender) = sender is EntityPlayer
+    override fun canCommandSenderUseCommand(sender: ICommandSender) = sender is EntityPlayer
 
     override fun addTabCompletionOptions(sender: ICommandSender, args: Array<out String>): MutableList<String> {
         if (sender !is EntityPlayer) return mutableListOf()
