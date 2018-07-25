@@ -219,7 +219,7 @@ class Party(leader: EntityPlayer) : IParty {
     init {
         membersImpl[leader] = Unit
         this.world = WeakReference(leader.world)
-        this.leader = leader
+        this.leaderImpl = WeakReference(leader)
         syncMembers()
     }
 
