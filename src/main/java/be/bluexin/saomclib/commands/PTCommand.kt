@@ -56,6 +56,7 @@ object PTCommand : CommandBase() {
 
     private fun handleAccept(player: EntityPlayer, args: Array<out String>) {
         val cap = player.getPartyCapability()
+
         val invitedTo = cap.invitedTo ?: throw CommandException("commands.pt.accept.notInvited")
         if (invitedTo.isInvited(player)) {
             invitedTo.addMember(player)

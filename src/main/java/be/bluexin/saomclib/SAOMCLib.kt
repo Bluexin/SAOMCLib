@@ -10,6 +10,7 @@ import be.bluexin.saomclib.packets.PTS2CPacket
 import be.bluexin.saomclib.packets.PacketPipeline
 import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
 import be.bluexin.saomclib.proxy.CommonProxy
+import cpw.mods.fml.common.FMLCommonHandler
 import cpw.mods.fml.common.Mod
 import cpw.mods.fml.common.SidedProxy
 import cpw.mods.fml.common.event.FMLInitializationEvent
@@ -44,7 +45,8 @@ object SAOMCLib {
     fun preInit(e: FMLPreInitializationEvent) {
         CapabilityManager.injectCapabilities(e.asmData)
         MinecraftForge.EVENT_BUS.register(EventHandler)
-        CapabilitiesHandler.registerEntityCapability(PartyCapability::class.java, PartyCapability.PartyStorage, { it is EntityPlayer })
+        FMLCommonHandler.instance().bus().register(EventHandler)
+        CapabilitiesHandler.registerEntityCapability(PartyCapability::class.java, PartyCapability.PartyStorage) { it is EntityPlayer }
         PacketPipeline.registerMessage(PTC2SPacket::class.java, PTC2SPacket.Companion.Handler::class.java)
         PacketPipeline.registerMessage(PTS2CPacket::class.java, PTS2CPacket.Companion.Handler::class.java)
         PacketPipeline.registerMessage(SyncEntityCapabilityPacket::class.java, SyncEntityCapabilityPacket.Companion.Handler::class.java)

@@ -1,10 +1,12 @@
 package be.bluexin.saomclib.capabilities
 
+import be.bluexin.saomclib.SAOMCLib
 import com.google.common.base.Preconditions
 import com.google.common.collect.Lists
 import cpw.mods.fml.common.FMLLog
 import cpw.mods.fml.common.discovery.ASMDataTable
 import net.minecraft.entity.Entity
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -27,20 +29,25 @@ class CapabilitiesExtendedProperty : IExtendedEntityProperties {
     private val capabilities = mutableMapOf<ResourceLocation, ICapabilitySerializable<NBTBase>>()
 
     override fun loadNBTData(compound: NBTTagCompound) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        capabilities.forEach { (key, provider) ->
+            val tag = compound.getTag(key.toString())
+            SAOMCLib.LOGGER.info("load nbt on ${Thread.currentThread().name}: $tag")
+            if (tag != null) provider.deserializeNBT(tag)
+        }
     }
 
     override fun saveNBTData(compound: NBTTagCompound) {
-        capabilities.forEach {(key, provider) ->
+        capabilities.forEach { (key, provider) ->
             compound.setTag(key.toString(), provider.serializeNBT())
         }
     }
 
     override fun init(entity: Entity, world: World) {
-        CapabilitiesHandler
+        if (entity is EntityPlayer) SAOMCLib.LOGGER.info("init on ${Thread.currentThread().name}")
+        CapabilitiesHandler.registerEntity(entity)
     }
 
-    operator fun get(capability: Capability<*>, facing: EnumFacing?) =
+    operator fun <T> get(capability: Capability<T>, facing: EnumFacing?) =
             capabilities.values.firstOrNull { it.hasCapability(capability, facing) }?.getCapability(capability, facing)
 
     operator fun get(key: ResourceLocation) = capabilities[key]
@@ -79,18 +86,18 @@ val Entity.capabilities
     get() = this.getExtendedProperties(CapabilitiesExtendedProperty.KEY) as CapabilitiesExtendedProperty
 
 fun Entity.hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {
-    TODO()
+    return this.capabilities[capability, facing] != null
 }
 
 fun <T> Entity.getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
-    TODO()
+    return this.capabilities[capability, facing]
 }
 
 fun Entity.addCapability(key: ResourceLocation, provider: ICapabilitySerializable<NBTBase>) {
     this.capabilities[key] = provider
 }
 
-interface ICapabilitySerializable<T: NBTBase> {
+interface ICapabilitySerializable<T : NBTBase> {
     fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean
 
     fun <R> getCapability(capability: Capability<R>, facing: EnumFacing?): R?

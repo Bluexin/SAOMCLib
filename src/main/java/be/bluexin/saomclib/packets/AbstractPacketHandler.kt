@@ -52,7 +52,7 @@ abstract class AbstractPacketHandler<T : IMessage> : IMessageHandler<T, IMessage
             else handleServerPacket(player, message, ctx)
         } else {
             SAOMCLib.LOGGER.info("Received packet before player got initialized.")
-            Thread({ Thread.sleep(1000); onMessage(message, ctx) }).start()
+            Thread { Thread.sleep(1000); onMessage(message, ctx) }.start() // TODO: change this, network isn't threaded on 1.7.10 !
             null
         }
     }

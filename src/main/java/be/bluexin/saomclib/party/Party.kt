@@ -196,6 +196,7 @@ class Party(leader: EntityPlayer) : IParty {
         with(w.getPlayerEntityByUUID(UUID.fromString(nbt.getString("leader")))) {
             if (this != null) leaderImpl = WeakReference(this)
         }
+        syncMembers()
     }
 
     override fun writeNBT(): NBTTagCompound {
@@ -220,7 +221,7 @@ class Party(leader: EntityPlayer) : IParty {
         membersImpl[leader] = Unit
         this.world = WeakReference(leader.world)
         this.leaderImpl = WeakReference(leader)
-        syncMembers()
+//        syncMembers()
     }
 
     override fun fixPostDeath(oldPlayer: EntityPlayer, newPlayer: EntityPlayer) {

@@ -82,13 +82,13 @@ internal object EventHandler {
     @SubscribeEvent
     fun clientConnectedToServer(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
         Minecraft.getMinecraft().addScheduledTask {
-            MinecraftForge.EVENT_BUS.register(JoinServerEvent)
+            MinecraftForge.EVENT_BUS.register(JoinServerEvent) // TODO: remove this wth bs is this shit
         }
     }
 
     @SubscribeEvent
     fun playerDisconnect(evt: cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
         evt.player.getPartyCapability().clear()
-    } // TODO: remove from existing parties, including invites & sync result
+    }
 
 }
