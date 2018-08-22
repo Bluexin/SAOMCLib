@@ -1,7 +1,8 @@
 buildscript {
-    ext.kotlin_version = '1.2.51'
+    ext.kotlin_version = '1.2.60'
     repositories {
         mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -47,12 +48,19 @@ configurations {
 }
 
 dependencies {
+    // Once for shading, and once for it to be included in pom. Blame this old forgegradle.
     shade "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     shade "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     shade "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     shade "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     shade "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines_version"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines_version"
     shade "org.jetbrains:annotations:$annotations_version"
+    compile "org.jetbrains:annotations:$annotations_version"
 }
 
 processResources {
@@ -82,7 +90,7 @@ uploadArchives {
     } else {
         println("No password set up! Uploading to local.")
         repositories.mavenDeployer {
-            repository(url: 'file://build/mvn')
+            repository(url: "file://${buildDir}/repo")
         }
     }
 }
