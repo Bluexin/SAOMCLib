@@ -1,6 +1,5 @@
 package be.bluexin.saomclib.events
 
-import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import net.minecraft.client.Minecraft
@@ -11,7 +10,6 @@ import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.AttachCapabilitiesEvent
-import net.minecraftforge.event.entity.living.LivingEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
@@ -35,26 +33,23 @@ internal object EventHandler {
     @SubscribeEvent
     fun attachWorldCapabilities(event: AttachCapabilitiesEvent<World>) = CapabilitiesHandler.registerWorld(event)
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     fun livingTick(e: LivingEvent.LivingUpdateEvent) {
         // TODO: Ticking capabilities?
-    }
+    }*/
 
     @SubscribeEvent
     fun cloneEvent(evt: PlayerEvent.Clone) {
-        SAOMCLib.LOGGER.info("${evt.entityPlayer} cloned.")
         if (!evt.entityPlayer.world.isRemote) CapabilitiesHandler.restoreEntitiesDeath(evt.entity, evt.original)
     }
 
     @SubscribeEvent
     fun respawnEvent(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent) {
-        SAOMCLib.LOGGER.info("${evt.player} respawned.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDeath(evt.player)
     }
 
     @SubscribeEvent
     fun playerChangeDimension(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent) {
-        SAOMCLib.LOGGER.info("${evt.player} changed dimension.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDimension(evt.player)
     }
 
@@ -75,13 +70,13 @@ internal object EventHandler {
     @SubscribeEvent
     fun clientConnectedToServer(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
         Minecraft.getMinecraft().addScheduledTask {
-            MinecraftForge.EVENT_BUS.register(JoinServerEvent)
+            MinecraftForge.EVENT_BUS.register(JoinServerEvent) // TODO: remove this wth bs is this shit
         }
     }
 
     @SubscribeEvent
     fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
         evt.player.getPartyCapability().clear()
-    } // TODO: remove from existing parties, including invites & sync result
+    }
 
 }

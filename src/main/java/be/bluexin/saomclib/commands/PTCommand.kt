@@ -1,6 +1,5 @@
 package be.bluexin.saomclib.commands
 
-import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.message
 import net.minecraft.command.CommandBase
@@ -24,7 +23,6 @@ object PTCommand : CommandBase() {
     override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String>) {
         if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
         if (args.isEmpty()) throw WrongUsageException(getUsage(sender))
-        SAOMCLib.LOGGER.info("args: " + args[0])
         when (args[0]) {
             "invite" -> handleInvite(server, sender, args)
             "accept" -> handleAccept(server, sender, args)
@@ -55,6 +53,7 @@ object PTCommand : CommandBase() {
 
     private fun handleAccept(server: MinecraftServer, player: EntityPlayer, args: Array<out String>) {
         val cap = player.getPartyCapability()
+
         val invitedTo = cap.invitedTo ?: throw CommandException("commands.pt.accept.notInvited")
         if (invitedTo.isInvited(player)) {
             invitedTo.addMember(player)
