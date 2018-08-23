@@ -19,7 +19,7 @@ import java.util.*
  *
  * @author Bluexin
  */
-class PTC2SPacket(): IMessage {
+class PTC2SPacket() : IMessage {
 
     private lateinit var type: Type
     private lateinit var member: String
@@ -57,24 +57,25 @@ class PTC2SPacket(): IMessage {
             override fun handleServerPacket(player: EntityPlayer, message: PTC2SPacket, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
                 mainThread.addScheduledTask {
                     try {
-                        val party = player.getPartyCapability().getOrCreatePT()
-                        if (party.leader == player) when (message.type) {
+                        val cap = player.getPartyCapability()
+                        val party = cap.getOrCreatePT()
+                        val invitedTo = cap.invitedTo
+                        @Suppress("NON_EXHAUSTIVE_WHEN") if (party.leader == player) when (message.type) {
                             Type.REMOVE -> party.removeMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                             Type.INVITE -> party.invite(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                             Type.LEADER -> party.leader == player.world.getPlayerEntityByUUID(UUID.fromString(message.member))
                             Type.JOIN -> party.addMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                             Type.REQUEST -> (player as EntityPlayerMP).sendPacket(SyncEntityCapabilityPacket(player.getPartyCapability(), player))
                             Type.CANCEL -> party.cancel(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
-                        } else if (party.isInvited(player)) when (message.type) {
+                        } else if (invitedTo?.isInvited(player) == true) when (message.type) {
                             Type.CANCEL -> party.cancel(player)
                             Type.JOIN -> party.addMember(player)
-                            else -> {}
+
                         }
                     } catch (e: Exception) {
                         SAOMCLib.LOGGER.debug("[PTC2SPacket] Suppressed an error.") // FIXME: very pro :ok_hand:
                         e.printStackTrace()
                     }
-                    SAOMCLib.LOGGER.debug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
                 }
                 return null
             }
