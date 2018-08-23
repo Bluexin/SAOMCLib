@@ -1,12 +1,10 @@
 package be.bluexin.saomclib.capabilities
 
-import be.bluexin.saomclib.SAOMCLib
 import com.google.common.base.Preconditions
 import com.google.common.collect.Lists
 import cpw.mods.fml.common.FMLLog
 import cpw.mods.fml.common.discovery.ASMDataTable
 import net.minecraft.entity.Entity
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -31,7 +29,6 @@ class CapabilitiesExtendedProperty : IExtendedEntityProperties {
     override fun loadNBTData(compound: NBTTagCompound) {
         capabilities.forEach { (key, provider) ->
             val tag = compound.getTag(key.toString())
-            SAOMCLib.LOGGER.info("load nbt on ${Thread.currentThread().name}: $tag")
             if (tag != null) provider.deserializeNBT(tag)
         }
     }
@@ -43,7 +40,6 @@ class CapabilitiesExtendedProperty : IExtendedEntityProperties {
     }
 
     override fun init(entity: Entity, world: World) {
-        if (entity is EntityPlayer) SAOMCLib.LOGGER.info("init on ${Thread.currentThread().name}")
         CapabilitiesHandler.registerEntity(entity)
     }
 

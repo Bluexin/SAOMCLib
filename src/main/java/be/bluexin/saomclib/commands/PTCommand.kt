@@ -1,6 +1,5 @@
 package be.bluexin.saomclib.commands
 
-import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.displayNameString
 import be.bluexin.saomclib.message
@@ -25,7 +24,6 @@ object PTCommand : CommandBase() {
     override fun processCommand(sender: ICommandSender, args: Array<out String>) {
         if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
         if (args.isEmpty()) throw WrongUsageException(getCommandUsage(sender))
-        SAOMCLib.LOGGER.info("args: " + args[0])
         when (args[0]) {
             "invite" -> handleInvite( sender, args)
             "accept" -> handleAccept(sender, args)

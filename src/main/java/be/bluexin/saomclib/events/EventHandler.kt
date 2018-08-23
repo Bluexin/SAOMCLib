@@ -1,6 +1,5 @@
 package be.bluexin.saomclib.events
 
-import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.CapabilitiesExtendedProperty
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
@@ -49,19 +48,16 @@ internal object EventHandler {
 
     @SubscribeEvent
     fun cloneEvent(evt: PlayerEvent.Clone) {
-        SAOMCLib.LOGGER.info("${evt.entityPlayer} cloned.")
         if (!evt.entityPlayer.world.isRemote) CapabilitiesHandler.restoreEntitiesDeath(evt.entity, evt.original)
     }
 
     @SubscribeEvent
     fun respawnEvent(evt: cpw.mods.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent) {
-        SAOMCLib.LOGGER.info("${evt.player} respawned.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDeath(evt.player)
     }
 
     @SubscribeEvent
     fun playerChangeDimension(evt: cpw.mods.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent) {
-        SAOMCLib.LOGGER.info("${evt.player} changed dimension.")
         if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDimension(evt.player)
     }
 
