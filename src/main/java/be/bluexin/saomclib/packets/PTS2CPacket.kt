@@ -28,7 +28,6 @@ class PTS2CPacket() : IMessage {
         this.type = type
         this.leader = leader.cachedUniqueIdString
         this.members = members.map { it.cachedUniqueIdString }.toList()
-        println(this.members.joinToString())
     }
 
     override fun fromBytes(buf: ByteBuf) {
