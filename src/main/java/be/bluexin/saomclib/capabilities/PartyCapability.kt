@@ -2,6 +2,8 @@ package be.bluexin.saomclib.capabilities
 
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.events.PartyEvent
+import be.bluexin.saomclib.onClient
+import be.bluexin.saomclib.onServer
 import be.bluexin.saomclib.party.IParty
 import be.bluexin.saomclib.party.Party
 import net.minecraft.entity.Entity
@@ -25,14 +27,18 @@ class PartyCapability : AbstractEntityCapability() {
     var party: IParty? = null
     private var invitedToImpl: WeakReference<IParty>? = null
 
-    var invitedTo: IParty?
-        get() = invitedToImpl?.get()
+    var invitedTo: IParty? = null
+        get() = field ?: invitedToImpl?.get()
         set(value) {
             val oldValue = invitedTo
-            invitedToImpl = if (value != null) {
-                WeakReference(value)
+            with(reference.get()) {
+                this?.world?.onClient {
+                    field = value
+                }
+                this?.world?.onServer {
+                    invitedToImpl = if (value != null) WeakReference(value) else null
+                }
             }
-            else null
             if (value != null) MinecraftForge.EVENT_BUS.post(PartyEvent.Invited(value, reference.get() as EntityPlayer))
             else if (oldValue != null) MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCanceled(oldValue, reference.get() as EntityPlayer))
         }
@@ -50,7 +56,7 @@ class PartyCapability : AbstractEntityCapability() {
     }
 
     override fun restore(entity: Entity, original: Entity): Boolean {
-        val old = original.getCapability(CAP_INSTANCE, null)?: return true
+        val old = original.getCapability(CAP_INSTANCE, null) ?: return true
         this.party = old.party
         this.invitedTo = old.invitedTo
 
@@ -66,15 +72,16 @@ class PartyCapability : AbstractEntityCapability() {
     override val shouldSendOnLogin = true
 
     companion object {
-        @Key val KEY = ResourceLocation(SAOMCLib.MODID, "party")
+        @Key
+        val KEY = ResourceLocation(SAOMCLib.MODID, "party")
 
         @CapabilityInject(PartyCapability::class)
         lateinit var CAP_INSTANCE: Capability<PartyCapability>
     }
 
-    object PartyStorage: Capability.IStorage<PartyCapability> {
+    object PartyStorage : Capability.IStorage<PartyCapability> {
         override fun readNBT(capability: Capability<PartyCapability>, instance: PartyCapability, side: EnumFacing?, nbt: NBTBase) {
-            val nbtTagCompound = nbt as? NBTTagCompound?: return
+            val nbtTagCompound = nbt as? NBTTagCompound ?: return
 
             if (nbtTagCompound.hasKey("party")) {
                 val pt = instance.getOrCreatePT()

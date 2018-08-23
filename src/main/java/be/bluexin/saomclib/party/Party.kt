@@ -175,6 +175,7 @@ class Party(leader: EntityPlayer) : IParty {
     private fun syncMembers() {
         world.get()?.onServer {
             members.forEach { (it as EntityPlayerMP).sendPacket(SyncEntityCapabilityPacket(it.getPartyCapability(), it)) }
+            invited.forEach { (it as EntityPlayerMP).sendPacket(SyncEntityCapabilityPacket(it.getPartyCapability(), it)) }
         }
     }
 
