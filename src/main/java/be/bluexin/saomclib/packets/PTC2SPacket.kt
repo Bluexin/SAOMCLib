@@ -64,8 +64,8 @@ class PTC2SPacket() : IMessage {
                         Type.REQUEST -> (player as EntityPlayerMP).sendPacket(SyncEntityCapabilityPacket(player.getPartyCapability(), player))
                         Type.CANCEL -> party.cancel(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                     } else if (invitedTo?.isInvited(player) == true) when (message.type) {
-                        Type.CANCEL -> party.cancel(player)
-                        Type.JOIN -> party.addMember(player)
+                        Type.CANCEL -> invitedTo.cancel(player)
+                        Type.JOIN -> invitedTo.addMember(player)
                     }
                 } catch (e: Exception) {
                     SAOMCLib.LOGGER.debug("[PTC2SPacket] Suppressed an error.") // FIXME: very pro :ok_hand:
