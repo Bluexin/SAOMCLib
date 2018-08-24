@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.Event
  * Party-related events.
  * They are fired both on client and server.
  */
-abstract class PartyEvent(val party: IParty): Event() {
+/*abstract*/open class PartyEvent(val party: IParty) : Event() {
     /**
      * Fired when a player actually joins a party.
      */
