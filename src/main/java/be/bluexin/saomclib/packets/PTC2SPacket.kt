@@ -60,14 +60,16 @@ class PTC2SPacket() : IMessage {
                         val cap = player.getPartyCapability()
                         val party = cap.getOrCreatePT()
                         val invitedTo = cap.invitedTo
-                        @Suppress("NON_EXHAUSTIVE_WHEN") if (party.leader == player) when (message.type) {
+                        if (party.leader == player) when (message.type) {
                             Type.REMOVE -> party.removeMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                             Type.INVITE -> party.invite(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                             Type.LEADER -> party.leader == player.world.getPlayerEntityByUUID(UUID.fromString(message.member))
                             Type.JOIN -> party.addMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
                             Type.REQUEST -> (player as EntityPlayerMP).sendPacket(SyncEntityCapabilityPacket(player.getPartyCapability(), player))
                             Type.CANCEL -> party.cancel(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
-                        } else if (invitedTo?.isInvited(player) == true) when (message.type) {
+                        }
+                        @Suppress("NON_EXHAUSTIVE_WHEN")
+                        if (invitedTo?.isInvited(player) == true) when (message.type) {
                             Type.CANCEL -> invitedTo.cancel(player)
                             Type.JOIN -> invitedTo.addMember(player)
 
