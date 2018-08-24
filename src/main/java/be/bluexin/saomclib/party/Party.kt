@@ -71,12 +71,13 @@ class Party(leader: EntityPlayer) : IParty {
             (member as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.CLEAR, member, sequenceOf()))
             syncMembers()
         }
-        if (isParty) {
+        if (membersImpl.isNotEmpty()) {
             world.get()?.onClient {
                 PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.REMOVE, member))
             }
             MinecraftForge.EVENT_BUS.post(PartyEvent.Leave(this, member))
-        } else dissolve()
+        }
+        if (!isParty) dissolve()
         true
     } else false
 
