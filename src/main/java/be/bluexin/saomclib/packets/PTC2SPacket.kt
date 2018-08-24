@@ -60,19 +60,22 @@ class PTC2SPacket() : IMessage {
                         val cap = player.getPartyCapability()
                         val party = cap.getOrCreatePT()
                         val invitedTo = cap.invitedTo
+                        val target: EntityPlayer? = player.world.getPlayerEntityByUUID(UUID.fromString(message.member))
                         if (party.leader == player) when (message.type) {
-                            Type.REMOVE -> party.removeMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
-                            Type.INVITE -> party.invite(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
-                            Type.LEADER -> party.leader == player.world.getPlayerEntityByUUID(UUID.fromString(message.member))
-                            Type.JOIN -> party.addMember(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
+                            Type.REMOVE -> party.removeMember(target!!)
+                            Type.INVITE -> party.invite(target!!)
+                            Type.LEADER -> party.leader == target
+                            Type.JOIN -> party.addMember(target!!)
                             Type.REQUEST -> (player as EntityPlayerMP).sendPacket(SyncEntityCapabilityPacket(player.getPartyCapability(), player))
-                            Type.CANCEL -> party.cancel(player.world.getPlayerEntityByUUID(UUID.fromString(message.member))!!)
+                            Type.CANCEL -> party.cancel(target!!)
                         }
                         @Suppress("NON_EXHAUSTIVE_WHEN")
                         if (invitedTo?.isInvited(player) == true) when (message.type) {
                             Type.CANCEL -> invitedTo.cancel(player)
                             Type.JOIN -> invitedTo.addMember(player)
-
+                        }
+                        if (player == target && message.type == Type.REMOVE) {
+                            party.removeMember(player)
                         }
                     } catch (e: Exception) {
                         SAOMCLib.LOGGER.debug("[PTC2SPacket] Suppressed an error.") // FIXME: very pro :ok_hand:
