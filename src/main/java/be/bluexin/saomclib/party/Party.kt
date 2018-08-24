@@ -156,7 +156,7 @@ class Party(leader: EntityPlayer) : IParty {
         true
     } else false
 
-    override fun isInvited(player: EntityPlayer) = invitesImpl.contains(player)
+    override fun isInvited(player: EntityPlayer) = player in invitesImpl
 
     override fun cleanupInvites(time: Long) {
         val remove = invitesImpl.filter { (if (time < it.value) time + 24000 else time) - it.value > 300 }
