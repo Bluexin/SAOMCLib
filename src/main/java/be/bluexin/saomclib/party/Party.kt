@@ -69,11 +69,12 @@ class Party(leader: EntityPlayer) : IParty {
             (member as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.CLEAR, member, sequenceOf()))
             syncMembers()
         }
-        world.get()?.onClient {
-            PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.REMOVE, member))
-        }
-        MinecraftForge.EVENT_BUS.post(PartyEvent.Leave(this, member))
-        if (!isParty) dissolve()
+        if (isParty) {
+            world.get()?.onClient {
+                PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.REMOVE, member))
+            }
+            MinecraftForge.EVENT_BUS.post(PartyEvent.Leave(this, member))
+        } else dissolve()
         true
     } else false
 
@@ -106,12 +107,14 @@ class Party(leader: EntityPlayer) : IParty {
 
     private val world: WeakReference<World>
 
-    override fun dissolve() {
-        println("Dissolving ${leader?.displayNameString}'s party.")
-        members.forEach { it.getPartyCapability().clear() }
-        if (leader != null) world.get()?.onServer { sendToMembers(PTS2CPacket(PTS2CPacket.Type.CLEAR, leader!!, sequenceOf())) }
-        membersImpl.clear()
-        MinecraftForge.EVENT_BUS.post(PartyEvent.Disbanded(this))
+    override fun dissolve() { // FIXME: clear invites as well
+        if (membersImpl.size > 1) {
+            println("Dissolving ${leader?.displayNameString}'s party.")
+            members.forEach { it.getPartyCapability().clear() }
+            if (leader != null) world.get()?.onServer { sendToMembers(PTS2CPacket(PTS2CPacket.Type.CLEAR, leader!!, sequenceOf())) }
+            membersImpl.clear()
+            MinecraftForge.EVENT_BUS.post(PartyEvent.Disbanded(this))
+        }
     }
 
     override val size: Int
