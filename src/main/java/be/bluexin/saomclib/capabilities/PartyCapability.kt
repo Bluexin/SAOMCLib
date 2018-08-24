@@ -48,6 +48,7 @@ class PartyCapability : AbstractEntityCapability() {
         println("Clearing ${(this.reference.get() as EntityPlayer?)?.displayNameString}'s party cap.")
         party?.removeMember(this.reference.get() as EntityPlayer)
         party = null
+        invitedTo?.cancel(this.reference.get() as EntityPlayer)
         invitedTo = null
     }
 
