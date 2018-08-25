@@ -34,13 +34,13 @@ class PartyCapability : AbstractEntityCapability() {
             with(reference.get()) {
                 this?.world?.onClient {
                     field = value
+                    if (value != null) MinecraftForge.EVENT_BUS.post(PartyEvent.Invited(value, reference.get() as EntityPlayer))
                 }
                 this?.world?.onServer {
                     invitedToImpl = if (value != null) WeakReference(value) else null
                 }
             }
-            if (value != null) MinecraftForge.EVENT_BUS.post(PartyEvent.Invited(value, reference.get() as EntityPlayer))
-            else if (oldValue != null) MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCanceled(oldValue, reference.get() as EntityPlayer))
+//            else if (oldValue != null) MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCanceled(oldValue, reference.get() as EntityPlayer))
         }
 
     fun getOrCreatePT(): IParty {
@@ -92,7 +92,10 @@ class PartyCapability : AbstractEntityCapability() {
                 val pt = Party(instance.reference.get() as EntityPlayer)
                 pt.readNBT(nbtTagCompound.getCompoundTag("invited"))
                 instance.invitedTo = pt
-            } else instance.invitedTo = null
+            } else {
+                instance.invitedTo = null
+                MinecraftForge.EVENT_BUS.post(PartyEvent.Refreshed(instance.party, null))
+            }
         }
 
         override fun writeNBT(capability: Capability<PartyCapability>, instance: PartyCapability, side: EnumFacing?): NBTBase {

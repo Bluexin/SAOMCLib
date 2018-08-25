@@ -1,5 +1,6 @@
 package be.bluexin.saomclib.party
 
+import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.events.PartyEvent
 import be.bluexin.saomclib.onClient
@@ -112,7 +113,7 @@ class Party(leader: EntityPlayer) : IParty {
 
     override fun dissolve() { // FIXME: clear invites as well
         if (membersImpl.size > 1) {
-            println("Dissolving ${leader?.displayNameString}'s party.")
+            SAOMCLib.LOGGER.info("Dissolving ${leader?.displayNameString}'s party.")
             members.forEach { it.getPartyCapability().clear() }
             if (leader != null) world.get()?.onServer { sendToMembers(PTS2CPacket(PTS2CPacket.Type.CLEAR, leader!!, sequenceOf())) }
             membersImpl.clear()
@@ -133,10 +134,9 @@ class Party(leader: EntityPlayer) : IParty {
             player.getPartyCapability().invitedTo = this
             invitesImpl[player] = player.world.worldTime // TODO: Using worldTime isn't too safe
             world.get()?.onServer {
-                println("Inviting ${player.displayNameString} to ${leader?.displayNameString}'s party.")
-                (player as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.INVITE, leader!!, members))
+                SAOMCLib.LOGGER.info("Inviting ${player.displayNameString} to ${leader?.displayNameString}'s party.")
+//                (player as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.INVITE, leader!!, members))
                 syncMembers()
-                println("Done. Members: ${members.joinToString { it.displayNameString }}. Invited: ${invited.joinToString { it.displayNameString }}. Leader: ${leader?.displayNameString}")
             }
             world.get()?.onClient {
                 PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.INVITE, player))
@@ -145,7 +145,6 @@ class Party(leader: EntityPlayer) : IParty {
             return true
         }
         return false
-
     }
 
     override fun cancel(player: EntityPlayer) = if (invitesImpl.remove(player) != null) {

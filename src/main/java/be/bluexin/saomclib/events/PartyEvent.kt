@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.Event
  * Party-related events.
  * They are fired both on client and server.
  */
-/*abstract*/open class PartyEvent(val party: IParty) : Event() {
+/*abstract*/open class PartyEvent(val party: IParty?) : Event() {
     /**
      * Fired when a player actually joins a party.
      */
@@ -20,4 +20,5 @@ import net.minecraftforge.fml.common.eventhandler.Event
     class LeaderChanged(party: IParty, val player: EntityPlayer): PartyEvent(party)
     class Invited(party: IParty, val player: EntityPlayer): PartyEvent(party)
     class InviteCanceled(party: IParty, val player: EntityPlayer): PartyEvent(party)
+    class Refreshed(party: IParty?, val invited: IParty?) : PartyEvent(party) // TODO: this is somewhat temporary, until I figure out a nice way of doing this
 }
