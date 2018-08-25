@@ -65,7 +65,6 @@ object PTCommand : CommandBase() {
     private fun handleDecline(player: EntityPlayer, args: Array<out String>) {
         val cap = player.getPartyCapability()
         val invitedTo = cap.invitedTo ?: throw CommandException("commands.pt.accept.notInvited")
-        cap.invitedTo = null
         if (invitedTo.isInvited(player)) {
             invitedTo.cancel(player)
             player.message("commands.pt.decline.success", invitedTo.leader?.displayNameString ?: "UNKNOWN")

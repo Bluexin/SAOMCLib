@@ -1,5 +1,6 @@
 package be.bluexin.saomclib.events
 
+import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.CapabilitiesExtendedProperty
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
@@ -19,7 +20,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent
  * @author Bluexin
  */
 internal object EventHandler {
-
 
 
     @SubscribeEvent
@@ -85,6 +85,12 @@ internal object EventHandler {
     @SubscribeEvent
     fun playerDisconnect(evt: cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
         evt.player.getPartyCapability().clear()
+    }
+
+    @SubscribeEvent
+    fun partyEvent(evt: PartyEvent) {
+        SAOMCLib.LOGGER.info("Party event: ${evt::class.simpleName}")
+        SAOMCLib.LOGGER.warn("", Exception())
     }
 
 }
