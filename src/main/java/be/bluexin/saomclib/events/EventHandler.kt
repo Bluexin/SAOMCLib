@@ -1,6 +1,5 @@
 package be.bluexin.saomclib.events
 
-import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.CapabilitiesExtendedProperty
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
@@ -87,10 +86,10 @@ internal object EventHandler {
         evt.player.getPartyCapability().clear()
     }
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     fun partyEvent(evt: PartyEvent) {
         SAOMCLib.LOGGER.info("Party event: ${evt::class.simpleName}")
         SAOMCLib.LOGGER.warn("", Exception())
-    }
+    }*/
 
 }
