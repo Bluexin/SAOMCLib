@@ -104,7 +104,7 @@ artifacts {
 jar {
     for (dep in configurations.shade) {
         from(project.zipTree(dep)) {
-            exclude 'META-INF', 'META-INF/**'
+            exclude 'META-INF/MANIFEST.MF'
         }
     }
 }
