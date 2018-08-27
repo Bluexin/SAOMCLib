@@ -34,9 +34,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage
  * Calls a profiled block, with given key.
  */
 inline fun Minecraft.profile(key: String, body: () -> Unit) {
-    this.mcProfiler.startSection(key)
+    this.profiler.startSection(key)
     body()
-    this.mcProfiler.endSection()
+    this.profiler.endSection()
 }
 
 /**
