@@ -53,8 +53,7 @@ class SyncEntityCapabilityPacket() : IMessage {
                     try {
                         cap.readNBT(player.world.loadedEntityList.single { it.uniqueID == message.targetUUID }.getCapability(cap, null), null, message.data)
                     } catch (e: Exception) {
-                        SAOMCLib.LOGGER.info("[SyncEntityCapabilityPacket] Suppressed an error.")
-                        e.printStackTrace()
+                        SAOMCLib.LOGGER.info("[SyncEntityCapabilityPacket] Suppressed an error.\nPacket content: ${message.capabilityID}, ${message.targetUUID}, ${message.data}\nPlayers: ${player.world.playerEntities}", e)
                     }
                 }
 

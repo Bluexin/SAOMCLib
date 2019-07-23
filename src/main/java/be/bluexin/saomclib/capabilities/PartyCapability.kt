@@ -2,10 +2,13 @@ package be.bluexin.saomclib.capabilities
 
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.events.PartyEvent
-import be.bluexin.saomclib.onClient
+import be.bluexin.saomclib.events.fireInviteCanceled
+import be.bluexin.saomclib.events.fireInvited
 import be.bluexin.saomclib.onServer
 import be.bluexin.saomclib.party.IParty
+import be.bluexin.saomclib.party.IPlayerInfo
 import be.bluexin.saomclib.party.Party
+import be.bluexin.saomclib.party.PlayerInfo
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTBase
@@ -27,32 +30,33 @@ class PartyCapability : AbstractEntityCapability() {
     var party: IParty? = null
     private var invitedToImpl: WeakReference<IParty>? = null
 
+    private val playerInfo: IPlayerInfo get() = PlayerInfo(reference.get() as EntityPlayer)
+
     var invitedTo: IParty? = null
         get() = field ?: invitedToImpl?.get()
         set(value) {
             val oldValue = invitedTo
-            with(reference.get()) {
-                this?.world?.onClient {
-                    field = value
-                    if (value != null) MinecraftForge.EVENT_BUS.post(PartyEvent.Invited(value, reference.get() as EntityPlayer))
-                }
-                this?.world?.onServer {
+            if (oldValue != value) {
+                // order in ifs is important !
+                if (oldValue != null && !oldValue.fireInviteCanceled(playerInfo) && value == null) field = null
+                if (value != null && !value.fireInvited(playerInfo)) field = value
+                reference.get()?.world?.onServer {
                     invitedToImpl = if (value != null) WeakReference(value) else null
                 }
             }
-//            else if (oldValue != null) MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCanceled(oldValue, reference.get() as EntityPlayer))
         }
 
     fun getOrCreatePT(): IParty {
-        if (party == null) party = Party(this.reference.get() as EntityPlayer)
+        if (party == null) party = Party(playerInfo)
         return party!!
     }
 
     fun clear() {
-        println("Clearing ${(this.reference.get() as EntityPlayer?)?.displayNameString}'s party cap.")
-        party?.removeMember(this.reference.get() as EntityPlayer)
+        val player = playerInfo
+        println("Clearing ${player.username}'s party cap.")
+        party?.removeMember(player)
         party = null
-        invitedTo?.cancel(this.reference.get() as EntityPlayer)
+        invitedTo?.cancel(player)
         invitedTo = null
     }
 
@@ -61,8 +65,10 @@ class PartyCapability : AbstractEntityCapability() {
         this.party = old.party
         this.invitedTo = old.invitedTo
 
-        this.party?.fixPostDeath(original as EntityPlayer, entity as EntityPlayer)
-        this.invitedTo?.fixPostDeath(original as EntityPlayer, entity as EntityPlayer)
+        this.party?.tryLoadPlayer(entity as EntityPlayer)
+        this.invitedTo?.tryLoadPlayer(entity as EntityPlayer)
+
+        this.sync()
 
         return false
     }
@@ -89,7 +95,7 @@ class PartyCapability : AbstractEntityCapability() {
                 pt.readNBT(nbtTagCompound.getCompoundTag("party"))
             } else instance.party = null
             if (nbtTagCompound.hasKey("invited")) {
-                val pt = Party(instance.reference.get() as EntityPlayer)
+                val pt = Party(instance.playerInfo)
                 pt.readNBT(nbtTagCompound.getCompoundTag("invited"))
                 instance.invitedTo = pt
             } else {

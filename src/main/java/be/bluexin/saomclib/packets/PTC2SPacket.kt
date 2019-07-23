@@ -28,9 +28,15 @@ class PTC2SPacket() : IMessage {
      * @param type the type of action
      * @param member the player linked to the request, may be null depending on request
      */
+    @Deprecated(message = "Replace with using IPlayerInfo")
     constructor(type: Type, member: EntityPlayer?) : this() {
         this.type = type
         this.member = member?.cachedUniqueIdString ?: ""
+    }
+
+    constructor(type: Type, memberUuid: String) : this() {
+        this.type = type
+        this.member = memberUuid
     }
 
     override fun fromBytes(buf: ByteBuf) {

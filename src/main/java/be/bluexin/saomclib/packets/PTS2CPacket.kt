@@ -27,10 +27,17 @@ class PTS2CPacket() : IMessage {
      * @param leader the leader of the party, or the member to add (depending on type of packet)
      * @param members the party list (may be empty when not required by [type]
      */
+    @Deprecated(message = "Replace with using IPlayerInfo")
     constructor(type: Type, leader: EntityPlayer, members: Sequence<EntityPlayer>) : this() {
         this.type = type
         this.leader = leader.cachedUniqueIdString
         this.members = members.map { it.cachedUniqueIdString }.toList()
+    }
+
+    constructor(type: Type, leader: String, members: Sequence<String>) : this() {
+        this.type = type
+        this.leader = leader
+        this.members = members.toList()
     }
 
     override fun fromBytes(buf: ByteBuf) {

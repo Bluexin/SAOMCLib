@@ -39,6 +39,9 @@ repositories {
     maven {
         url "https://maven.bluexin.be/repository/releases/"
     }
+    maven {
+        url "https://maven.bluexin.be/repository/snapshots/"
+    }
 
     maven {
         url "http://maven.shadowfacts.net/"
@@ -47,6 +50,9 @@ repositories {
 
 dependencies {
     compile "net.shadowfacts:Forgelin:${forgelin_version}"
+    runtimeOnly('com.saomc:saoui:1.12.2-2.0.0.12-SNAPSHOT:deobf') {
+        exclude group: 'be.bluexin'
+    }
 }
 
 configurations {

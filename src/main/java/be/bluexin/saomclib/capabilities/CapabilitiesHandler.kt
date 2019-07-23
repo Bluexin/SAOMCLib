@@ -111,7 +111,10 @@ object CapabilitiesHandler {
         if ((entity.getCapability(it.value.capability, null) as AbstractEntityCapability).restore(entity, original)) it.value.capability.readNBT(entity.getCapability(it.value.capability, null), null, it.value.capability.writeNBT(original.getCapability(it.value.capability, null), null))
     }
 
-    internal fun syncEntitiesDimension(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDimensionChange }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
+    internal fun syncEntitiesDimension(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDimensionChange }?.forEach {
+        val c = (entity.getCapability(it.value.capability, null) as AbstractEntityCapability)
+        if (c.restore(entity, entity)) c.sync()
+    }
 
     internal fun syncEntitiesLogin(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSendOnLogin }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
 

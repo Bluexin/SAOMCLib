@@ -90,7 +90,6 @@ fun EntityPlayer.message(str: String, vararg args: Any) = this.sendMessage(TextC
  * Send a packet to a player.
  */
 fun EntityPlayerMP.sendPacket(packet: IMessage) = PacketPipeline.sendTo(packet, this)
-fun EntityPlayer.sentPacketToServer(packet: IMessage) = PacketPipeline.sendToServer(packet)
 
 /**
  * Next 4 :
