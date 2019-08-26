@@ -87,7 +87,7 @@ uploadArchives {
     } else {
         println("No password set up! Uploading to local.")
         repositories.mavenDeployer {
-            repository(url: 'file://G:/saomclib/build/mvn')
+            repository(url: "file://$buildDir/repo")
         }
     }
 }
