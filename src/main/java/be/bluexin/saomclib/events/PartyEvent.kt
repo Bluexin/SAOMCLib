@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.Event
  * They are fired both on client and server.
  */
 @Deprecated("Deprecated in favor of PartyEventV2", replaceWith = ReplaceWith("PartyEventV2"))
-/*abstract*/sealed class PartyEvent(val party: IParty?) : Event() {
+/*abstract*//*sealed*/open class PartyEvent(val party: IParty?) : Event() {
     /**
      * Fired when a player actually joins a party.
      */
@@ -35,7 +35,7 @@ import net.minecraftforge.fml.common.eventhandler.Event
  * They are fired both on client and server.
  * Don't fire these directly, use the fire methods below instead.
  */
-/*abstract*/sealed class PartyEventV2(val party: IParty?) : Event() {
+/*abstract*//*sealed*/open class PartyEventV2(val party: IParty?) : Event() {
     /**
      * Fired when a player actually joins a party.
      */
