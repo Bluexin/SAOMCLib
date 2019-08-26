@@ -59,11 +59,11 @@ internal object EventHandler {
         val ptcap = Minecraft.getMinecraft().player.getPartyCapability()
         evt.left.add("Party: ${ptcap.party}")
         if (ptcap.party != null) {
-            evt.left.add(ptcap.party!!.members.joinToString { it.displayNameString } + " " + ptcap.party!!.invited.joinToString { "+${it.displayNameString}" })
+            evt.left.add(ptcap.party!!.membersInfo.joinToString { it.username } + " " + ptcap.party!!.invitedInfo.joinToString { "+${it.key.username}" })
         }
         evt.left.add("Invited: ${ptcap.invitedTo}")
         if (ptcap.invitedTo != null) {
-            evt.left.add(ptcap.invitedTo!!.members.joinToString { it.displayNameString } + " " + ptcap.invitedTo!!.invited.joinToString { "+${it.displayNameString}" })
+            evt.left.add(ptcap.invitedTo!!.membersInfo.joinToString { it.username } + " " + ptcap.invitedTo!!.invitedInfo.joinToString { "+${it.key.username}" })
         }
     }
 

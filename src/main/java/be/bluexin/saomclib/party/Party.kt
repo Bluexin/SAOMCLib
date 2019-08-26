@@ -61,7 +61,8 @@ class Party(leader: IPlayerInfo) : IParty {
             val player = member.player
             if (player != null) {
                 player.getPartyCapability().clear()
-                (player as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.CLEAR, "", sequenceOf()))
+                (player as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.CLEAR, this.leaderInfo?.uuidString
+                        ?: member.uuidString, sequenceOf()))
             }
             syncMembers()
         }
@@ -109,7 +110,9 @@ class Party(leader: IPlayerInfo) : IParty {
         if (this.isParty) {
             SAOMCLib.LOGGER.info("Dissolving ${leaderInfo?.username}'s party.")
             membersInfo.forEach { it.player?.getPartyCapability()?.clear() }
-            if (leaderInfo != null) world?.onServer { sendToMembers(PTS2CPacket(PTS2CPacket.Type.CLEAR, "", sequenceOf())) }
+            if (leaderInfo != null) world?.onServer {
+                sendToMembers(PTS2CPacket(PTS2CPacket.Type.CLEAR, this.leaderInfo?.uuidString ?: "", sequenceOf()))
+            }
             membersImpl.clear()
             this.fireDisbanded()
         }
@@ -145,7 +148,8 @@ class Party(leader: IPlayerInfo) : IParty {
 
     override fun cancel(player: IPlayerInfo) = if (invitedImpl.removeLong(player) != Long.MIN_VALUE) {
         world?.onServer {
-            (player.player as? EntityPlayerMP)?.sendPacket(PTS2CPacket(PTS2CPacket.Type.CLEAR, "", sequenceOf()))
+            (player.player as? EntityPlayerMP)?.sendPacket(PTS2CPacket(PTS2CPacket.Type.CLEAR, this.leaderInfo?.uuidString
+                    ?: player.uuidString, sequenceOf()))
             syncMembers()
         }
         world?.onClient {
@@ -164,9 +168,8 @@ class Party(leader: IPlayerInfo) : IParty {
 
     override fun readNBT(nbt: NBTTagCompound) {
         val w = world ?: return
-        val sid = NBTTagString("").id.toInt()
-        val membersTag = nbt.getTagList("members", sid)
-        val invitesTag = nbt.getTagList("invites", sid)
+        val membersTag = nbt.getTagList("members", NBTTagString("").id.toInt())
+        val invitesTag = nbt.getTagList("invites", NBTTagCompound().id.toInt())
         var leader: IPlayerInfo? = null
         val leaderUUID = nbt.getString("leader")
         membersImpl.clear()
@@ -186,6 +189,7 @@ class Party(leader: IPlayerInfo) : IParty {
                     it.getLong("time")
             )
         }
+        this.fireRefreshed()
     }
 
     override fun writeNBT(): NBTTagCompound {

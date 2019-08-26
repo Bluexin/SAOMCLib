@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.Event
     class LeaderChanged(party: IParty, val player: EntityPlayer) : PartyEvent(party)
     class Invited(party: IParty, val player: EntityPlayer) : PartyEvent(party)
     class InviteCanceled(party: IParty, val player: EntityPlayer) : PartyEvent(party)
-    class Refreshed(party: IParty?, val invited: IParty?) : PartyEvent(party) // TODO: this is somewhat temporary, until I figure out a nice way of doing this
+    class Refreshed(party: IParty?) : PartyEvent(party) // TODO: this is somewhat temporary, until I figure out a nice way of doing this
 }
 
 /**
@@ -49,7 +49,7 @@ import net.minecraftforge.fml.common.eventhandler.Event
     class LeaderChanged(party: IParty, val player: IPlayerInfo) : PartyEventV2(party)
     class Invited(party: IParty, val player: IPlayerInfo) : PartyEventV2(party)
     class InviteCanceled(party: IParty, val player: IPlayerInfo) : PartyEventV2(party)
-    class Refreshed(party: IParty?, val invited: IParty?) : PartyEventV2(party) // TODO: this is somewhat temporary, until I figure out a nice way of doing this
+    class Refreshed(party: IParty?) : PartyEventV2(party) // TODO: this is somewhat temporary, until I figure out a nice way of doing this
 }
 
 fun IParty.fireJoin(player: IPlayerInfo): Boolean {
@@ -101,8 +101,8 @@ fun IParty.fireInviteCanceled(player: IPlayerInfo): Boolean {
     return e1 && e2
 }
 
-fun IParty?.fireRefreshed(invited: IParty?): Boolean {
-    val e1 = MinecraftForge.EVENT_BUS.post(PartyEventV2.Refreshed(this, invited))
-    val e2 = MinecraftForge.EVENT_BUS.post(PartyEvent.Refreshed(this, invited))
+fun IParty?.fireRefreshed(): Boolean {
+    val e1 = MinecraftForge.EVENT_BUS.post(PartyEventV2.Refreshed(this))
+    val e2 = MinecraftForge.EVENT_BUS.post(PartyEvent.Refreshed(this))
     return e1 && e2
 }
