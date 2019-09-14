@@ -2,6 +2,8 @@ package be.bluexin.saomclib.packets
 
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.getPartyCapability
+import be.bluexin.saomclib.party.IPlayerInfo
+import be.bluexin.saomclib.party.PlayerInfo
 import be.bluexin.saomclib.readString
 import be.bluexin.saomclib.writeString
 import io.netty.buffer.ByteBuf
@@ -79,7 +81,9 @@ class PTS2CPacket() : IMessage {
                                     player.getPartyCapability().invitedTo = pt
                                 }
                             }
-                            Type.LEADER -> if (p1 != null) player.getPartyCapability().party?.leader = p1
+                            Type.LEADER -> if (p1 != null) {
+                                player.getPartyCapability().party?.leaderInfo = PlayerInfo(p1)
+                            }
                             Type.JOIN -> {
                                 if (p1 != null) {
                                     val pt = p1.getPartyCapability().getOrCreatePT()
@@ -95,7 +99,7 @@ class PTS2CPacket() : IMessage {
                         SAOMCLib.LOGGER.debug("[PTS2CPacket] Suppressed an error.")
                         e.printStackTrace()
                     }
-                    SAOMCLib.LOGGER.debug("${player.getPartyCapability().party?.leader?.displayNameString} -> ${player.getPartyCapability().party?.members?.joinToString { it.displayNameString }}")
+                    SAOMCLib.LOGGER.debug("${player.getPartyCapability().party?.let { it.leaderInfo?.player }?.displayNameString} -> ${player.getPartyCapability().party?.membersInfo?.mapNotNull(IPlayerInfo::player)?.joinToString { it.displayNameString }}")
                 }
 
                 return null

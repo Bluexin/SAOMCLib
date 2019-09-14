@@ -1,9 +1,5 @@
 package be.bluexin.saomclib.proxy
 
-import be.bluexin.saomclib.packets.PTC2SPacket
-import be.bluexin.saomclib.packets.PTS2CPacket
-import be.bluexin.saomclib.packets.PacketPipeline
-import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.IThreadListener

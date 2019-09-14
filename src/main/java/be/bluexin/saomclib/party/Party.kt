@@ -22,7 +22,9 @@ import java.util.*
 class Party(leader: IPlayerInfo) : IParty {
 
     override fun addMember(member: IPlayerInfo): Boolean {
-        if (member !in this) {
+        if (leaderInfo != null && member !in this) {
+            // Ensure leader is in party member list.
+            membersImpl.add(leaderInfo!!)
             membersImpl += member
             invitedImpl -= member
             world?.onServer {
@@ -104,25 +106,23 @@ class Party(leader: IPlayerInfo) : IParty {
             }
         }
 
-    private val world get() = membersInfo.mapNotNull { it.player?.world }.firstOrNull()
+    private val world get() = leaderInfo?.player?.world
 
     override fun dissolve() {
-        if (this.isParty) {
-            SAOMCLib.LOGGER.info("Dissolving ${leaderInfo?.username}'s party.")
-            membersInfo.forEach { it.player?.getPartyCapability()?.clear() }
-            if (leaderInfo != null) world?.onServer {
-                sendToMembers(PTS2CPacket(PTS2CPacket.Type.CLEAR, this.leaderInfo?.uuidString ?: "", sequenceOf()))
-            }
-            membersImpl.clear()
-            this.fireDisbanded()
+        SAOMCLib.LOGGER.info("Dissolving ${leaderInfo?.username}'s party.")
+        membersInfo.forEach { it.player?.getPartyCapability()?.clear() }
+        world?.onServer {
+            sendToMembers(PTS2CPacket(PTS2CPacket.Type.CLEAR, this.leaderInfo?.uuidString ?: "", membersInfo.map { it.uuidString }))
         }
+        membersImpl.clear()
+        this.fireDisbanded()
     }
 
     override val size: Int
         get() = membersImpl.size
 
     override val isParty: Boolean
-        get() = size > 1
+        get() = membersImpl.any { it != leaderInfo }
 
     override fun isMember(player: IPlayerInfo) = player in this.membersImpl
 

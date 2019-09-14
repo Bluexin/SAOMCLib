@@ -92,16 +92,16 @@ object CapabilitiesHandler {
     @Throws(CapabilityException::class)
     internal fun setup() {
         entitiezz = HashMap(entitiez?.size ?: 0, 1F)
-        entitiez?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { entitiezz!!.put(getID(it.clazz), it) }
+        entitiez?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { entitiezz!![getID(it.clazz)] = it }
         entitiez = null
         itemzz = HashMap(itemz?.size ?: 0, 1F)
-        itemz?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { itemzz!!.put(getID(it.clazz), it) }
+        itemz?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { itemzz!![getID(it.clazz)] = it }
         itemz = null
         tileEntitiezz = HashMap(tileEntitiez?.size ?: 0, 1F)
-        tileEntitiez?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { tileEntitiezz!!.put(getID(it.clazz), it) }
+        tileEntitiez?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { tileEntitiezz!![getID(it.clazz)] = it }
         tileEntitiez = null
         worldzz = HashMap(worldz?.size ?: 0, 1F)
-        worldz?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { worldzz!!.put(getID(it.clazz), it) }
+        worldz?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { worldzz!![getID(it.clazz)] = it }
         worldz = null
     }
 

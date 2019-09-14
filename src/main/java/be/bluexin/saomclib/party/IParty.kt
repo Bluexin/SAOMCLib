@@ -169,7 +169,7 @@ interface IParty {
      * @param player the player to check for leadership
      * @return whether the player is leader
      */
-    fun isLeader(player: EntityPlayer) = leader == player
+    fun isLeader(player: EntityPlayer) = leaderInfo?.player == player
 
     fun isLeader(player: IPlayerInfo) = leaderInfo == player
 

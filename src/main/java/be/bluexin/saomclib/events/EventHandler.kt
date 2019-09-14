@@ -8,11 +8,9 @@ import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
 /**
  *
@@ -68,21 +66,8 @@ internal object EventHandler {
     }
 
     @SubscribeEvent
-    fun clientConnectedToServer(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
-        Minecraft.getMinecraft().addScheduledTask {
-            MinecraftForge.EVENT_BUS.register(JoinServerEvent) // TODO: remove this wth bs is this shit
-        }
-    }
-
-    @SubscribeEvent
     fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
         evt.player.getPartyCapability().clear()
     }
-
-    /*@SubscribeEvent
-    fun partyEvent(evt: PartyEvent) {
-        SAOMCLib.LOGGER.info("Party event: ${evt::class.simpleName}")
-        SAOMCLib.LOGGER.warn("", Exception())
-    }*/
 
 }

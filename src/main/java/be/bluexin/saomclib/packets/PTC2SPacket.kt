@@ -67,10 +67,10 @@ class PTC2SPacket() : IMessage {
                         val party = cap.getOrCreatePT()
                         val invitedTo = cap.invitedTo
                         val target: EntityPlayer? = player.world.getPlayerEntityByUUID(UUID.fromString(message.member))
-                        if (party.leader == player) when (message.type) {
+                        if (party.leaderInfo?.player == player) when (message.type) {
                             Type.REMOVE -> party.removeMember(target!!)
                             Type.INVITE -> party.invite(target!!)
-                            Type.LEADER -> party.leader == target
+                            Type.LEADER -> party.leaderInfo?.player == target
                             Type.JOIN -> party.addMember(target!!)
                             Type.REQUEST -> (player as EntityPlayerMP).sendPacket(SyncEntityCapabilityPacket(player.getPartyCapability(), player))
                             Type.CANCEL -> party.cancel(target!!)
