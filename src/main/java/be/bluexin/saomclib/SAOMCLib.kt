@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger
 object SAOMCLib {
 
     const val MODID = "saomclib"
-    const val VERSION = "1.3.0"
+    const val VERSION = "1.3.1"
     const val DEPENDENCIES = "required-after:forgelin@[1.6.0,)"
 
     @Suppress("unused")
