@@ -32,9 +32,12 @@ object Command: CommandBase() {
     override fun getTabCompletions(server: MinecraftServer, sender: ICommandSender, params: Array<String>, targetPos: BlockPos?): MutableList<String> {
         if (params.isEmpty()) throw WrongUsageException(getUsage(sender))
         if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
-        return CommandList.values().firstOrNull { command -> command.getID().equals(params[0], true) }
-                ?.getTabCompletions(server, sender, params.drop(1).toTypedArray(), targetPos)
-                ?: getListOfStringsMatchingLastWord(params, CommandList.commands)
+
+        val commands = CommandList.values().filter { it.checkPermission(server, sender) }
+        val command = commands.firstOrNull{command -> command.getID().equals(params[0], true)}
+                ?: return getListOfStringsMatchingLastWord(params, commands.map { it.getID() })
+        return if (params.size > 1) command.getTabCompletions(server, sender, params.drop(1).toTypedArray(), targetPos)
+        else mutableListOf()
     }
 
     fun sendSuccess(sender: ICommandSender, message: ITextComponent) {

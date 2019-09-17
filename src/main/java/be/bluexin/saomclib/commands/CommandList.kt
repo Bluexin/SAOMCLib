@@ -11,9 +11,10 @@ enum class CommandList: CommandBase {
     PT {
         override fun getTabCompletions(server: MinecraftServer, sender: ICommandSender, params: Array<String>, pos: BlockPos?): MutableList<String> {
             val commands = PTCommands.values().filter { it.checkPermission(server, sender) }
-            return commands.firstOrNull{command -> command.getID().equals(params[0], true)}
-                    ?.getTabCompletions(server, sender, params.drop(1).toTypedArray(), pos)
-                    ?: getListOfStringsMatchingLastWord(params, commands.map { it.getID() })
+            val command = commands.firstOrNull{command -> command.getID().equals(params[0], true)}
+                    ?: return getListOfStringsMatchingLastWord(params, commands.map { it.getID() })
+            return if (params.size > 1) command.getTabCompletions(server, sender, params.drop(1).toTypedArray(), pos)
+            else mutableListOf()
         }
 
         override fun execute(server: MinecraftServer, sender: ICommandSender, params: Array<String>) {
