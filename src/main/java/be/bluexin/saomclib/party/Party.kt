@@ -5,9 +5,9 @@ import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.events.*
 import be.bluexin.saomclib.onClient
 import be.bluexin.saomclib.onServer
-import be.bluexin.saomclib.packets.PTC2SPacket
-import be.bluexin.saomclib.packets.PTS2CPacket
+import be.bluexin.saomclib.packets.ClearPartyPacket
 import be.bluexin.saomclib.packets.PacketPipeline
+import be.bluexin.saomclib.packets.PartyPacket
 import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
 import be.bluexin.saomclib.sendPacket
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap
@@ -35,7 +35,6 @@ class Party(leader: IPlayerInfo) : IParty {
                     cap.party = this
                     cap.invitedTo = null
                 }
-//                (member.player as? EntityPlayerMP)?.sendPacket(PTS2CPacket(PTS2CPacket.Type.JOIN, leaderInfo!!.uuidString, membersInfo.map(IPlayerInfo::uuidString)))
                 this.syncMembers()
                 println("Done. Members: ${membersInfo.joinToString { it.username }}. Invited: ${invitedInfo.joinToString { it.key.username }}. Leader: ${leaderInfo?.username}")
             }
@@ -48,7 +47,7 @@ class Party(leader: IPlayerInfo) : IParty {
     override fun acceptInvite(player: IPlayerInfo): Boolean {
         if (this.isInvited(player)) {
             world?.onClient {
-                PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.JOIN, player.uuidString))
+                PacketPipeline.sendToServer(PartyPacket(PartyPacket.Type.JOIN, player.uuidString))
             }
 
             return true
@@ -63,14 +62,13 @@ class Party(leader: IPlayerInfo) : IParty {
             val player = member.player
             if (player != null) {
                 player.getPartyCapability().clear()
-                (player as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.CLEAR, this.leaderInfo?.uuidString
-                        ?: member.uuidString, sequenceOf()))
+                (player as EntityPlayerMP).sendPacket(ClearPartyPacket(ClearPartyPacket.Type.PARTY))
             }
             syncMembers()
         }
         if (membersImpl.isNotEmpty()) {
             world?.onClient {
-                PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.REMOVE, member.uuidString))
+                PacketPipeline.sendToServer(PartyPacket(PartyPacket.Type.REMOVE, member.uuidString))
             }
             this.fireLeave(member)
         }
@@ -100,7 +98,7 @@ class Party(leader: IPlayerInfo) : IParty {
                     syncMembers()
                 }
                 world?.onClient {
-                    PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.LEADER, player.uuidString))
+                    PacketPipeline.sendToServer(PartyPacket(PartyPacket.Type.LEADER, player.uuidString))
                 }
                 this.fireLeaderChanged(player)
             }
@@ -112,7 +110,7 @@ class Party(leader: IPlayerInfo) : IParty {
         SAOMCLib.LOGGER.info("Dissolving ${leaderInfo?.username}'s party.")
         membersInfo.forEach { it.player?.getPartyCapability()?.clear() }
         world?.onServer {
-            sendToMembers(PTS2CPacket(PTS2CPacket.Type.CLEAR, this.leaderInfo?.uuidString ?: "", membersInfo.map { it.uuidString }))
+            disband()
         }
         membersImpl.clear()
         this.fireDisbanded()
@@ -122,7 +120,7 @@ class Party(leader: IPlayerInfo) : IParty {
         get() = membersImpl.size
 
     override val isParty: Boolean
-        get() = membersImpl.any { it != leaderInfo }
+        get() = leaderInfo != null && membersImpl.any { it != leaderInfo }
 
     override fun isMember(player: IPlayerInfo) = player in this.membersImpl
 
@@ -134,11 +132,10 @@ class Party(leader: IPlayerInfo) : IParty {
             val w = this.world
             w?.onServer {
                 SAOMCLib.LOGGER.info("Inviting ${player.username} to ${leaderInfo?.username}'s party.")
-//                (player as EntityPlayerMP).sendPacket(PTS2CPacket(PTS2CPacket.Type.INVITE, leader!!, members))
                 syncMembers()
             }
             w?.onClient {
-                PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.INVITE, player.uuidString))
+                PacketPipeline.sendToServer(PartyPacket(PartyPacket.Type.INVITE, player.uuidString))
             }
             this.fireInvited(player)
             return true
@@ -148,12 +145,11 @@ class Party(leader: IPlayerInfo) : IParty {
 
     override fun cancel(player: IPlayerInfo) = if (invitedImpl.removeLong(player) != Long.MIN_VALUE) {
         world?.onServer {
-            (player.player as? EntityPlayerMP)?.sendPacket(PTS2CPacket(PTS2CPacket.Type.CLEAR, this.leaderInfo?.uuidString
-                    ?: player.uuidString, sequenceOf()))
+            (player.player as? EntityPlayerMP)?.sendPacket(ClearPartyPacket(ClearPartyPacket.Type.INVITE))
             syncMembers()
         }
         world?.onClient {
-            PacketPipeline.sendToServer(PTC2SPacket(PTC2SPacket.Type.CANCEL, player.uuidString))
+            PacketPipeline.sendToServer(PartyPacket(PartyPacket.Type.CANCEL, player.uuidString))
         }
         this.fireInviteCanceled(player)
         true
@@ -226,9 +222,11 @@ class Party(leader: IPlayerInfo) : IParty {
         }
     }
 
-    private fun sendToMembers(packet: PTS2CPacket) {
+    private fun disband() {
         world?.onServer {
-            membersInfo.forEach { (it as? EntityPlayerMP)?.sendPacket(packet) }
+            membersInfo.mapNotNull { it.player as? EntityPlayerMP }.forEach { it.sendPacket(ClearPartyPacket(ClearPartyPacket.Type.PARTY)) }
+            invitedInfo.mapNotNull { it.key.player as? EntityPlayerMP }.forEach { it.sendPacket(ClearPartyPacket(ClearPartyPacket.Type.INVITE)) }
         }
     }
+
 }

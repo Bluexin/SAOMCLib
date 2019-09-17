@@ -4,9 +4,9 @@ import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.PartyCapability
 import be.bluexin.saomclib.commands.Command
 import be.bluexin.saomclib.events.EventHandler
-import be.bluexin.saomclib.packets.PTC2SPacket
-import be.bluexin.saomclib.packets.PTS2CPacket
+import be.bluexin.saomclib.packets.ClearPartyPacket
 import be.bluexin.saomclib.packets.PacketPipeline
+import be.bluexin.saomclib.packets.PartyPacket
 import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
 import be.bluexin.saomclib.proxy.CommonProxy
 import net.minecraft.entity.player.EntityPlayer
@@ -43,8 +43,10 @@ object SAOMCLib {
     fun preInit(e: FMLPreInitializationEvent) {
         MinecraftForge.EVENT_BUS.register(EventHandler)
         CapabilitiesHandler.registerEntityCapability(PartyCapability::class.java, PartyCapability.PartyStorage) { it is EntityPlayer }
-        PacketPipeline.registerMessage(PTC2SPacket::class.java, PTC2SPacket.Companion.Handler::class.java)
-        PacketPipeline.registerMessage(PTS2CPacket::class.java, PTS2CPacket.Companion.Handler::class.java)
+        PacketPipeline.registerMessage(PartyPacket::class.java, PartyPacket.Companion.Handler::class.java)
+        PacketPipeline.registerMessage(ClearPartyPacket::class.java, ClearPartyPacket.Companion.Handler::class.java)
+        //PacketPipeline.registerMessage(PTC2SPacket::class.java, PTC2SPacket.Companion.Handler::class.java)
+        //PacketPipeline.registerMessage(PTS2CPacket::class.java, PTS2CPacket.Companion.Handler::class.java)
         PacketPipeline.registerMessage(SyncEntityCapabilityPacket::class.java, SyncEntityCapabilityPacket.Companion.Handler::class.java)
     }
 

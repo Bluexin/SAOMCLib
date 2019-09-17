@@ -18,6 +18,8 @@ import java.util.*
  *
  * @author Bluexin
  */
+
+@Deprecated("")
 class PTS2CPacket() : IMessage {
 
     private lateinit var type: Type

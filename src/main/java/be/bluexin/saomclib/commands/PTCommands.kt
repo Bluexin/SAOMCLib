@@ -54,7 +54,7 @@ enum class PTCommands: CommandBase {
         }
 
         override fun checkPermission(server: MinecraftServer, sender: ICommandSender): Boolean {
-            return (sender as? EntityPlayer)?.getPartyCapability()?.party?.isInvited(sender)?: false
+            return (sender as? EntityPlayer)?.getPartyCapability()?.invitedTo != null
         }
     },
     DECLINE {
@@ -71,7 +71,7 @@ enum class PTCommands: CommandBase {
         }
 
         override fun checkPermission(server: MinecraftServer, sender: ICommandSender): Boolean {
-            return (sender as? EntityPlayer)?.getPartyCapability()?.party?.isInvited(sender)?: false
+            return (sender as? EntityPlayer)?.getPartyCapability()?.invitedTo != null
         }
     },
     KICK {

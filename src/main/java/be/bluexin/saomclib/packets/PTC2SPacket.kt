@@ -19,6 +19,8 @@ import java.util.*
  *
  * @author Bluexin
  */
+
+@Deprecated("")
 class PTC2SPacket() : IMessage {
 
     private lateinit var type: Type
