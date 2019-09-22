@@ -38,7 +38,7 @@ enum class PTCommands: CommandBase {
         }
 
         override fun checkPermission(server: MinecraftServer, sender: ICommandSender): Boolean {
-            return (sender as? EntityPlayer)?.getPartyCapability()?.party?.leaderInfo?.player != sender
+            return !checkInParty(sender) || checkIfLeader(sender)
         }
     },
     ACCEPT {
@@ -54,7 +54,7 @@ enum class PTCommands: CommandBase {
         }
 
         override fun checkPermission(server: MinecraftServer, sender: ICommandSender): Boolean {
-            return (sender as? EntityPlayer)?.getPartyCapability()?.invitedTo != null
+            return checkIfInvited(sender)
         }
     },
     DECLINE {
@@ -71,7 +71,7 @@ enum class PTCommands: CommandBase {
         }
 
         override fun checkPermission(server: MinecraftServer, sender: ICommandSender): Boolean {
-            return (sender as? EntityPlayer)?.getPartyCapability()?.invitedTo != null
+            return checkIfInvited(sender)
         }
     },
     KICK {
@@ -100,7 +100,7 @@ enum class PTCommands: CommandBase {
         }
 
         override fun checkPermission(server: MinecraftServer, sender: ICommandSender): Boolean {
-            return (sender as? EntityPlayer)?.getPartyCapability()?.party?.leaderInfo?.player == sender
+            return checkIfLeader(sender)
         }
     },
     LEAVE {
@@ -116,7 +116,7 @@ enum class PTCommands: CommandBase {
         }
 
         override fun checkPermission(server: MinecraftServer, sender: ICommandSender): Boolean {
-            return (sender as? EntityPlayer)?.getPartyCapability()?.party != null
+            return checkInParty(sender)
         }
     },
     CANCEL {
@@ -145,8 +145,7 @@ enum class PTCommands: CommandBase {
         }
 
         override fun checkPermission(server: MinecraftServer, sender: ICommandSender): Boolean {
-            val party = (sender as? EntityPlayer)?.getPartyCapability()?.party?: return false
-            return party.leaderInfo?.player == sender && party.invitedInfo.count() > 0
+            return checkAnyInvited(sender)
         }
     },
     PRINT {
@@ -183,5 +182,37 @@ enum class PTCommands: CommandBase {
 
     companion object {
         val commands = values().map { it.getID() }
+
+        /**
+         * Checks if this player is in a valid party
+         */
+        fun checkInParty(sender: ICommandSender): Boolean {
+            val player = (sender as? EntityPlayer) ?: return false
+            return player.getPartyCapability().party?.isParty == true
+        }
+
+        /**
+         * Checks if this player has permission to do
+         * general party management commands.
+         */
+        fun checkIfLeader(sender: ICommandSender): Boolean {
+            return if (checkInParty(sender))
+                (sender as EntityPlayer).getPartyCapability().party?.leaderInfo?.uuid == sender.uniqueID
+            else false
+        }
+
+        /**
+         * Checks if the sender has been invited to any parties
+         */
+        fun checkIfInvited(sender: ICommandSender): Boolean {
+            return (sender as? EntityPlayer)?.getPartyCapability()?.invitedTo != null
+        }
+
+        /**
+         * Checks if the party has any pending invites sent
+         */
+        fun checkAnyInvited(sender: ICommandSender): Boolean {
+            return checkIfLeader(sender) && (sender as EntityPlayer).getPartyCapability().party!!.invitedInfo.count() > 0
+        }
     }
 }
