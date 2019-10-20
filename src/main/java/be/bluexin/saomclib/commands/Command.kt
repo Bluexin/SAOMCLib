@@ -20,9 +20,9 @@ object Command: CommandBase() {
         if (params.isEmpty()) throw WrongUsageException(getUsage(sender))
         if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
 
-        CommandList.values().firstOrNull { it.getID().equals(params[0], true) }?.let { command ->
-            command.execute(server, sender, params.drop(1).toTypedArray())
-        }?: throw WrongUsageException(getUsage(sender))
+        CommandList.values().firstOrNull { it.getID().equals(params[0], true) }?.
+                execute(server, sender, params.drop(1).toTypedArray())
+                ?: throw WrongUsageException(getUsage(sender))
     }
 
     override fun getTabCompletions(server: MinecraftServer, sender: ICommandSender, params: Array<String>, targetPos: BlockPos?): MutableList<String> {
