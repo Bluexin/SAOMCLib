@@ -21,12 +21,9 @@ enum class CommandList: CommandBase {
             if (params.isEmpty()) throw WrongUsageException("commands.pt.usage")
             if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
 
-            PTCommands.values().firstOrNull { it.getID().equals(params[0], true) }?.let { command ->
-                if (command.checkPermission(server, sender))
-                    command.execute(server, sender, params.drop(1).toTypedArray())
-                else
-                    Command.sendError(sender, TextComponentTranslation("commands.generic.permission"))
-            }?: throw WrongUsageException("commands.pt.usage")
+            PTCommands.values().firstOrNull { it.getID().equals(params[0], true) }?.
+                    execute(server, sender, params.drop(1).toTypedArray())
+                    ?: throw WrongUsageException("commands.pt.usage")
         }
     };
 
@@ -38,8 +35,6 @@ enum class CommandList: CommandBase {
     override fun getUsage(sender: ICommandSender): String {
         return "commands.${name.toLowerCase()}.usage"
     }
-
-    override fun checkPermission(server: MinecraftServer, sender: ICommandSender) = sender is EntityPlayer
 
     companion object {
         val commands = values().map { it.getID() }

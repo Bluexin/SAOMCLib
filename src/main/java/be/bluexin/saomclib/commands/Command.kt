@@ -8,7 +8,6 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.ITextComponent
 import net.minecraft.util.text.Style
-import net.minecraft.util.text.TextComponentTranslation
 import net.minecraft.util.text.TextFormatting
 
 object Command: CommandBase() {
@@ -22,17 +21,11 @@ object Command: CommandBase() {
         if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
 
         CommandList.values().firstOrNull { it.getID().equals(params[0], true) }?.let { command ->
-            if (command.checkPermission(server, sender))
-                command.execute(server, sender, params.drop(1).toTypedArray())
-            else
-                sendError(sender, TextComponentTranslation("commands.generic.permission"))
+            command.execute(server, sender, params.drop(1).toTypedArray())
         }?: throw WrongUsageException(getUsage(sender))
     }
 
     override fun getTabCompletions(server: MinecraftServer, sender: ICommandSender, params: Array<String>, targetPos: BlockPos?): MutableList<String> {
-        if (params.isEmpty()) throw WrongUsageException(getUsage(sender))
-        if (sender !is EntityPlayer) throw WrongUsageException("commands.pt.playeronly")
-
         val commands = CommandList.values().filter { it.checkPermission(server, sender) }
         val command = commands.firstOrNull{command -> command.getID().equals(params[0], true)}
                 ?: return getListOfStringsMatchingLastWord(params, commands.map { it.getID() })

@@ -1,3 +1,5 @@
+@file:Suppress("KDocUnresolvedReference")
+
 package be.bluexin.saomclib.except
 
 import be.bluexin.saomclib.capabilities.AbstractCapability
