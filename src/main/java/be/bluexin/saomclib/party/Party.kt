@@ -37,8 +37,9 @@ class Party(leader: IPlayerInfo) : IParty {
                 }
                 this.syncMembers()
                 println("Done. Members: ${membersInfo.joinToString { it.username }}. Invited: ${invitedInfo.joinToString { it.key.username }}. Leader: ${leaderInfo?.username}")
+
+                fireJoin(member)
             }
-            this.fireJoin(member)
             return true
         }
         return false
@@ -70,7 +71,9 @@ class Party(leader: IPlayerInfo) : IParty {
             world?.onClient {
                 PacketPipeline.sendToServer(PartyPacket(PartyPacket.Type.REMOVE, member.uuidString))
             }
-            this.fireLeave(member)
+            world?.onServer {
+                fireLeave(member)
+            }
         }
         if (!isParty) dissolve()
         true
@@ -96,11 +99,11 @@ class Party(leader: IPlayerInfo) : IParty {
                 field = player
                 world?.onServer {
                     syncMembers()
+                    fireLeaderChanged(player)
                 }
                 world?.onClient {
                     PacketPipeline.sendToServer(PartyPacket(PartyPacket.Type.LEADER, player.uuidString))
                 }
-                this.fireLeaderChanged(player)
             }
         }
 
@@ -113,7 +116,9 @@ class Party(leader: IPlayerInfo) : IParty {
             disband()
         }
         membersImpl.clear()
-        this.fireDisbanded()
+        world?.onServer {
+            fireDisbanded()
+        }
     }
 
     override val size: Int
@@ -133,11 +138,11 @@ class Party(leader: IPlayerInfo) : IParty {
             w?.onServer {
                 SAOMCLib.LOGGER.info("Inviting ${player.username} to ${leaderInfo?.username}'s party.")
                 syncMembers()
+                fireInvited(player)
             }
             w?.onClient {
                 PacketPipeline.sendToServer(PartyPacket(PartyPacket.Type.INVITE, player.uuidString))
             }
-            this.fireInvited(player)
             return true
         }
         return false
@@ -145,13 +150,13 @@ class Party(leader: IPlayerInfo) : IParty {
 
     override fun cancel(player: IPlayerInfo) = if (invitedImpl.removeLong(player) != Long.MIN_VALUE) {
         world?.onServer {
+            fireInviteCanceled(player)
             (player.player as? EntityPlayerMP)?.sendPacket(ClearPartyPacket(ClearPartyPacket.Type.INVITE))
             syncMembers()
         }
         world?.onClient {
             PacketPipeline.sendToServer(PartyPacket(PartyPacket.Type.CANCEL, player.uuidString))
         }
-        this.fireInviteCanceled(player)
         true
     } else false
 
@@ -185,7 +190,9 @@ class Party(leader: IPlayerInfo) : IParty {
                     it.getLong("time")
             )
         }
-        this.fireRefreshed()
+        world?.onServer {
+            fireRefreshed()
+        }
     }
 
     override fun writeNBT(): NBTTagCompound {

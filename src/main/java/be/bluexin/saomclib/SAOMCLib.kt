@@ -4,10 +4,7 @@ import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.PartyCapability
 import be.bluexin.saomclib.commands.Command
 import be.bluexin.saomclib.events.EventHandler
-import be.bluexin.saomclib.packets.ClearPartyPacket
-import be.bluexin.saomclib.packets.PacketPipeline
-import be.bluexin.saomclib.packets.PartyPacket
-import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
+import be.bluexin.saomclib.packets.*
 import be.bluexin.saomclib.proxy.CommonProxy
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.common.MinecraftForge
@@ -30,7 +27,7 @@ import org.apache.logging.log4j.Logger
 object SAOMCLib {
 
     const val MODID = "saomclib"
-    const val VERSION = "1.3.3"
+    const val VERSION = "1.3.4"
     const val DEPENDENCIES = "required-after:forgelin@[1.6.0,)"
 
     @Suppress("unused")
@@ -45,6 +42,7 @@ object SAOMCLib {
         CapabilitiesHandler.registerEntityCapability(PartyCapability::class.java, PartyCapability.PartyStorage) { it is EntityPlayer }
         PacketPipeline.registerMessage(PartyPacket::class.java, PartyPacket.Companion.Handler::class.java)
         PacketPipeline.registerMessage(ClearPartyPacket::class.java, ClearPartyPacket.Companion.Handler::class.java)
+        PacketPipeline.registerMessage(ClientPartyPacket::class.java, ClientPartyPacket.Companion.Handler::class.java)
         //PacketPipeline.registerMessage(PTC2SPacket::class.java, PTC2SPacket.Companion.Handler::class.java)
         //PacketPipeline.registerMessage(PTS2CPacket::class.java, PTS2CPacket.Companion.Handler::class.java)
         PacketPipeline.registerMessage(SyncEntityCapabilityPacket::class.java, SyncEntityCapabilityPacket.Companion.Handler::class.java)
