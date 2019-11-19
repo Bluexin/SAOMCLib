@@ -49,9 +49,9 @@ repositories {
 
 dependencies {
     compile "net.shadowfacts:Forgelin:${forgelin_version}"
-    runtimeOnly('com.saomc:saoui:1.12.2-2.0.0.14-SNAPSHOT:deobf') {
-        exclude group: 'be.bluexin'
-    }
+    //runtimeOnly('com.saomc:saoui:1.12.2-2.+:deobf') {
+        //exclude group: 'be.bluexin'
+    //}
 }
 
 configurations {

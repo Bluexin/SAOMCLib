@@ -38,6 +38,7 @@ commands.pt.kick.notification=You have been kicked from %s's party.
 commands.pt.leave=leave
 commands.pt.leave.notInPT=You are not currently in a party.
 commands.pt.leave.success=You left %s's party.
+commands.pt.leave.disband=You disbanded the party
 
 
 commands.pt.decline=decline

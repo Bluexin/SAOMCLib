@@ -2,6 +2,8 @@ package be.bluexin.saomclib.events
 
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
+import be.bluexin.saomclib.onServer
+import be.bluexin.saomclib.party.PartyManager
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
@@ -10,7 +12,9 @@ import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
+import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 
 /**
  *
@@ -55,19 +59,32 @@ internal object EventHandler {
     fun renderDebugText(evt: RenderGameOverlayEvent.Text) {
         if (!Minecraft.getMinecraft().gameSettings.showDebugInfo) return
         val ptcap = Minecraft.getMinecraft().player.getPartyCapability()
-        evt.left.add("Party: ${ptcap.party}")
-        if (ptcap.party != null) {
-            evt.left.add(ptcap.party!!.membersInfo.joinToString { it.username } + " " + ptcap.party!!.invitedInfo.joinToString { "+${it.key.username}" })
+        evt.left.add("Party: ${ptcap.partyData}")
+        if (ptcap.partyData != null) {
+            evt.left.add(ptcap.partyData!!.membersInfo.joinToString { it.username } + " " + ptcap.partyData!!.invitedInfo.keys.joinToString { "+${it.username}" })
         }
-        evt.left.add("Invited: ${ptcap.invitedTo}")
-        if (ptcap.invitedTo != null) {
-            evt.left.add(ptcap.invitedTo!!.membersInfo.joinToString { it.username } + " " + ptcap.invitedTo!!.invitedInfo.joinToString { "+${it.key.username}" })
+        evt.left.add("Invited: ${ptcap.inviteData}")
+        if (ptcap.inviteData != null) {
+            evt.left.add(ptcap.inviteData!!.membersInfo.joinToString { it.username } + " " + ptcap.inviteData!!.invitedInfo.keys.joinToString { "+${it.username}" })
         }
     }
 
     @SubscribeEvent
     fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
-        evt.player.getPartyCapability().clear()
+        evt.player.world.onServer {
+            PartyManager.getPartyObject(evt.player)?.removeMember(evt.player)
+            PartyManager.getInvitedParty(evt.player)?.cancel(evt.player)
+        }
+    }
+
+    @SubscribeEvent
+    fun clearInvites(evt: TickEvent.WorldTickEvent){
+        evt.world.onServer {
+            if (evt.world == FMLCommonHandler.instance().minecraftServerInstance.getWorld(0)) {
+                PartyManager.partyList.forEach { it.cleanupInvites(evt.world.totalWorldTime) }
+                PartyManager
+            }
+        }
     }
 
 }
