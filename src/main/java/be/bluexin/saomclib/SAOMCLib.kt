@@ -32,7 +32,7 @@ object SAOMCLib {
 
     const val MODID = "saomclib"
     const val VERSION = "1.4.1"
-    const val DEPENDENCIES = "required-after:forgelin@[1.8.4,);after:librarianlib@[4.19.2,)"
+    const val DEPENDENCIES = "required-after:forgelin@[1.8.4,)"
 
     @Suppress("unused")
     @SidedProxy(clientSide = "be.bluexin.saomclib.proxy.ClientProxy", serverSide = "be.bluexin.saomclib.proxy.CommonProxy")

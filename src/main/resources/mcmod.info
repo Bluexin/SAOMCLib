@@ -15,8 +15,7 @@
     "screenshots": [],
     "dependencies": [
       "mod_MinecraftForge",
-      "forgelin",
-      "librarianlib"
+      "forgelin"
     ]
   }
 ]
