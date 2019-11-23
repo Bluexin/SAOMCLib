@@ -13,6 +13,10 @@
     "credits": "",
     "logoFile": "",
     "screenshots": [],
-    "dependencies": []
+    "dependencies": [
+      "mod_MinecraftForge",
+      "forgelin",
+      "librarianlib"
+    ]
   }
 ]
