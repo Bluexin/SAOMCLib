@@ -14,8 +14,6 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.capabilities.CapabilityInject
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
 
 class PartyCapability : AbstractEntityCapability() {
 
@@ -87,5 +85,4 @@ class PartyCapability : AbstractEntityCapability() {
     }
 }
 
-@SideOnly(Side.CLIENT)
 fun EntityPlayer.getPartyCapability() = this.getCapability(PartyCapability.CAP_INSTANCE, null)!!
