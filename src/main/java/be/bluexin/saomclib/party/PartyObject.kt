@@ -116,17 +116,19 @@ data class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
     } else false
 
     override fun cleanupInvites(time: Long) {
-        invitedInfo.asIterable().filter { it.value <= time }.forEach {
-            updateMembers(Type.CANCELINVITE, it.key.uuid)
-            fireInviteCanceled(it.key)
-            invitedInfo.remove(it.key)
+        invitedInfo.object2LongEntrySet().removeAll {
+            if (it.longValue <= time) {
+                updateMembers(Type.CANCELINVITE, it.key.uuid)
+                fireInviteCanceled(it.key)
+                true
+            } else false
         }
         if (!isParty) dissolve()
     }
 
     fun updateMembers(type: Type, target: UUID?){
-        membersInfo.filter { it.player is EntityPlayerMP }.forEach { type.updateClient(it.player as EntityPlayerMP, this, target) }
-        invitedInfo.filter { it.key.player is EntityPlayerMP }.forEach { type.updateClient(it.key.player as EntityPlayerMP, this, target) }
+        membersInfo.asSequence().filter { it.player is EntityPlayerMP }.forEach { type.updateClient(it.player as EntityPlayerMP, this, target) }
+        invitedInfo.asSequence().filter { it.key.player is EntityPlayerMP }.forEach { type.updateClient(it.key.player as EntityPlayerMP, this, target) }
     }
 
 }

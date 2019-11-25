@@ -10,9 +10,9 @@ import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.common.DimensionManager
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
-import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -80,7 +80,7 @@ internal object EventHandler {
     @SubscribeEvent
     fun clearInvites(evt: TickEvent.WorldTickEvent){
         evt.world.onServer {
-            if (evt.world == FMLCommonHandler.instance().minecraftServerInstance.getWorld(0)) {
+            if (evt.world == DimensionManager.getWorld(0)) {
                 PartyManager.partyList.forEach { it.cleanupInvites(evt.world.totalWorldTime) }
                 PartyManager
             }

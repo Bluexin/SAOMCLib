@@ -93,7 +93,7 @@ interface IParty: IPartyData {
      *
      * @param time the current world time
      */
-    fun cleanupInvites(time: Long) // TODO: this could use some improvements. Not used for now
+    fun cleanupInvites(time: Long)
 
 
     /**
