@@ -6,7 +6,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import java.util.*
 
-interface IPartyData {
+data class PartyData {
 
     /**
      * Gets the list of current leader.
