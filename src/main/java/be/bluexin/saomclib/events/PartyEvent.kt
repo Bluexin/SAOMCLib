@@ -1,109 +1,160 @@
-@file:Suppress("DEPRECATION")
-
 package be.bluexin.saomclib.events
-/*
-import be.bluexin.saomclib.party.IParty
-import be.bluexin.saomclib.party.IPlayerInfo
+
+import be.bluexin.saomclib.party.*
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.common.eventhandler.Cancelable
 import net.minecraftforge.fml.common.eventhandler.Event
 
-/**
- * Party-related events.
- * They are fired both on client and server.
- */
-@Deprecated("Deprecated in favor of PartyEventV2", replaceWith = ReplaceWith("PartyEventV2"))
-/*abstract*//*sealed*/open class PartyEvent(val party: IParty?) : Event() {
+open class PartyEvent(val partyData: IPartyData): Event() {
+
     /**
-     * Fired when a player actually joins a party.
+     * Fired when a player tries to join the party.
+     * Only fired server side
+     * @param party The party data in question
+     * @param player The player who's attempting to join
+     * @return If event is cancelled, the join is cancelled
      */
-    class Join(party: IParty, val player: EntityPlayer) : PartyEvent(party)
+    @Cancelable
+    class JoinCheck(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
 
-    class Leave(party: IParty, val player: EntityPlayer) : PartyEvent(party)
-    class Disbanded(party: IParty) : PartyEvent(party)
-    @Deprecated("Should we really have a distinction with Leave? Unused for now.")
-    class Kicked(party: IParty, val player: EntityPlayer) : PartyEvent(party)
-
-    class LeaderChanged(party: IParty, val player: EntityPlayer) : PartyEvent(party)
-    class Invited(party: IParty, val player: EntityPlayer) : PartyEvent(party)
-    class InviteCanceled(party: IParty, val player: EntityPlayer) : PartyEvent(party)
-    class Refreshed(party: IParty?) : PartyEvent(party) // TODO: this is somewhat temporary, until I figure out a nice way of doing this
-}
-
-/**
- * Party-related events.
- * They are fired both on client and server.
- * Don't fire these directly, use the fire methods below instead.
- */
-/*abstract*//*sealed*/open class PartyEventV2(val party: IParty?) : Event() {
     /**
-     * Fired when a player actually joins a party.
+     * Fired when a player joins the party.
+     * Fired both on client and server
+     * @param party The party data in question
+     * @param player The player who joined
      */
-    class Join(party: IParty, val player: IPlayerInfo) : PartyEventV2(party)
+    class Join(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
 
-    class Leave(party: IParty, val player: IPlayerInfo) : PartyEventV2(party)
-    class Disbanded(party: IParty) : PartyEventV2(party)
-    @Deprecated("Should we really have a distinction with Leave? Unused for now.")
-    class Kicked(party: IParty, val player: IPlayerInfo) : PartyEventV2(party)
+    /**
+     * Fired when a player actually leaves the party.
+     * Fired both on client and server
+     * @param party The party data in question
+     * @param player The player who left
+     */
+    class Leave(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
 
-    class LeaderChanged(party: IParty, val player: IPlayerInfo) : PartyEventV2(party)
-    class Invited(party: IParty, val player: IPlayerInfo) : PartyEventV2(party)
-    class InviteCanceled(party: IParty, val player: IPlayerInfo) : PartyEventV2(party)
-    class Refreshed(party: IParty?) : PartyEventV2(party) // TODO: this is somewhat temporary, until I figure out a nice way of doing this
+    /**
+     * Fired when the party disbands
+     * Fired both on client and server
+     * @param party The party data in question
+     */
+    class Disbanded(party: IPartyData) : PartyEvent(party)
+
+    /**
+     * Fired when a player is about to be kicked from the party.
+     * Only fired server side
+     * @param party The party data in question
+     * @param player The player who's about to be kicked
+     * @return If event is cancelled, the kick is cancelled
+     */
+    @Cancelable
+    class KickCheck(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
+
+    /**
+     * Fired when a player is kicked from the party.
+     * Fired both on client and server
+     * @param party The party data in question
+     * @param player The player who's kicked
+     */
+    class Kicked(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
+
+    /**
+     * Fired when the leader has left and a new leader is needed.
+     * Only fired server side
+     * @param party The party data in question
+     * @param player The player who will be the next leader, if
+     * null, the first member on the members list will be the leader
+     */
+    class LeaderLeft(party: IPartyData, val player: PlayerInfo?) : PartyEvent(party)
+
+    /**
+     * Fired when the leader has changed.
+     * Fired both on client and server
+     * @param party The party data in question
+     * @param player The new leader
+     */
+    class LeaderChanged(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
+
+    /**
+     * Fired when a player is about to be invited.
+     * Only fired server side
+     * @param party The party data in question
+     * @param player The player about to be invited
+     * @return If event is cancelled, the invite is cancelled
+     */
+    @Cancelable
+    class InviteCheck(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
+
+    /**
+     * Fired when a player is invited
+     * Fired both on client and server
+     * @param party The party data in question
+     * @param player The player invited
+     */
+    class Invited(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
+
+    /**
+     * Fired when a player cancels their invite
+     * Only fired after a player has been successfully invited
+     * Fired both on client and server
+     * @param party The party data in question
+     * @param player The player invited
+     */
+    class InviteCanceled(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
+
+}
+class PartyCreate(val party: IParty): Event()
+
+fun IPartyData.fireJoinCheck(player: PlayerInfo): Boolean {
+    return !MinecraftForge.EVENT_BUS.post(PartyEvent.JoinCheck(this, player))
 }
 
-fun IParty.fireJoin(player: IPlayerInfo): Boolean {
-    val e1 = MinecraftForge.EVENT_BUS.post(PartyEventV2.Join(this, player))
-    val aPlayer = player.player ?: return e1
-    val e2 = MinecraftForge.EVENT_BUS.post(PartyEvent.Join(this, aPlayer))
-    return e1 && e2
+fun IPartyData.fireJoin(player: PlayerInfo): Boolean {
+    return !MinecraftForge.EVENT_BUS.post(PartyEvent.Join(this, player))
 }
 
-fun IParty.fireLeave(player: IPlayerInfo): Boolean {
-    val e1 = MinecraftForge.EVENT_BUS.post(PartyEventV2.Leave(this, player))
-    val aPlayer = player.player ?: return e1
-    val e2 = MinecraftForge.EVENT_BUS.post(PartyEvent.Leave(this, aPlayer))
-    return e1 && e2
+fun IPartyData.fireLeave(player: PlayerInfo): Boolean {
+    return !MinecraftForge.EVENT_BUS.post(PartyEvent.Leave(this, player))
 }
 
-fun IParty.fireDisbanded(): Boolean {
-    val e1 = MinecraftForge.EVENT_BUS.post(PartyEventV2.Disbanded(this))
-    val e2 = MinecraftForge.EVENT_BUS.post(PartyEvent.Disbanded(this))
-    return e1 && e2
+fun IPartyData.fireDisbanded(): Boolean {
+    return !MinecraftForge.EVENT_BUS.post(PartyEvent.Disbanded(this))
 }
 
-@Deprecated("Should we really have a distinction with Leave? Unused for now.")
-fun IParty.fireKicked(player: IPlayerInfo): Boolean {
-    val e1 = MinecraftForge.EVENT_BUS.post(PartyEventV2.Kicked(this, player))
-    val aPlayer = player.player ?: return e1
-    val e2 = MinecraftForge.EVENT_BUS.post(PartyEvent.Kicked(this, aPlayer))
-    return e1 && e2
+fun IPartyData.fireKickCheck(player: PlayerInfo): Boolean {
+    return !MinecraftForge.EVENT_BUS.post(PartyEvent.KickCheck(this, player))
 }
 
-fun IParty.fireLeaderChanged(player: IPlayerInfo): Boolean {
-    val e1 = MinecraftForge.EVENT_BUS.post(PartyEventV2.LeaderChanged(this, player))
-    val aPlayer = player.player ?: return e1
-    val e2 = MinecraftForge.EVENT_BUS.post(PartyEvent.LeaderChanged(this, aPlayer))
-    return e1 && e2
+fun IPartyData.fireKicked(player: PlayerInfo): Boolean {
+    return !MinecraftForge.EVENT_BUS.post(PartyEvent.Kicked(this, player))
 }
 
-fun IParty.fireInvited(player: IPlayerInfo): Boolean {
-    val e1 = MinecraftForge.EVENT_BUS.post(PartyEventV2.Invited(this, player))
-    val aPlayer = player.player ?: return e1
-    val e2 = MinecraftForge.EVENT_BUS.post(PartyEvent.Invited(this, aPlayer))
-    return e1 && e2
+fun IPartyData.fireLeaderLeft(): PlayerInfo? {
+    val event = PartyEvent.LeaderLeft(this, null)
+    MinecraftForge.EVENT_BUS.post(event)
+    return event.player
 }
 
-fun IParty.fireInviteCanceled(player: IPlayerInfo): Boolean {
-    val e1 = MinecraftForge.EVENT_BUS.post(PartyEventV2.InviteCanceled(this, player))
-    val aPlayer = player.player ?: return e1
-    val e2 = MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCanceled(this, aPlayer))
-    return e1 && e2
+fun IPartyData.fireLeaderChanged(player: PlayerInfo): Boolean {
+    return !MinecraftForge.EVENT_BUS.post(PartyEvent.LeaderChanged(this, player))
 }
 
-fun IParty?.fireRefreshed(): Boolean {
-    val e1 = MinecraftForge.EVENT_BUS.post(PartyEventV2.Refreshed(this))
-    val e2 = MinecraftForge.EVENT_BUS.post(PartyEvent.Refreshed(this))
-    return e1 && e2
+
+fun IPartyData.fireInviteCheck(player: PlayerInfo): Boolean {
+    return !MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCheck(this, player))
 }
-*/
+
+fun IPartyData.fireInvited(player: PlayerInfo): Boolean {
+    return !MinecraftForge.EVENT_BUS.post(PartyEvent.Invited(this, player))
+}
+
+fun IPartyData.fireInviteCanceled(player: PlayerInfo): Boolean {
+    return !MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCanceled(this, player))
+}
+
+fun PartyManager.firePartyCreate(player: EntityPlayer): IParty {
+    val event = PartyCreate(PartyObject(PlayerInfo(player)))
+    MinecraftForge.EVENT_BUS.post(event)
+    return event.party
+}

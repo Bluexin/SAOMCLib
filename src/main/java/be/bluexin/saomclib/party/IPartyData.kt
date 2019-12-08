@@ -6,8 +6,7 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import java.util.*
 
-data class PartyData {
-
+interface IPartyData: Cloneable{
     /**
      * Gets the list of current leader.
      */
@@ -22,6 +21,7 @@ data class PartyData {
      * Gets the list of invited players.
      */
     val invitedInfo: Object2LongMap<PlayerInfo>
+
 
     operator fun contains(player: EntityPlayer) = isMember(player)
     operator fun contains(player: UUID) = isMember(player)
@@ -127,6 +127,10 @@ data class PartyData {
         nbt.setTag("invites", invitesTag)
 
         return nbt
+    }
+
+    public override fun clone(): Any {
+        return super.clone()
     }
 
 }
