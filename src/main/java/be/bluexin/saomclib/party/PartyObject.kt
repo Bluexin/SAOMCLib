@@ -35,11 +35,13 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
                 invitedInfo -= member
                 updateMembers(Type.JOIN, member.uuid)
                 fireJoin(member)
+                fireRefresh()
                 return true
             }
             else if (isInvited(member)){
                 invitedInfo -= member
                 fireInviteCanceled(member)
+                fireRefresh()
                 updateMembers(Type.CANCELINVITE, member.uuid)
             }
 
@@ -64,6 +66,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
                     val leader = fireLeaderLeft()
                     if (leader != null && !membersInfo.contains(leader) && fireJoinCheck(leader)) {
                         fireJoin(leader)
+                        fireRefresh()
                         membersInfo += leader
                     }
                     leader
@@ -74,6 +77,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
                 // if leader change wasn't possible, disband the party
                 if (member == leaderInfo) return true
                 fireLeaderChanged(leaderInfo)
+                fireRefresh()
                 updateMembers(Type.LEADERCHANGE, leaderInfo.uuid)
             }
             return true
@@ -85,6 +89,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
         Type.LEAVE.updateClient(player.player as EntityPlayerMP, this, player.uuid)
         updateMembers(Type.LEAVE, player.uuid)
         fireLeave(player)
+        fireRefresh()
         true
     } else false
 
@@ -93,6 +98,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
         fireDisbanded()
         membersInfo.clear()
         invitedInfo.clear()
+        fireRefresh()
         PartyManager.removeParty(this)
     }
 
@@ -103,6 +109,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
             invitedInfo += Pair(player, SAOMCLib.proxy.getMainWorld().totalWorldTime + (300 * 20))
             updateMembers(Type.INVITE, player.uuid)
             fireInvited(player)
+            fireRefresh()
             return true
         }
         return false
@@ -112,6 +119,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
         invitedInfo -= player
         updateMembers(Type.CANCELINVITE, player.uuid)
         fireInviteCanceled(player)
+        fireRefresh()
         true
     } else false
 
@@ -120,6 +128,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
             if (it.longValue <= time) {
                 updateMembers(Type.CANCELINVITE, it.key.uuid)
                 fireInviteCanceled(it.key)
+                fireRefresh()
                 true
             } else false
         }

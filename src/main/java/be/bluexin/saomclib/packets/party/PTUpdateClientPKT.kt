@@ -107,6 +107,8 @@ class PTUpdateClientPKT(): IMessage {
                     }
                     else -> return null
                 }
+                // Fire refresh last so all other changes can occur
+                message.data.fireRefresh()
                 return null
             }
 

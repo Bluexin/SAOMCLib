@@ -103,6 +103,12 @@ open class PartyEvent(val partyData: IPartyData): Event() {
      */
     class InviteCanceled(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
 
+    /**
+     * Fired when there's been a change in the party
+     * Useful for renderers or other hooks that depend
+     * on the data being up to date.
+     */
+    class Refresh(party: IPartyData): PartyEvent(party)
 }
 class PartyCreate(val party: IParty): Event()
 
@@ -110,24 +116,24 @@ fun IPartyData.fireJoinCheck(player: PlayerInfo): Boolean {
     return !MinecraftForge.EVENT_BUS.post(PartyEvent.JoinCheck(this, player))
 }
 
-fun IPartyData.fireJoin(player: PlayerInfo): Boolean {
-    return !MinecraftForge.EVENT_BUS.post(PartyEvent.Join(this, player))
+fun IPartyData.fireJoin(player: PlayerInfo) {
+    MinecraftForge.EVENT_BUS.post(PartyEvent.Join(this, player))
 }
 
-fun IPartyData.fireLeave(player: PlayerInfo): Boolean {
-    return !MinecraftForge.EVENT_BUS.post(PartyEvent.Leave(this, player))
+fun IPartyData.fireLeave(player: PlayerInfo) {
+    MinecraftForge.EVENT_BUS.post(PartyEvent.Leave(this, player))
 }
 
-fun IPartyData.fireDisbanded(): Boolean {
-    return !MinecraftForge.EVENT_BUS.post(PartyEvent.Disbanded(this))
+fun IPartyData.fireDisbanded() {
+    MinecraftForge.EVENT_BUS.post(PartyEvent.Disbanded(this))
 }
 
 fun IPartyData.fireKickCheck(player: PlayerInfo): Boolean {
     return !MinecraftForge.EVENT_BUS.post(PartyEvent.KickCheck(this, player))
 }
 
-fun IPartyData.fireKicked(player: PlayerInfo): Boolean {
-    return !MinecraftForge.EVENT_BUS.post(PartyEvent.Kicked(this, player))
+fun IPartyData.fireKicked(player: PlayerInfo) {
+    MinecraftForge.EVENT_BUS.post(PartyEvent.Kicked(this, player))
 }
 
 fun IPartyData.fireLeaderLeft(): PlayerInfo? {
@@ -136,8 +142,8 @@ fun IPartyData.fireLeaderLeft(): PlayerInfo? {
     return event.player
 }
 
-fun IPartyData.fireLeaderChanged(player: PlayerInfo): Boolean {
-    return !MinecraftForge.EVENT_BUS.post(PartyEvent.LeaderChanged(this, player))
+fun IPartyData.fireLeaderChanged(player: PlayerInfo) {
+    MinecraftForge.EVENT_BUS.post(PartyEvent.LeaderChanged(this, player))
 }
 
 
@@ -145,12 +151,16 @@ fun IPartyData.fireInviteCheck(player: PlayerInfo): Boolean {
     return !MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCheck(this, player))
 }
 
-fun IPartyData.fireInvited(player: PlayerInfo): Boolean {
-    return !MinecraftForge.EVENT_BUS.post(PartyEvent.Invited(this, player))
+fun IPartyData.fireInvited(player: PlayerInfo) {
+    MinecraftForge.EVENT_BUS.post(PartyEvent.Invited(this, player))
 }
 
-fun IPartyData.fireInviteCanceled(player: PlayerInfo): Boolean {
-    return !MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCanceled(this, player))
+fun IPartyData.fireInviteCanceled(player: PlayerInfo) {
+    MinecraftForge.EVENT_BUS.post(PartyEvent.InviteCanceled(this, player))
+}
+
+fun IPartyData.fireRefresh(){
+    MinecraftForge.EVENT_BUS.post(PartyEvent.Refresh(this))
 }
 
 fun PartyManager.firePartyCreate(player: EntityPlayer): IParty {
