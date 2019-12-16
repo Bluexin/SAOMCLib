@@ -1,5 +1,8 @@
 package be.bluexin.saomclib.party
 
+import be.bluexin.saomclib.SAOMCLib
+import be.bluexin.saomclib.proxy.CommonProxy.ProxySide.CLIENT
+import be.bluexin.saomclib.proxy.CommonProxy.ProxySide.SERVER
 import it.unimi.dsi.fastutil.objects.Object2LongMap
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
@@ -130,7 +133,10 @@ interface IPartyData: Cloneable{
     }
 
     public override fun clone(): Any {
-        return super.clone()
+        return when (SAOMCLib.proxy.getSide()){
+            CLIENT -> PartyClientObject(this)
+            SERVER -> PartyObject(this)
+        }
     }
 
 }

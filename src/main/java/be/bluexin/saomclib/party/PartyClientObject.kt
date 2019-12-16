@@ -14,6 +14,7 @@ data class PartyClientObject(override var leaderInfo: PlayerInfo,
                                  defaultReturnValue(Long.MIN_VALUE)
                              }): IPartyData {
 
+    constructor(partyData: IPartyData): this(partyData.leaderInfo, partyData.membersInfo, partyData.invitedInfo)
 
     companion object{
         fun readNBT(nbtTagCompound: NBTTagCompound?): PartyClientObject? {
