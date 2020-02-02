@@ -127,6 +127,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
     override fun cancel(player: PlayerInfo) = if (invitedInfo.remove(player) != null) {
         invitedInfo -= player
         updateMembers(Type.CANCELINVITE, player.uuid)
+        updateMember(Type.CANCELINVITE, player, player.uuid)
         fireInviteCanceled(player)
         fireRefresh()
         true
@@ -147,6 +148,10 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
     fun updateMembers(type: Type, target: UUID?){
         membersInfo.asSequence().filter { it.player is EntityPlayerMP }.forEach { type.updateClient(it.player as EntityPlayerMP, this, target) }
         invitedInfo.asSequence().filter { it.key.player is EntityPlayerMP }.forEach { type.updateClient(it.key.player as EntityPlayerMP, this, target) }
+    }
+
+    fun updateMember(type: Type, player: PlayerInfo, target: UUID?){
+        type.updateClient(player.player as EntityPlayerMP, this, target)
     }
 
 }
