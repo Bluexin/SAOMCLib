@@ -102,8 +102,13 @@ class PTUpdateClientPKT(): IMessage {
                         message.data.fireDisbanded()
                     }
                     Type.LEADERCHANGE -> {
+                        val oldLeader = partyCap.getPartyData(message.partyType)?.leaderInfo?: return null
                         partyCap.setPartyData(message.data, message.partyType)
-                        message.data.fireLeaderChanged(PlayerInfo(target))
+                        message.data.fireLeaderChanged(PlayerInfo(target), oldLeader)
+                    }
+                    Type.REFRESH -> {
+                        partyCap.setPartyData(message.data, message.partyType)
+                        message.data.fireRefresh()
                     }
                     else -> return null
                 }

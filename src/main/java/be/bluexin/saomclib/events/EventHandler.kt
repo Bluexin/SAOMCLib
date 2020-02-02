@@ -4,6 +4,7 @@ import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
 import be.bluexin.saomclib.onServer
 import be.bluexin.saomclib.party.PartyManager
+import be.bluexin.saomclib.utils.ModHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
@@ -15,6 +16,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+
 
 /**
  *
@@ -71,18 +73,33 @@ internal object EventHandler {
 
     @SubscribeEvent
     fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
-        evt.player.world.onServer {
-            PartyManager.getPartyObject(evt.player)?.removeMember(evt.player)
-            PartyManager.getInvitedParty(evt.player)?.cancel(evt.player)
+        if (ModHelper.isTogetherForeverLoaded) {
+            evt.player.world.onServer {
+                PartyManager.getInvitedParty(evt.player)?.cancel(evt.player)
+            }
+        } else {
+            evt.player.world.onServer {
+                PartyManager.getPartyObject(evt.player)?.removeMember(evt.player)
+                PartyManager.getInvitedParty(evt.player)?.cancel(evt.player)
+            }
         }
+    }
+
+    @SubscribeEvent
+    fun playerConnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent){
+        PartyManager.getPartyObject(evt.player)?.sync(evt.player)
     }
 
     @SubscribeEvent
     fun clearInvites(evt: TickEvent.WorldTickEvent){
         evt.world.onServer {
             if (evt.world == DimensionManager.getWorld(0)) {
-                PartyManager.partyList.forEach { it.cleanupInvites(evt.world.totalWorldTime) }
-                PartyManager
+                val parties = PartyManager.partyList
+                while (parties.hasNext()){
+                    val party = parties.next()
+                    if (party.cleanupInvites(evt.world.totalWorldTime))
+                        parties.remove()
+                }
             }
         }
     }

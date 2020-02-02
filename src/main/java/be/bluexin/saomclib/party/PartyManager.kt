@@ -6,37 +6,62 @@ import net.minecraft.entity.player.EntityPlayer
 object PartyManager {
 
     private val parties = HashSet<IParty>()
-    val partyList = parties.asIterable()
+
+    // Using mutable iterator for safe removals
+    val partyList
+        get() = parties.iterator()
+
+    fun addParty(party: IParty){
+        parties.add(party)
+    }
+
+    fun getPartyData(player: PlayerInfo): IPartyData?{
+        return parties.firstOrNull { player in it }
+    }
 
     fun getPartyData(player: EntityPlayer): IPartyData?{
-        return partyList.firstOrNull { player in it }
+        return parties.firstOrNull { player in it }
+    }
+
+    fun getPartyObject(player: PlayerInfo): IParty?{
+        return parties.firstOrNull { player in it }
     }
 
     fun getPartyObject(player: EntityPlayer): IParty?{
-        return partyList.firstOrNull { player in it }
+        return parties.firstOrNull { player in it }
     }
 
-    fun createParty(player: EntityPlayer): IParty {
+
+    fun createParty(player: PlayerInfo): IParty {
         val party = firePartyCreate(player)
         parties += party
         return party
     }
 
-    fun getOrCreateParty(player: EntityPlayer): IParty {
+    fun getOrCreateParty(player: PlayerInfo): IParty {
         return getPartyObject(player)
                 ?: createParty(player)
     }
 
     fun getInvitedParty(player: EntityPlayer): IParty?{
-        return partyList.firstOrNull { it.isInvited(player) }
+        return parties.firstOrNull { it.isInvited(player) }
     }
 
     fun removeParty(party: IParty){
-        parties.remove(party)
+        val parties = partyList
+        while (parties.hasNext()){
+            if (parties.next() == party)
+                parties.remove()
+        }
     }
 
     fun cleanInvalidParties(){
-        parties.removeIf { !it.isParty }
+        val parties = partyList
+        while (parties.hasNext()){
+            val party = parties.next()
+            if (!party.isParty)
+                parties.remove()
+        }
     }
 
     fun clean(){

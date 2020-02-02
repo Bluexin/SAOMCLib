@@ -27,7 +27,7 @@ enum class PTCommands: CommandBase {
             if (params.isEmpty()) throw WrongUsageException(Command.getUsage(sender))
             val target = net.minecraft.command.CommandBase.getPlayer(server, player, params[0]) // Player not found will interrupt execution
             if (target == player) throw CommandException("commands.pt.invite.self")
-            val pt = PartyManager.getOrCreateParty(sender)
+            val pt = PartyManager.getOrCreateParty(PlayerInfo(sender))
             if (pt.isLeader(player)) {
                 if (!pt.isInvited(target)) {
                     pt.invite(target)

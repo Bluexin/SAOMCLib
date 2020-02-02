@@ -13,5 +13,6 @@ enum class Type{
     LEAVE,
     KICK,
     DISBAND,
-    LEADERCHANGE;
+    LEADERCHANGE,
+    REFRESH;
 }

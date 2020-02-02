@@ -37,6 +37,13 @@ class PartyCapability : AbstractEntityCapability() {
         }
     }
 
+    fun getPartyData(partyType: PartyType): IPartyData?{
+        return when (partyType){
+            PartyType.MAIN -> this.partyData
+            PartyType.INVITE -> this.inviteData
+        }
+    }
+
     override val shouldSyncOnDeath = true
     override val shouldSyncOnDimensionChange = true
     override val shouldRestoreOnDeath = true

@@ -1,7 +1,6 @@
 package be.bluexin.saomclib.events
 
 import be.bluexin.saomclib.party.*
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 import net.minecraftforge.fml.common.eventhandler.Event
@@ -74,7 +73,7 @@ open class PartyEvent(val partyData: IPartyData): Event() {
      * @param party The party data in question
      * @param player The new leader
      */
-    class LeaderChanged(party: IPartyData, val player: PlayerInfo) : PartyEvent(party)
+    class LeaderChanged(party: IPartyData, val newLeader: PlayerInfo, val oldLeader: PlayerInfo) : PartyEvent(party)
 
     /**
      * Fired when a player is about to be invited.
@@ -142,8 +141,8 @@ fun IPartyData.fireLeaderLeft(): PlayerInfo? {
     return event.player
 }
 
-fun IPartyData.fireLeaderChanged(player: PlayerInfo) {
-    MinecraftForge.EVENT_BUS.post(PartyEvent.LeaderChanged(this, player))
+fun IPartyData.fireLeaderChanged(newLeader: PlayerInfo, oldLeader: PlayerInfo) {
+    MinecraftForge.EVENT_BUS.post(PartyEvent.LeaderChanged(this, newLeader, oldLeader))
 }
 
 
@@ -163,8 +162,8 @@ fun IPartyData.fireRefresh(){
     MinecraftForge.EVENT_BUS.post(PartyEvent.Refresh(this))
 }
 
-fun PartyManager.firePartyCreate(player: EntityPlayer): IParty {
-    val event = PartyCreate(PartyObject(PlayerInfo(player)))
+fun PartyManager.firePartyCreate(player: PlayerInfo): IParty {
+    val event = PartyCreate(PartyObject(player))
     MinecraftForge.EVENT_BUS.post(event)
     return event.party
 }

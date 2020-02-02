@@ -4,6 +4,7 @@ import be.bluexin.saomclib.message
 import be.bluexin.saomclib.packets.AbstractServerPacketHandler
 import be.bluexin.saomclib.packets.PacketPipeline
 import be.bluexin.saomclib.party.PartyManager
+import be.bluexin.saomclib.party.PlayerInfo
 import be.bluexin.saomclib.readString
 import be.bluexin.saomclib.writeString
 import io.netty.buffer.ByteBuf
@@ -53,7 +54,7 @@ class PTUpdateServerPKT(): IMessage{
         class Handler: AbstractServerPacketHandler<PTUpdateServerPKT>(){
             override fun handleServerPacket(player: EntityPlayer, message: PTUpdateServerPKT, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
                 val party = when (message.partyType) {
-                    PartyType.MAIN -> PartyManager.getOrCreateParty(player)
+                    PartyType.MAIN -> PartyManager.getOrCreateParty(PlayerInfo(player))
                     PartyType.INVITE -> PartyManager.getInvitedParty(player)?: let {
                         player.message("You do not have permission to invite")
                         return null

@@ -9,7 +9,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongMap
 import net.minecraft.entity.player.EntityPlayerMP
 import java.util.*
 
-class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
+class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
 
     constructor(partyData: IPartyData): this(partyData.leaderInfo){
         membersInfo += partyData.membersInfo
@@ -21,6 +21,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
     override val invitedInfo: Object2LongMap<PlayerInfo> = Object2LongLinkedOpenHashMap<PlayerInfo>().apply {
         defaultReturnValue(Long.MIN_VALUE)
     }
+
 
     /**
      * Attempts to add player to the current party
@@ -76,7 +77,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
                 }.invoke()
                 // if leader change wasn't possible, disband the party
                 if (member == leaderInfo) return true
-                fireLeaderChanged(leaderInfo)
+                fireLeaderChanged(leaderInfo, member)
                 fireRefresh()
                 updateMembers(Type.LEADERCHANGE, leaderInfo.uuid)
             }
@@ -102,6 +103,14 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
         PartyManager.removeParty(this)
     }
 
+    override fun syncAll() {
+        updateMembers(Type.REFRESH, null)
+    }
+
+    override fun sync(member: PlayerInfo) {
+        Type.REFRESH.updateClient(member.player as EntityPlayerMP, this, null)
+    }
+
     override fun invite(player: PlayerInfo): Boolean {
         if (player !in this && !isInvited(player) && fireInviteCheck(player)){
             // 300 second timer
@@ -123,7 +132,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
         true
     } else false
 
-    override fun cleanupInvites(time: Long) {
+    override fun cleanupInvites(time: Long): Boolean {
         invitedInfo.object2LongEntrySet().removeAll {
             if (it.longValue <= time) {
                 updateMembers(Type.CANCELINVITE, it.key.uuid)
@@ -132,7 +141,7 @@ class PartyObject(override var leaderInfo: PlayerInfo) : IParty {
                 true
             } else false
         }
-        if (!isParty) dissolve()
+        return !isParty
     }
 
     fun updateMembers(type: Type, target: UUID?){

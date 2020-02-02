@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.init.Blocks
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumHand
@@ -104,7 +105,7 @@ fun EntityPlayerMP.hasBreakPermission(pos: BlockPos) = this.hasEditPermission(po
 
 fun EntityPlayerMP.hasEditPermission(pos: BlockPos) =
         !FMLCommonHandler.instance().minecraftServerInstance.isBlockProtected(this.entityWorld, pos, this)
-                && EnumFacing.VALUES.any { this.canPlayerEdit(pos, it, null) }
+                && EnumFacing.VALUES.any { this.canPlayerEdit(pos, it, ItemStack.EMPTY) }
 
 fun EntityPlayerMP.checkedPlaceBlock(pos: BlockPos, state: IBlockState): Boolean {
     if (!this.hasEditPermission(pos)) return false

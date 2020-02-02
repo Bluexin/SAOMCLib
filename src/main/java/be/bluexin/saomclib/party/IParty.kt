@@ -60,6 +60,20 @@ interface IParty: IPartyData {
      */
     fun dissolve()
 
+    /**
+     * Resends all party data as [PartyEvent3.Refreshed]
+     */
+    fun syncAll()
+
+    /**
+     * Resends party data to player as [PartyEvent3.Refreshed]
+     */
+    fun sync(member: EntityPlayer) = sync(PlayerInfo(member))
+
+    fun sync(member: UUID) = sync(PlayerInfo(member))
+
+    fun sync(member: PlayerInfo)
+
 
     /**
      * Invite someone to this party.
@@ -92,8 +106,9 @@ interface IParty: IPartyData {
      * Clean up the invites (invite timeout) based on current world time.
      *
      * @param time the current world time
+     * @return returns true if party is no longer valid
      */
-    fun cleanupInvites(time: Long)
+    fun cleanupInvites(time: Long): Boolean
 
 
     /**
@@ -107,8 +122,9 @@ interface IParty: IPartyData {
     fun changeLeader(player: PlayerInfo): Boolean{
         if (player !in this)
             return false
+        val oldLeader = leaderInfo
         leaderInfo = player
-        fireLeaderChanged(player)
+        fireLeaderChanged(player, oldLeader)
         return true
     }
 }
