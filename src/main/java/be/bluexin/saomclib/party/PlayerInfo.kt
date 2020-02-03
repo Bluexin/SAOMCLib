@@ -2,12 +2,13 @@ package be.bluexin.saomclib.party
 
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.proxy.CommonProxy
+import com.google.gson.annotations.SerializedName
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.lang.ref.WeakReference
 import java.util.*
 
-data class PlayerInfo(val uuid: UUID) {
+data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
 
     constructor(player: EntityPlayer): this(player.uniqueID){
         this.username = player.displayNameString
@@ -31,7 +32,7 @@ data class PlayerInfo(val uuid: UUID) {
     val player: EntityPlayer?
         get() = playerImpl?.get()
 
-    lateinit var username: String
+    @SerializedName("Username") lateinit var username: String
 
 
     init {
