@@ -71,10 +71,12 @@ class PTUpdateClientPKT(): IMessage {
                         else
                             partyCap.setPartyData(message.data, message.partyType)
                         message.data.fireJoin(PlayerInfo(target))
+                        message.data.fireRefresh()
                     }
                     Type.INVITE -> {
                         partyCap.setPartyData(message.data, message.partyType)
                         message.data.fireInvited(PlayerInfo(target))
+                        message.data.fireRefresh()
                     }
                     Type.CANCELINVITE -> {
                         if (target == player.uniqueID)
@@ -82,6 +84,7 @@ class PTUpdateClientPKT(): IMessage {
                         else
                             partyCap.setPartyData(message.data, message.partyType)
                         message.data.fireInviteCanceled(PlayerInfo(target))
+                        message.data.fireRefresh()
                     }
                     Type.LEAVE -> {
                         if (target == player.uniqueID)
@@ -89,6 +92,7 @@ class PTUpdateClientPKT(): IMessage {
                         else
                             partyCap.setPartyData(message.data, message.partyType)
                         message.data.fireInviteCanceled(PlayerInfo(target))
+                        message.data.fireRefresh()
                     }
                     Type.KICK -> {
                         if (target == player.uniqueID)
@@ -96,15 +100,18 @@ class PTUpdateClientPKT(): IMessage {
                         else
                             partyCap.setPartyData(message.data, message.partyType)
                         message.data.fireKicked(PlayerInfo(target))
+                        message.data.fireRefresh()
                     }
                     Type.DISBAND -> {
                         partyCap.setPartyData(null, message.partyType)
                         message.data.fireDisbanded()
+                        message.data.fireRefresh()
                     }
                     Type.LEADERCHANGE -> {
                         val oldLeader = partyCap.getPartyData(message.partyType)?.leaderInfo?: return null
                         partyCap.setPartyData(message.data, message.partyType)
                         message.data.fireLeaderChanged(PlayerInfo(target), oldLeader)
+                        message.data.fireRefresh()
                     }
                     Type.REFRESH -> {
                         partyCap.setPartyData(message.data, message.partyType)
