@@ -25,6 +25,8 @@ internal open class CommonProxy {
 
     open fun getPlayerEntity(uuid: UUID): EntityPlayer? = FMLCommonHandler.instance().minecraftServerInstance.playerList.getPlayerByUUID(uuid)
 
+    open fun getGameProfile(uuid: UUID) = FMLCommonHandler.instance().minecraftServerInstance.playerProfileCache.getProfileByUUID(uuid)
+
     open fun getSide() = ProxySide.SERVER
 
     enum class ProxySide {

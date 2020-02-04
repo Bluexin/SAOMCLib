@@ -1,10 +1,8 @@
 package be.bluexin.saomclib.party
 
-import be.bluexin.saomclib.SAOMCLib
-import be.bluexin.saomclib.proxy.CommonProxy
+import be.bluexin.saomclib.SAOMCLib.proxy
 import com.google.gson.annotations.SerializedName
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraftforge.fml.common.FMLCommonHandler
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -22,7 +20,7 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     var playerImpl: WeakReference<EntityPlayer>? = null
         get() {
             if (field == null){
-                val player = SAOMCLib.proxy.getPlayerEntity(uuid)
+                val player = proxy.getPlayerEntity(uuid)
                 if (player != null)
                     field = WeakReference(player)
             }
@@ -32,17 +30,12 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     val player: EntityPlayer?
         get() = playerImpl?.get()
 
-    @SerializedName("Username") lateinit var username: String
-
-
-    init {
-        if (!::username.isInitialized){
-            username = if (SAOMCLib.proxy.getSide() == CommonProxy.ProxySide.SERVER)
-                FMLCommonHandler.instance().minecraftServerInstance.playerProfileCache.getProfileByUUID(uuid)?.name?: uuidString
-            else
-                player?.displayNameString?: uuidString
+    @SerializedName("Username") var username: String = ""
+        get() {
+            if (field.isEmpty())
+                field = proxy.getGameProfile(uuid)?.name?: return uuidString
+            return field
         }
-    }
 
     override fun equals(other: Any?): Boolean {
         if (other is EntityPlayer)

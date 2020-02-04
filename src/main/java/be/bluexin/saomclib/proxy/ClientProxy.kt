@@ -27,5 +27,7 @@ internal class ClientProxy : CommonProxy() {
 
     override fun getPlayerEntity(uuid: UUID): EntityPlayer? = FMLClientHandler.instance().worldClient.getPlayerEntityByUUID(uuid)
 
+    override fun getGameProfile(uuid: UUID) = FMLClientHandler.instance().client.connection?.getPlayerInfo(uuid)?.gameProfile
+
     override fun getSide() = ProxySide.CLIENT
 }
