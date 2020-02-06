@@ -30,6 +30,34 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     val player: EntityPlayer?
         get() = playerImpl?.get()
 
+    val gameProfile = proxy.getGameProfile(uuid)
+
+
+    //Health cache
+    var health: Float = -1f
+    get() {
+        if (player != null){
+            field = -1f
+            return player!!.health
+        }
+        else if (field == -1F) {
+            field = proxy.getPlayerHealth(uuid)
+        }
+        return field
+    }
+
+    var maxHealth: Float = -1f
+    get() {
+        if (player != null){
+            field -1f
+            return player!!.maxHealth
+        }
+        else if (field == -1F){
+            field = proxy.getPlayerMaxHealth(uuid)
+        }
+        return field
+    }
+
     @SerializedName("Username") var username: String = ""
         get() {
             if (field.isEmpty())

@@ -3,6 +3,7 @@ package be.bluexin.saomclib.proxy
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.IThreadListener
 import net.minecraft.world.World
+import net.minecraftforge.common.util.FakePlayer
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import java.util.*
@@ -26,6 +27,18 @@ internal open class CommonProxy {
     open fun getPlayerEntity(uuid: UUID): EntityPlayer? = FMLCommonHandler.instance().minecraftServerInstance.playerList.getPlayerByUUID(uuid)
 
     open fun getGameProfile(uuid: UUID) = FMLCommonHandler.instance().minecraftServerInstance.playerProfileCache.getProfileByUUID(uuid)
+
+    open fun getPlayerHealth(uuid: UUID): Float {
+        val worldServer = FMLCommonHandler.instance().minecraftServerInstance.getWorld(0)
+        val player = FakePlayer(worldServer, getGameProfile(uuid))
+        return worldServer.saveHandler.playerNBTManager.readPlayerData(player)?.getFloat("Health")?: 0f
+    }
+
+    open fun getPlayerMaxHealth(uuid: UUID): Float {
+        val worldServer = FMLCommonHandler.instance().minecraftServerInstance.getWorld(0)
+        val player = FakePlayer(worldServer, getGameProfile(uuid))
+        return worldServer.saveHandler.playerNBTManager.readPlayerData(player)?.getTagList("Attributes", 10)?.getCompoundTagAt(0)?.getDouble("Base")?.toFloat()?: 0f
+    }
 
     open fun getSide() = ProxySide.SERVER
 

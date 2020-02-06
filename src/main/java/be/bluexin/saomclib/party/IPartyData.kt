@@ -46,7 +46,7 @@ interface IPartyData: Cloneable{
      * @return whether the party is valid
      */
     val isParty: Boolean
-        get() = membersInfo.any { it != leaderInfo } || (membersInfo.isNotEmpty() && invitedInfo.isNotEmpty())
+        get() = (membersInfo.any { it != leaderInfo } || (membersInfo.isNotEmpty() && invitedInfo.isNotEmpty())) && membersInfo.any { it.player != null }
 
     /**
      * Returns whether the provided player is in this party.
