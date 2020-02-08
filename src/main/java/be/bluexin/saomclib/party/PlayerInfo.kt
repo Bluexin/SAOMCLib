@@ -2,6 +2,7 @@ package be.bluexin.saomclib.party
 
 import be.bluexin.saomclib.SAOMCLib.proxy
 import com.google.gson.annotations.SerializedName
+import com.mojang.authlib.GameProfile
 import net.minecraft.entity.player.EntityPlayer
 import java.lang.ref.WeakReference
 import java.util.*
@@ -29,8 +30,6 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
 
     val player: EntityPlayer?
         get() = playerImpl?.get()
-
-    val gameProfile = proxy.getGameProfile(uuid)
 
 
     //Health cache
@@ -64,6 +63,8 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
                 field = proxy.getGameProfile(uuid)?.name?: return uuidString
             return field
         }
+
+    val gameProfile: GameProfile = proxy.getGameProfile(uuid)?: GameProfile(uuid, username)
 
     override fun equals(other: Any?): Boolean {
         if (other is EntityPlayer)
