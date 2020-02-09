@@ -1,13 +1,16 @@
 package be.bluexin.saomclib.party
 
 import be.bluexin.saomclib.SAOMCLib.proxy
-import com.google.gson.Gson
+import com.google.gson.*
+import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import com.mojang.authlib.GameProfile
 import net.minecraft.entity.player.EntityPlayer
 import java.lang.ref.WeakReference
+import java.lang.reflect.Type
 import java.util.*
 
+@JsonAdapter(PlayerInfoSerializer::class)
 data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
 
     constructor(player: EntityPlayer): this(player.uniqueID){
@@ -86,9 +89,20 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     companion object{
         val EMPTY = PlayerInfo(UUID.fromString("00000000-0000-0000-0000-000000000000"))
 
-        val gson = Gson()
+        val gson = GsonBuilder().create()
     }
 
+}
+
+object PlayerInfoSerializer: JsonSerializer<PlayerInfo>, JsonDeserializer<PlayerInfo>{
+    override fun serialize(src: PlayerInfo, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
+        return JsonPrimitive("${src.uuidString}:${src.username}")
+    }
+
+    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): PlayerInfo {
+        val data = json.asJsonPrimitive.asString.split(":")
+        return PlayerInfo(UUID.fromString(data.first()), data.last())
+    }
 }
 
 fun EntityPlayer.playerInfo() = PlayerInfo(this)
