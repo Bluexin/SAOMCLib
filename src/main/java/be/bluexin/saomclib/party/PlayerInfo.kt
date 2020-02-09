@@ -56,6 +56,8 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
 
     val gameProfile: GameProfile = proxy.getGameProfile(uuid)?: GameProfile(uuid, username)
 
+    val isOnline = proxy.isPlayerOnline(uuid)
+
     override fun equals(other: Any?): Boolean {
         if (other is EntityPlayer)
             return other.uniqueID == uuid

@@ -40,6 +40,8 @@ internal open class CommonProxy {
         return worldServer.saveHandler.playerNBTManager.readPlayerData(player)?.getTagList("Attributes", 10)?.getCompoundTagAt(0)?.getDouble("Base")?.toFloat()?: 20f
     }
 
+    open fun isPlayerOnline(uuid: UUID) = FMLCommonHandler.instance().minecraftServerInstance.playerList.onlinePlayerProfiles.any { it.id == uuid }
+
     open fun getSide() = ProxySide.SERVER
 
     enum class ProxySide {
