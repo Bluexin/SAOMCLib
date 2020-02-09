@@ -39,14 +39,12 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     //Health cache
     val health: Float
     get() {
-        return if (player != null) player!!.health
-        else proxy.getPlayerHealth(uuid)
+        return player?.health?: proxy.getPlayerHealth(uuid)?: 0f
     }
 
     val maxHealth: Float
     get() {
-        return if (player != null)  player!!.maxHealth
-        else proxy.getPlayerMaxHealth(uuid)
+        return player?.maxHealth?: proxy.getPlayerMaxHealth(uuid)?: 20f
     }
 
     @SerializedName("Username") var username: String = ""

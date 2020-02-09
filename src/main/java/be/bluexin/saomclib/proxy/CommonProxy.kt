@@ -37,7 +37,7 @@ internal open class CommonProxy {
     open fun getPlayerMaxHealth(uuid: UUID): Float {
         val worldServer = FMLCommonHandler.instance().minecraftServerInstance.getWorld(0)
         val player = FakePlayer(worldServer, getGameProfile(uuid))
-        return worldServer.saveHandler.playerNBTManager.readPlayerData(player)?.getTagList("Attributes", 10)?.getCompoundTagAt(0)?.getDouble("Base")?.toFloat()?: 0f
+        return worldServer.saveHandler.playerNBTManager.readPlayerData(player)?.getTagList("Attributes", 10)?.getCompoundTagAt(0)?.getDouble("Base")?.toFloat()?: 20f
     }
 
     open fun getSide() = ProxySide.SERVER

@@ -30,14 +30,17 @@ internal class ClientProxy : CommonProxy() {
 
     override fun getGameProfile(uuid: UUID) = FMLClientHandler.instance().client.connection?.getPlayerInfo(uuid)?.gameProfile
 
-    override fun getPlayerHealth(uuid: UUID) = FMLClientHandler.instance().client.connection?.getPlayerInfo(uuid)?.lastHealth?.toFloat()?: {
-        val player = EntityOtherPlayerMP(FMLClientHandler.instance().worldClient, getGameProfile(uuid)!!)
-        FMLClientHandler.instance().worldClient.saveHandler.playerNBTManager.readPlayerData(player)?.getFloat("Health")?: 0f
-    }.invoke()
+    override fun getPlayerHealth(uuid: UUID): Float {
+        return FMLClientHandler.instance().client.connection?.getPlayerInfo(uuid)?.displayHealth?.toFloat() ?: {
+            val player = EntityOtherPlayerMP(FMLClientHandler.instance().worldClient, getGameProfile(uuid)!!)
+            FMLClientHandler.instance().worldClient.saveHandler.playerNBTManager.readPlayerData(player)?.getFloat("Health")
+                    ?: 0f
+        }.invoke()
+    }
 
     override fun getPlayerMaxHealth(uuid: UUID): Float {
         val player = EntityOtherPlayerMP(FMLClientHandler.instance().worldClient, getGameProfile(uuid)!!)
-        return FMLClientHandler.instance().worldClient.saveHandler.playerNBTManager.readPlayerData(player)?.getTagList("Attributes", 10)?.getCompoundTagAt(0)?.getDouble("Base")?.toFloat()?: 0f
+        return FMLClientHandler.instance().worldClient.saveHandler.playerNBTManager.readPlayerData(player)?.getTagList("Attributes", 10)?.getCompoundTagAt(0)?.getDouble("Base")?.toFloat()?: 20f
     }
 
     override fun getSide() = ProxySide.CLIENT
