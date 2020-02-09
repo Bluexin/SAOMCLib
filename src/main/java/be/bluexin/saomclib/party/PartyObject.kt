@@ -7,7 +7,6 @@ import be.bluexin.saomclib.packets.party.updateClient
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2LongMap
 import net.minecraft.entity.player.EntityPlayerMP
-import java.util.*
 
 class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
 
@@ -34,7 +33,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
                 membersInfo += leaderInfo
                 membersInfo += member
                 invitedInfo -= member
-                updateMembers(Type.JOIN, member.uuid)
+                updateMembers(Type.JOIN, member)
                 fireJoin(member)
                 fireRefresh()
                 return true
@@ -43,7 +42,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
                 invitedInfo -= member
                 fireInviteCanceled(member)
                 fireRefresh()
-                updateMembers(Type.CANCELINVITE, member.uuid)
+                updateMembers(Type.CANCELINVITE, member)
             }
 
         }
@@ -79,7 +78,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
                 if (member == leaderInfo) return true
                 fireLeaderChanged(leaderInfo, member)
                 fireRefresh()
-                updateMembers(Type.LEADERCHANGE, leaderInfo.uuid)
+                updateMembers(Type.LEADERCHANGE, leaderInfo)
             }
             return true
         }
@@ -87,15 +86,15 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
     }
 
     private fun remove(player: PlayerInfo) = if (membersInfo.remove(player)){
-        Type.LEAVE.updateClient(player.player as EntityPlayerMP, this, player.uuid)
-        updateMembers(Type.LEAVE, player.uuid)
+        Type.LEAVE.updateClient(player.player as EntityPlayerMP, this, player)
+        updateMembers(Type.LEAVE, player)
         fireLeave(player)
         fireRefresh()
         true
     } else false
 
     override fun dissolve() {
-        updateMembers(Type.DISBAND, null)
+        updateMembers(Type.DISBAND, PlayerInfo.EMPTY)
         fireDisbanded()
         membersInfo.clear()
         invitedInfo.clear()
@@ -104,11 +103,11 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
     }
 
     override fun syncAll() {
-        updateMembers(Type.REFRESH, null)
+        updateMembers(Type.REFRESH, PlayerInfo.EMPTY)
     }
 
     override fun sync(member: PlayerInfo) {
-        Type.REFRESH.updateClient(member.player as EntityPlayerMP, this, null)
+        Type.REFRESH.updateClient(member.player as EntityPlayerMP, this, PlayerInfo.EMPTY)
     }
 
     override fun invite(player: PlayerInfo): Boolean {
@@ -116,7 +115,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
             // 300 second timer
             // TODO make timeout a config  option
             invitedInfo += Pair(player, SAOMCLib.proxy.getMainWorld().totalWorldTime + (300 * 20))
-            updateMembers(Type.INVITE, player.uuid)
+            updateMembers(Type.INVITE, player)
             fireInvited(player)
             fireRefresh()
             return true
@@ -126,8 +125,8 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
 
     override fun cancel(player: PlayerInfo) = if (invitedInfo.remove(player) != null) {
         invitedInfo -= player
-        updateMembers(Type.CANCELINVITE, player.uuid)
-        updateMember(Type.CANCELINVITE, player, player.uuid)
+        updateMembers(Type.CANCELINVITE, player)
+        updateMember(Type.CANCELINVITE, player, player)
         fireInviteCanceled(player)
         fireRefresh()
         true
@@ -136,7 +135,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
     override fun cleanupInvites(time: Long): Boolean {
         invitedInfo.object2LongEntrySet().removeAll {
             if (it.longValue <= time) {
-                updateMembers(Type.CANCELINVITE, it.key.uuid)
+                updateMembers(Type.CANCELINVITE, it.key)
                 fireInviteCanceled(it.key)
                 fireRefresh()
                 true
@@ -145,12 +144,12 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
         return !isParty
     }
 
-    fun updateMembers(type: Type, target: UUID?){
+    fun updateMembers(type: Type, target: PlayerInfo){
         membersInfo.asSequence().filter { it.player is EntityPlayerMP }.forEach { type.updateClient(it.player as EntityPlayerMP, this, target) }
         invitedInfo.asSequence().filter { it.key.player is EntityPlayerMP }.forEach { type.updateClient(it.key.player as EntityPlayerMP, this, target) }
     }
 
-    fun updateMember(type: Type, player: PlayerInfo, target: UUID?){
+    fun updateMember(type: Type, player: PlayerInfo, target: PlayerInfo){
         type.updateClient(player.player as EntityPlayerMP, this, target)
     }
 

@@ -32,10 +32,10 @@ class PTUpdateServerPKT(): IMessage{
         this.target = target
     }
 
-    constructor(type: Type, partyType: PartyType, target: EntityPlayer?): this(){
+    constructor(type: Type, partyType: PartyType, target: PlayerInfo): this(){
         this.type = type
         this.partyType = partyType
-        this.target = target?.uniqueID?: UUID.randomUUID()
+        this.target = target.uuid
     }
 
     override fun fromBytes(buf: ByteBuf) {
@@ -110,6 +110,5 @@ class PTUpdateServerPKT(): IMessage{
  * data server side, this will not succeed if the
  * required permissions aren't met.
  */
-fun Type.updateServer(target: EntityPlayer?, type: PartyType) = PacketPipeline.sendToServer(PTUpdateServerPKT(this, type,target
-        ?: Minecraft.getMinecraft().player))
-fun Type.updateServer(type: PartyType) = PacketPipeline.sendToServer(PTUpdateServerPKT(this, type, Minecraft.getMinecraft().player))
+fun Type.updateServer(target: PlayerInfo, type: PartyType) = PacketPipeline.sendToServer(PTUpdateServerPKT(this, type, target))
+fun Type.updateServer(type: PartyType) = PacketPipeline.sendToServer(PTUpdateServerPKT(this, type, Minecraft.getMinecraft().player.uniqueID))

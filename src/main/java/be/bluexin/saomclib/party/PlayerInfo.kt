@@ -1,6 +1,7 @@
 package be.bluexin.saomclib.party
 
 import be.bluexin.saomclib.SAOMCLib.proxy
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.mojang.authlib.GameProfile
 import net.minecraft.entity.player.EntityPlayer
@@ -80,6 +81,12 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
 
     override fun hashCode(): Int {
         return uuid.hashCode()
+    }
+
+    companion object{
+        val EMPTY = PlayerInfo(UUID.fromString("00000000-0000-0000-0000-000000000000"))
+
+        val gson = Gson()
     }
 
 }

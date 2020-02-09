@@ -6,9 +6,7 @@ import be.bluexin.saomclib.packets.AbstractClientPacketHandler
 import be.bluexin.saomclib.party.IPartyData
 import be.bluexin.saomclib.party.PartyClientObject
 import be.bluexin.saomclib.party.PlayerInfo
-import be.bluexin.saomclib.readString
 import be.bluexin.saomclib.sendPacket
-import be.bluexin.saomclib.writeString
 import io.netty.buffer.ByteBuf
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EntityPlayerMP
@@ -16,14 +14,13 @@ import net.minecraft.util.IThreadListener
 import net.minecraftforge.fml.common.network.ByteBufUtils
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
-import java.util.*
 
 class PTUpdateClientPKT(): IMessage {
 
     lateinit var partyType: PartyType
     lateinit var type: Type
     lateinit var data: IPartyData
-    var target: String = ""
+    var target: PlayerInfo = PlayerInfo.EMPTY
 
     constructor(type: Type, partyType: PartyType, data: IPartyData): this(){
         this.type = type
@@ -31,25 +28,25 @@ class PTUpdateClientPKT(): IMessage {
         this.data = data
     }
 
-    constructor(type: Type, partyType: PartyType, data: IPartyData, target: UUID): this(){
+    constructor(type: Type, partyType: PartyType, data: IPartyData, target: PlayerInfo): this(){
         this.type = type
         this.partyType = partyType
         this.data = data
-        this.target = target.toString()
+        this.target = target
     }
 
     override fun fromBytes(buf: ByteBuf) {
         partyType = PartyType.values()[buf.readInt()]
         type = Type.values()[buf.readInt()]
         data = PartyClientObject.readNBT(ByteBufUtils.readTag(buf))!!
-        target = buf.readString()
+        target = PlayerInfo.gson.fromJson(ByteBufUtils.readUTF8String(buf), PlayerInfo::class.java)
     }
 
     override fun toBytes(buf: ByteBuf) {
         buf.writeInt(PartyType.values().indexOf(partyType))
         buf.writeInt(Type.values().indexOf(type))
         ByteBufUtils.writeTag(buf, data.writeNBT())
-        buf.writeString(target)
+        ByteBufUtils.writeUTF8String(buf, PlayerInfo.gson.toJson(target))
     }
 
 
@@ -57,49 +54,44 @@ class PTUpdateClientPKT(): IMessage {
         class Handler : AbstractClientPacketHandler<PTUpdateClientPKT>() {
             override fun handleClientPacket(player: EntityPlayer, message: PTUpdateClientPKT, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
                 val partyCap = player.getPartyCapability()
-                val target: UUID= if (message.target.isNotEmpty()) try {
-                    UUID.fromString(message.target)
-                } catch (e: Exception){
-                    UUID.randomUUID()
-                } else UUID.randomUUID()
                 when (message.type){
                     Type.JOIN -> {
-                        if (target == player.uniqueID) {
+                        if (message.target.equals(player.uniqueID)) {
                             partyCap.inviteData = null
                             partyCap.partyData = message.data
                         }
                         else
                             partyCap.setPartyData(message.data, message.partyType)
-                        message.data.fireJoin(PlayerInfo(target))
+                        message.data.fireJoin(message.target)
                         message.data.fireRefresh()
                     }
                     Type.INVITE -> {
                         partyCap.setPartyData(message.data, message.partyType)
-                        message.data.fireInvited(PlayerInfo(target))
+                        message.data.fireInvited(message.target)
                         message.data.fireRefresh()
                     }
                     Type.CANCELINVITE -> {
-                        if (target == player.uniqueID)
+                        if (message.target.equals(player.uniqueID))
                             partyCap.inviteData = null
                         else
                             partyCap.setPartyData(message.data, message.partyType)
-                        message.data.fireInviteCanceled(PlayerInfo(target))
+                        message.data.fireInviteCanceled(message.target)
                         message.data.fireRefresh()
                     }
                     Type.LEAVE -> {
-                        if (target == player.uniqueID)
+                        if (message.target.equals(player.uniqueID))
                             partyCap.partyData = null
                         else
                             partyCap.setPartyData(message.data, message.partyType)
-                        message.data.fireInviteCanceled(PlayerInfo(target))
+                        message.data.fireInviteCanceled(message.target)
                         message.data.fireRefresh()
                     }
                     Type.KICK -> {
-                        if (target == player.uniqueID)
+                        if (message.target.equals(player.uniqueID))
                             partyCap.partyData = null
                         else
                             partyCap.setPartyData(message.data, message.partyType)
-                        message.data.fireKicked(PlayerInfo(target))
+                        message.data.fireKicked(message.target)
                         message.data.fireRefresh()
                     }
                     Type.DISBAND -> {
@@ -110,7 +102,7 @@ class PTUpdateClientPKT(): IMessage {
                     Type.LEADERCHANGE -> {
                         val oldLeader = partyCap.getPartyData(message.partyType)?.leaderInfo?: return null
                         partyCap.setPartyData(message.data, message.partyType)
-                        message.data.fireLeaderChanged(PlayerInfo(target), oldLeader)
+                        message.data.fireLeaderChanged(message.target, oldLeader)
                         message.data.fireRefresh()
                     }
                     Type.REFRESH -> {
@@ -128,5 +120,5 @@ class PTUpdateClientPKT(): IMessage {
     }
 }
 
-fun Type.updateClient(player: EntityPlayerMP, data: IPartyData, target: UUID?)
-        = player.sendPacket(PTUpdateClientPKT(this, if (player in data) PartyType.MAIN else PartyType.INVITE, data, target ?: player.uniqueID))
+fun Type.updateClient(player: EntityPlayerMP, data: IPartyData, target: PlayerInfo)
+        = player.sendPacket(PTUpdateClientPKT(this, if (player in data) PartyType.MAIN else PartyType.INVITE, data, target))
