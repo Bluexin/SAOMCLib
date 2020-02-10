@@ -137,12 +137,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
     }
 
     override fun cleanupInvites(time: Long): Boolean {
-        invitedInfo.object2LongEntrySet().removeAll {
-            if (it.longValue <= time) {
-                cancel(it.key)
-                true
-            } else false
-        }
+        invitedInfo.asIterable().filter { it.value <= time }.forEach { cancel(it.key) }
         return !isParty
     }
 
