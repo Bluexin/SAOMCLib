@@ -10,6 +10,7 @@ import be.bluexin.saomclib.party.PartyManager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagList
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.capabilities.Capability
@@ -23,24 +24,22 @@ class PartyCapability : AbstractEntityCapability() {
             PartyManager.getPartyData(reference.get() as EntityPlayer)
         else field
     }
-    var inviteData: IPartyData? = null
+    var inviteData: MutableSet<IPartyData> = mutableSetOf()
     get() {
         return if (reference.get()?.world?.isRemote == false)
-            PartyManager.getInvitedParty(reference.get() as EntityPlayer)
+            PartyManager.getInvitedParties(reference.get() as EntityPlayer).toMutableSet()
         else field
     }
 
     fun setPartyData(partyData: IPartyData?, partyType: PartyType){
         when (partyType){
             PartyType.MAIN -> this.partyData = partyData
-            PartyType.INVITE -> this.inviteData = partyData
-        }
-    }
-
-    fun getPartyData(partyType: PartyType): IPartyData?{
-        return when (partyType){
-            PartyType.MAIN -> this.partyData
-            PartyType.INVITE -> this.inviteData
+            PartyType.INVITE -> {
+                if (partyData != null){
+                    this.inviteData.removeIf { it.isLeader(partyData.leaderInfo) }
+                    this.inviteData.add(partyData)
+                }
+            }
         }
     }
 
@@ -56,27 +55,35 @@ class PartyCapability : AbstractEntityCapability() {
                 val world = instance.reference.get()?.world
                 world?.onServer {
                     instance.partyData = PartyManager.getPartyData(instance.reference.get() as EntityPlayer)
-                    instance.inviteData = PartyManager.getInvitedParty(instance.reference.get() as EntityPlayer)
+                    instance.inviteData = PartyManager.getInvitedParties(instance.reference.get() as EntityPlayer).toMutableSet()
                 }
                 world?.onClient {
                     if (nbtTagCompound.hasKey("party")) {
                         instance.partyData = PartyClientObject.readNBT(nbtTagCompound.getCompoundTag("party"))
                     }
-                    if (nbtTagCompound.hasKey("invited")) {
-                        instance.inviteData = PartyClientObject.readNBT(nbtTagCompound.getCompoundTag("invited"))
+                    if (nbtTagCompound.hasKey("invitedList")) {
+                        val tagList = nbtTagCompound.getTagList("invitedList", 10)
+                        tagList.tagCount()
+                        for (i in 0 until tagList.tagCount()){
+                            instance.inviteData.add(PartyClientObject.readNBT(tagList.getCompoundTagAt(i))!!)
+                        }
                     }
                 }
             }
         }
 
-        override fun writeNBT(capability: Capability<PartyCapability>?, instance: PartyCapability?, side: EnumFacing?): NBTBase? {
+        override fun writeNBT(capability: Capability<PartyCapability>?, instance: PartyCapability, side: EnumFacing?): NBTBase? {
             val nbt = NBTTagCompound()
 
-            if (instance?.partyData != null){
+            if (instance.partyData != null){
                 nbt.setTag("party", instance.partyData!!.writeNBT())
             }
-            if (instance?.inviteData != null){
-                nbt.setTag("invited", instance.inviteData!!.writeNBT())
+            if (instance.inviteData.isNotEmpty()){
+                val tagList = NBTTagList()
+                instance.inviteData.forEach {
+                    tagList.appendTag(it.writeNBT())
+                }
+                nbt.setTag("invitedList", tagList)
             }
             return nbt
         }

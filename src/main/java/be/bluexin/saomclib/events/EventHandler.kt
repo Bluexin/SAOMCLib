@@ -66,8 +66,8 @@ internal object EventHandler {
             evt.left.add(ptcap.partyData!!.membersInfo.joinToString { it.username } + " " + ptcap.partyData!!.invitedInfo.keys.joinToString { "+${it.username}" })
         }
         evt.left.add("Invited: ${ptcap.inviteData}")
-        if (ptcap.inviteData != null) {
-            evt.left.add(ptcap.inviteData!!.membersInfo.joinToString { it.username } + " " + ptcap.inviteData!!.invitedInfo.keys.joinToString { "+${it.username}" })
+        ptcap.inviteData.forEach { inviteData ->
+            evt.left.add(inviteData.membersInfo.joinToString { it.username } + " " + inviteData.invitedInfo.keys.joinToString { "+${it.username}" })
         }
     }
 

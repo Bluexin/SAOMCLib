@@ -47,6 +47,10 @@ object PartyManager {
         return parties.firstOrNull { it.isInvited(player) }
     }
 
+    fun getInvitedParties(player: EntityPlayer): Set<IParty>{
+        return parties.filter { it.isInvited(player) }.toSet()
+    }
+
     fun removeParty(party: IParty){
         val parties = partyList
         while (parties.hasNext()){

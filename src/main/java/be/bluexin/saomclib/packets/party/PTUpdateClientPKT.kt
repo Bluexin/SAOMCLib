@@ -57,7 +57,7 @@ class PTUpdateClientPKT(): IMessage {
                 when (message.type){
                     Type.JOIN -> {
                         if (message.target.equals(player.uniqueID)) {
-                            partyCap.inviteData = null
+                            partyCap.inviteData.removeIf { it.isLeader(message.data.leaderInfo) }
                             partyCap.partyData = message.data
                         }
                         else
@@ -72,7 +72,7 @@ class PTUpdateClientPKT(): IMessage {
                     }
                     Type.CANCELINVITE -> {
                         if (message.target.equals(player.uniqueID))
-                            partyCap.inviteData = null
+                            partyCap.inviteData.removeIf { it.isLeader(message.data.leaderInfo) }
                         else
                             partyCap.setPartyData(message.data, message.partyType)
                         message.data.fireInviteCanceled(message.target)
@@ -100,9 +100,17 @@ class PTUpdateClientPKT(): IMessage {
                         message.data.fireRefresh()
                     }
                     Type.LEADERCHANGE -> {
-                        val oldLeader = partyCap.getPartyData(message.partyType)?.leaderInfo?: return null
-                        partyCap.setPartyData(message.data, message.partyType)
-                        message.data.fireLeaderChanged(message.target, oldLeader)
+                        when (message.partyType){
+                            PartyType.MAIN -> {
+                                partyCap.setPartyData(message.data, message.partyType)
+                            }
+                            PartyType.INVITE -> {
+                                partyCap.inviteData.removeIf { it.isLeader(message.target) }
+                                partyCap.inviteData.add(message.data)
+
+                            }
+                        }
+                        message.data.fireLeaderChanged(message.data.leaderInfo, message.target)
                         message.data.fireRefresh()
                     }
                     Type.REFRESH -> {
