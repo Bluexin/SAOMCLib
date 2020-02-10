@@ -123,21 +123,23 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
         return false
     }
 
-    override fun cancel(player: PlayerInfo) = if (invitedInfo.remove(player) != null) {
-        invitedInfo -= player
-        updateMembers(Type.CANCELINVITE, player)
-        updateMember(Type.CANCELINVITE, player, player)
-        fireInviteCanceled(player)
-        fireRefresh()
-        true
-    } else false
+    override fun cancel(player: PlayerInfo): Boolean {
+        return if (invitedInfo.remove(player) != null) {
+            invitedInfo -= player
+            updateMembers(Type.CANCELINVITE, player)
+            updateMember(Type.CANCELINVITE, player, player)
+            fireInviteCanceled(player)
+            if (!isParty)
+                dissolve()
+            else fireRefresh()
+            true
+        } else false
+    }
 
     override fun cleanupInvites(time: Long): Boolean {
         invitedInfo.object2LongEntrySet().removeAll {
             if (it.longValue <= time) {
-                updateMembers(Type.CANCELINVITE, it.key)
-                fireInviteCanceled(it.key)
-                fireRefresh()
+                cancel(it.key)
                 true
             } else false
         }
