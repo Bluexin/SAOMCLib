@@ -39,12 +39,12 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     //Health cache
     val health: Float
     get() {
-        return player?.health?: proxy.getPlayerHealth(uuid)?: 0f
+        return player?.health?: proxy.getPlayerHealth(uuid)
     }
 
     val maxHealth: Float
     get() {
-        return player?.maxHealth?: proxy.getPlayerMaxHealth(uuid)?: 20f
+        return player?.maxHealth?: proxy.getPlayerMaxHealth(uuid)
     }
 
     @SerializedName("Username") var username: String = ""
@@ -59,17 +59,26 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     val isOnline: Boolean
         get() = proxy.isPlayerOnline(uuid)
 
-    override fun equals(other: Any?): Boolean {
-        if (other is EntityPlayer)
-            return other.uniqueID == uuid
-        if (other is PlayerInfo)
-            return other.uuid == uuid
-        if (other is String)
-            return other == uuidString
-        if (other is UUID)
-            return uuid == other
-        return false
+    fun equals(other: EntityPlayer): Boolean {
+        return other.uniqueID == uuid
     }
+
+    fun equals(other: PlayerInfo): Boolean {
+        return other.uuid == uuid
+    }
+
+    fun equals(other: String): Boolean {
+        return other == uuidString
+    }
+
+    fun equals(other: UUID): Boolean {
+        return uuid == other
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other)
+    }
+
 
     override fun hashCode(): Int {
         return uuid.hashCode()
@@ -78,7 +87,7 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     companion object{
         val EMPTY = PlayerInfo(UUID.fromString("00000000-0000-0000-0000-000000000000"))
 
-        val gson = GsonBuilder().create()
+        val gson: Gson = GsonBuilder().create()
     }
 
 }
