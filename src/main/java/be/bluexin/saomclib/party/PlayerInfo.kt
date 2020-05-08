@@ -76,13 +76,20 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     }
 
     override fun equals(other: Any?): Boolean {
-        return super.equals(other)
-    }
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
+        other as PlayerInfo
+
+        if (uuid != other.uuid) return false
+
+        return true
+    }
 
     override fun hashCode(): Int {
         return uuid.hashCode()
     }
+
 
     companion object{
         val EMPTY = PlayerInfo(UUID.fromString("00000000-0000-0000-0000-000000000000"))

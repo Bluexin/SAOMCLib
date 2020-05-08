@@ -15,7 +15,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
         invitedInfo += partyData.invitedInfo
     }
 
-    override val membersInfo: MutableCollection<PlayerInfo> = hashSetOf(leaderInfo)
+    override val membersInfo: HashSet<PlayerInfo> = hashSetOf(leaderInfo)
 
     override val invitedInfo: Object2LongMap<PlayerInfo> = Object2LongLinkedOpenHashMap<PlayerInfo>().apply {
         defaultReturnValue(Long.MIN_VALUE)
@@ -85,13 +85,22 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
         else return false
     }
 
-    private fun remove(player: PlayerInfo) = if (membersInfo.remove(player)){
-        Type.LEAVE.updateClient(player.player as EntityPlayerMP, this, player)
-        updateMembers(Type.LEAVE, player)
-        fireLeave(player)
-        fireRefresh()
-        true
-    } else false
+    private fun remove(player: PlayerInfo): Boolean {
+        val memberIterator = membersInfo.iterator()
+        var removed = false
+        while (memberIterator.hasNext() && !removed){
+            val member = memberIterator.next()
+            if (member == player) {
+                memberIterator.remove()
+                Type.LEAVE.updateClient(player.player as EntityPlayerMP, this, player)
+                updateMembers(Type.LEAVE, player)
+                fireLeave(player)
+                fireRefresh()
+                removed = true
+            }
+        }
+        return removed
+    }
 
     override fun dissolve() {
         updateMembers(Type.DISBAND, PlayerInfo.EMPTY)
@@ -124,20 +133,39 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
     }
 
     override fun cancel(player: PlayerInfo): Boolean {
-        return if (invitedInfo.remove(player) != null) {
-            invitedInfo -= player
-            updateMembers(Type.CANCELINVITE, player)
-            updateMember(Type.CANCELINVITE, player, player)
-            fireInviteCanceled(player)
-            if (!isParty)
-                dissolve()
-            else fireRefresh()
-            true
-        } else false
+        val inviteIterator = invitedInfo.iterator()
+        var removed = false
+        while (inviteIterator.hasNext() && !removed){
+            val invited = inviteIterator.next()
+            if (invited.key == player) {
+                inviteIterator.remove()
+                updateMembers(Type.CANCELINVITE, player)
+                updateMember(Type.CANCELINVITE, player, player)
+                fireInviteCanceled(player)
+                removed = true
+            }
+        }
+        if (!isParty)
+            dissolve()
+        else fireRefresh()
+        return removed
     }
 
     override fun cleanupInvites(time: Long): Boolean {
-        invitedInfo.asIterable().filter { it.value <= time }.forEach { cancel(it.key) }
+        val inviteIterator = invitedInfo.iterator()
+        while (inviteIterator.hasNext()){
+            val invited = inviteIterator.next()
+            if (invited.value <= time){
+                val player = invited.key
+                inviteIterator.remove()
+                updateMembers(Type.CANCELINVITE, player)
+                updateMember(Type.CANCELINVITE, player, player)
+                fireInviteCanceled(player)
+            }
+        }
+        if (!isParty)
+            dissolve()
+        else fireRefresh()
         return !isParty
     }
 

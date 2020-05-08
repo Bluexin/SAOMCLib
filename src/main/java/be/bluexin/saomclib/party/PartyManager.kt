@@ -7,10 +7,6 @@ object PartyManager {
 
     private val parties = HashSet<IParty>()
 
-    // Using mutable iterator for safe removals
-    val partyList
-        get() = parties.iterator()
-
     fun addParty(party: IParty){
         parties.add(party)
     }
@@ -52,24 +48,28 @@ object PartyManager {
     }
 
     fun removeParty(party: IParty){
-        val parties = partyList
-        while (parties.hasNext()){
-            if (parties.next() == party)
-                parties.remove()
+        val partyIterator = getPartyIterator()
+        while (partyIterator.hasNext()){
+            if (partyIterator.next() == party)
+                partyIterator.remove()
         }
     }
 
     fun cleanInvalidParties(){
-        val parties = partyList
-        while (parties.hasNext()){
-            val party = parties.next()
+        val partyIterator = getPartyIterator()
+        while (partyIterator.hasNext()){
+            val party = partyIterator.next()
             if (!party.isParty)
-                parties.remove()
+                partyIterator.remove()
         }
     }
 
     fun clean(){
         parties.clear()
+    }
+
+    fun getPartyIterator(): MutableIterator<IParty>{
+        return parties.iterator()
     }
 
 }

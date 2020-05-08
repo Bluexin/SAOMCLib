@@ -56,6 +56,10 @@ object TFPartyEvents {
     fun onPartyLeave(e: PartyEvent.Leave){
         val team: ITogetherTeam = getParty(e.partyData)
         team.removePlayer(createPlayerInfo(e.player))
+
+        // If last player remains, remove party.
+        if (team.players.size == 1 && TogetherForeverAPI.getInstance().teamInvites.none { it.sender == team.players.first() })
+            team.removePlayer(team.players.first())
         markDirty()
     }
 

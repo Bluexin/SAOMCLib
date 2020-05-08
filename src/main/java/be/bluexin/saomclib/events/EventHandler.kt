@@ -89,13 +89,13 @@ internal object EventHandler {
 
     @SubscribeEvent
     fun clearInvites(evt: TickEvent.WorldTickEvent){
-        evt.world.onServer {
-            if (evt.world == DimensionManager.getWorld(0)) {
-                val parties = PartyManager.partyList
-                while (parties.hasNext()){
-                    val party = parties.next()
-                    if (party.cleanupInvites(evt.world.totalWorldTime))
-                        parties.remove()
+        if (evt.phase == TickEvent.Phase.END) {
+            evt.world.onServer {
+                if (evt.world == DimensionManager.getWorld(0)) {
+                    val parties = PartyManager.getPartyIterator()
+                    while (parties.hasNext()) {
+                        parties.next().cleanupInvites(evt.world.totalWorldTime)
+                    }
                 }
             }
         }
