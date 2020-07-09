@@ -7,6 +7,7 @@ import be.bluexin.saomclib.packets.party.updateClient
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2LongMap
 import net.minecraft.entity.player.EntityPlayerMP
+import net.minecraftforge.fml.common.FMLCommonHandler
 
 class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
 
@@ -151,7 +152,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
         return removed
     }
 
-    override fun cleanupInvites(time: Long): Boolean {
+    override fun cleanupInvites(): Boolean {
         val inviteIterator = invitedInfo.iterator()
         while (inviteIterator.hasNext()){
             val invited = inviteIterator.next()
@@ -176,6 +177,11 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
 
     fun updateMember(type: Type, player: PlayerInfo, target: PlayerInfo){
         type.updateClient(player.player as EntityPlayerMP, this, target)
+    }
+
+    companion object{
+        val time: Long
+            get() = FMLCommonHandler.instance().minecraftServerInstance.currentTime
     }
 
 }

@@ -11,7 +11,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.common.DimensionManager
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -88,15 +87,10 @@ internal object EventHandler {
     }
 
     @SubscribeEvent
-    fun clearInvites(evt: TickEvent.WorldTickEvent){
+    fun clearInvites(evt: TickEvent.ServerTickEvent){
         if (evt.phase == TickEvent.Phase.END) {
-            evt.world.onServer {
-                if (evt.world == DimensionManager.getWorld(0)) {
-                    val parties = PartyManager.getPartyIterator()
-                    while (parties.hasNext()) {
-                        parties.next().cleanupInvites(evt.world.totalWorldTime)
-                    }
-                }
+            PartyManager.parties.forEach {
+                it.cleanupInvites()
             }
         }
     }

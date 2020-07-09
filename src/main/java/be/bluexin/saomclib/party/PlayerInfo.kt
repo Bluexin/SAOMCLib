@@ -21,6 +21,11 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
         this.username = name
     }
 
+    constructor(profile: GameProfile): this(profile.id){
+        username = profile.name
+        gameProfile = profile
+    }
+
     val uuidString by lazy { uuid.toString() }
     var playerImpl: WeakReference<EntityPlayer>? = null
         get() {
@@ -54,7 +59,7 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
             return field
         }
 
-    val gameProfile: GameProfile = proxy.getGameProfile(uuid)?: GameProfile(uuid, username)
+    var gameProfile: GameProfile = proxy.getGameProfile(uuid)?: GameProfile(uuid, username)
 
     val isOnline: Boolean
         get() = proxy.isPlayerOnline(uuid)

@@ -104,11 +104,9 @@ interface IParty: IPartyData {
 
     /**
      * Clean up the invites (invite timeout) based on current world time.
-     *
-     * @param time the current world time
      * @return returns true if party is no longer valid
      */
-    fun cleanupInvites(time: Long): Boolean
+    fun cleanupInvites(): Boolean
 
 
     /**
@@ -127,4 +125,5 @@ interface IParty: IPartyData {
         fireLeaderChanged(player, oldLeader)
         return true
     }
+
 }
