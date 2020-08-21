@@ -44,6 +44,8 @@ internal open class CommonProxy {
 
     open fun getSide() = ProxySide.SERVER
 
+    open var isServerSideLoaded: Boolean = true
+
     enum class ProxySide {
         CLIENT,
         SERVER;

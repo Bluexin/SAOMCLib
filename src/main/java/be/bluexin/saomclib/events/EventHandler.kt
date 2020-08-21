@@ -1,12 +1,17 @@
 package be.bluexin.saomclib.events
 
+import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
+import be.bluexin.saomclib.onClient
 import be.bluexin.saomclib.onServer
+import be.bluexin.saomclib.packets.MakeClientAwarePacket
+import be.bluexin.saomclib.packets.PacketPipeline
 import be.bluexin.saomclib.party.PartyManager
 import be.bluexin.saomclib.utils.ModHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
+import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
@@ -79,12 +84,23 @@ internal object EventHandler {
                     PartyManager.removeParty(PartyManager.getPartyObject(evt.player)!!)
             }
         }
+        evt.player.world.onClient {
+            SAOMCLib.proxy.isServerSideLoaded = false
+        }
+        // Just incase
+        evt.player.world.onServer {
+            PacketPipeline.sendTo(MakeClientAwarePacket(false), evt.player as EntityPlayerMP)
+        }
     }
 
     @SubscribeEvent
     fun playerConnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent){
         PartyManager.getPartyObject(evt.player)?.sync(evt.player)
+        evt.player.world.onServer {
+            PacketPipeline.sendTo(MakeClientAwarePacket(true), evt.player as EntityPlayerMP)
+        }
     }
+
 
     @SubscribeEvent
     fun clearInvites(evt: TickEvent.ServerTickEvent){

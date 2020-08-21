@@ -2,12 +2,12 @@ package be.bluexin.saomclib.party
 
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.events.*
+import be.bluexin.saomclib.message
 import be.bluexin.saomclib.packets.party.Type
 import be.bluexin.saomclib.packets.party.updateClient
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2LongMap
 import net.minecraft.entity.player.EntityPlayerMP
-import net.minecraftforge.fml.common.FMLCommonHandler
 
 class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
 
@@ -124,7 +124,10 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
         if (player !in this && !isInvited(player) && fireInviteCheck(player)){
             // 300 second timer
             // TODO make timeout a config  option
-            invitedInfo += Pair(player, SAOMCLib.proxy.getMainWorld().totalWorldTime + (300 * 20))
+            //invitedInfo += Pair(player, time + (300 * 20))
+            invitedInfo += Pair(player, time + (20 * 20))
+            leaderInfo.player?.message("commands.pt.invite.success", player.username)
+            player.player?.message("commands.pt.invited", leaderInfo.username)
             updateMembers(Type.INVITE, player)
             fireInvited(player)
             fireRefresh()
@@ -140,6 +143,8 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
             val invited = inviteIterator.next()
             if (invited.key == player) {
                 inviteIterator.remove()
+                leaderInfo.player?.message("commands.pt.declined", player.username)
+                player.player?.message("commands.pt.decline.success", leaderInfo.username)
                 updateMembers(Type.CANCELINVITE, player)
                 updateMember(Type.CANCELINVITE, player, player)
                 fireInviteCanceled(player)
@@ -158,6 +163,8 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
             val invited = inviteIterator.next()
             if (invited.value <= time){
                 val player = invited.key
+                player.player?.message("commands.pt.cancel.notification")
+                leaderInfo.player?.message("commands.pt.cancel.leaderNotification", player.username)
                 inviteIterator.remove()
                 updateMembers(Type.CANCELINVITE, player)
                 updateMember(Type.CANCELINVITE, player, player)
@@ -181,7 +188,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
 
     companion object{
         val time: Long
-            get() = FMLCommonHandler.instance().minecraftServerInstance.currentTime
+            get() = SAOMCLib.proxy.getMainWorld().totalWorldTime
     }
 
 }

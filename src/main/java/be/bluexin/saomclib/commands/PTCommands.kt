@@ -31,8 +31,6 @@ enum class PTCommands: CommandBase {
             if (pt.isLeader(player)) {
                 if (!pt.isInvited(target)) {
                     pt.invite(target)
-                    player.message("commands.pt.invite.success", params[0])
-                    target.message("commands.pt.invited", player.displayNameString)
                 } else throw CommandException("commands.pt.invite.alreadyPresent", params[0])
             } else throw CommandException("commands.pt.invite.notLeader", pt.leaderInfo.username)
         }
@@ -63,8 +61,6 @@ enum class PTCommands: CommandBase {
             val party = PartyManager.getInvitedParty(sender) ?: throw CommandException("commands.pt.accept.notInvited")
             if (party.isInvited(player)) {
                 party.cancel(player)
-                player.message("commands.pt.decline.success", party.leaderInfo.username)
-                party.leaderInfo.player?.message("commands.pt.declined", player.displayNameString) // TODO: remove this (should be handled by onReceive)
             } else throw CommandException("commands.pt.accept.notInvited")
         }
 
