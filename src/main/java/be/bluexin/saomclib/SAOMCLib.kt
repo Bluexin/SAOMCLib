@@ -5,6 +5,7 @@ import be.bluexin.saomclib.capabilities.PartyCapability
 import be.bluexin.saomclib.commands.Command
 import be.bluexin.saomclib.events.EventHandler
 import be.bluexin.saomclib.events.TFPartyEvents
+import be.bluexin.saomclib.packets.MakeClientAwarePacket
 import be.bluexin.saomclib.packets.PacketPipeline
 import be.bluexin.saomclib.packets.SyncEntityCapabilityPacket
 import be.bluexin.saomclib.packets.party.PTUpdateClientPKT
@@ -52,6 +53,7 @@ object SAOMCLib {
         PacketPipeline.registerMessage(PTUpdateClientPKT::class.java, PTUpdateClientPKT.Companion.Handler::class.java)
         PacketPipeline.registerMessage(PTUpdateServerPKT::class.java, PTUpdateServerPKT.Companion.Handler::class.java)
         PacketPipeline.registerMessage(SyncEntityCapabilityPacket::class.java, SyncEntityCapabilityPacket.Companion.Handler::class.java)
+        PacketPipeline.registerMessage(MakeClientAwarePacket::class.java, MakeClientAwarePacket.Companion.Handler::class.java)
     }
 
     @Mod.EventHandler
