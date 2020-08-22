@@ -3,7 +3,6 @@ package be.bluexin.saomclib.events
 import be.bluexin.saomclib.SAOMCLib
 import be.bluexin.saomclib.capabilities.CapabilitiesHandler
 import be.bluexin.saomclib.capabilities.getPartyCapability
-import be.bluexin.saomclib.onClient
 import be.bluexin.saomclib.onServer
 import be.bluexin.saomclib.packets.MakeClientAwarePacket
 import be.bluexin.saomclib.packets.PacketPipeline
@@ -20,6 +19,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
 
 /**
@@ -84,13 +84,15 @@ internal object EventHandler {
                     PartyManager.removeParty(PartyManager.getPartyObject(evt.player)!!)
             }
         }
-        evt.player.world.onClient {
-            SAOMCLib.proxy.isServerSideLoaded = false
-        }
         // Just incase
         evt.player.world.onServer {
             PacketPipeline.sendTo(MakeClientAwarePacket(false), evt.player as EntityPlayerMP)
         }
+    }
+
+    @SubscribeEvent
+    fun clientDisconnect(e: FMLNetworkEvent.ClientDisconnectionFromServerEvent){
+        SAOMCLib.proxy.isServerSideLoaded = false
     }
 
     @SubscribeEvent
