@@ -45,7 +45,7 @@ class ClientProxy : CommonProxy() {
 
     override fun isPlayerOnline(uuid: UUID) = getGameProfile(uuid)?.name?.let { FMLClientHandler.instance().client?.currentServerData?.playerList?.contains(it) } ?: FMLClientHandler.instance().worldClient?.getPlayerEntityByUUID(uuid) != null
 
-    override var isServerSideLoaded: Boolean = true
+    override var isServerSideLoaded: Boolean = false
 
     override fun getSide() = ProxySide.CLIENT
 }
