@@ -13,7 +13,7 @@ import java.util.*
 
  * @author Bluexin
  */
-internal open class CommonProxy {
+open class CommonProxy {
 
     open fun preInit(){
     }

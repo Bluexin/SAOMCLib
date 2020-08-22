@@ -15,7 +15,7 @@ import java.util.*
  * @author Bluexin
  */
 @Suppress("unused")
-internal class ClientProxy : CommonProxy() {
+class ClientProxy : CommonProxy() {
 
     override fun preInit() {
     }

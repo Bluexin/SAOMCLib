@@ -40,7 +40,7 @@ object SAOMCLib {
 
     @Suppress("unused")
     @SidedProxy(clientSide = "be.bluexin.saomclib.proxy.ClientProxy", serverSide = "be.bluexin.saomclib.proxy.CommonProxy")
-    internal lateinit var proxy: CommonProxy
+    lateinit var proxy: CommonProxy
 
     val LOGGER: Logger = LogManager.getLogger(MODID)
 
