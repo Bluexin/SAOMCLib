@@ -7,7 +7,7 @@ import net.minecraft.util.IThreadListener
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 
-class MakeClientAwarePacket: IMessage {
+class MakeClientAwarePacket(): IMessage {
 
     var isServerSideLoaded: Boolean = false
 
