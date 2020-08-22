@@ -11,7 +11,7 @@ class MakeClientAwarePacket(): IMessage {
 
     var isServerSideLoaded: Boolean = false
 
-    constructor(isServerSideLoaded: Boolean){
+    constructor(isServerSideLoaded: Boolean): this(){
         this.isServerSideLoaded = isServerSideLoaded
     }
 
