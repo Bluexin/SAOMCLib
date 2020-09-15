@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
+import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
@@ -40,6 +41,9 @@ internal object EventHandler {
 
     @SubscribeEvent
     fun attachWorldCapabilities(event: AttachCapabilitiesEvent<World>) = CapabilitiesHandler.registerWorld(event)
+
+    @SubscribeEvent
+    fun attachChunkCapabilities(event: AttachCapabilitiesEvent<Chunk>) = CapabilitiesHandler.registerChunk(event)
 
     /*@SubscribeEvent
     fun livingTick(e: LivingEvent.LivingUpdateEvent) {

@@ -9,6 +9,7 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
+import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.capabilities.*
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import java.util.*
@@ -30,6 +31,8 @@ object CapabilitiesHandler {
     private var itemzz: HashMap<ResourceLocation, CapabilityStorage>? = null
     private var worldz: ArrayList<Pair<Class<out AbstractCapability>, (Any) -> Boolean>>? = ArrayList()
     private var worldzz: HashMap<ResourceLocation, CapabilityStorage>? = null
+    private var chunkz: ArrayList<Pair<Class<out AbstractCapability>, (Any) -> Boolean>>? = ArrayList()
+    private var chunkzz: HashMap<ResourceLocation, CapabilityStorage>? = null
     // TODO: add Village & Chunk
 
     /**
@@ -65,6 +68,14 @@ object CapabilitiesHandler {
     }
 
     /**
+     * Register a capability to registry for all subtypes of Chunk.
+     */
+    fun <T : AbstractCapability> registerChunkCapability(clazz: Class<T>, storage: Capability.IStorage<T>, assignable: (Any) -> Boolean) {
+        worldz?.add(Pair(clazz, assignable)) ?: throw WrongPhaseException(clazz)
+        CapabilityManager.INSTANCE.register(clazz, storage, clazz)
+    }
+
+    /**
      * Queries a Entity Capability based on it's [id], or throws an [IDNotFoundException] if no capability was found.
      */
     fun getEntityCapability(id: ResourceLocation) = entitiezz!![id]?.capability ?: throw IDNotFoundException(id)
@@ -80,9 +91,14 @@ object CapabilitiesHandler {
     fun getTileEntityCapability(id: ResourceLocation) = tileEntitiezz!![id]?.capability ?: throw IDNotFoundException(id)
 
     /**
-     * Queries a TE Capability based on it's ID, or throws an [IDNotFoundException] if no capability was found.
+     * Queries a World Capability based on it's ID, or throws an [IDNotFoundException] if no capability was found.
      */
     fun getWorldCapability(id: ResourceLocation) = worldzz!![id]?.capability ?: throw IDNotFoundException(id)
+
+    /**
+     * Queries a Chunk Capability based on it's ID, or throws an [IDNotFoundException] if no capability was found.
+     */
+    fun getChunkCapability(id: ResourceLocation) = chunkzz!![id]?.capability ?: throw IDNotFoundException(id)
 
     /**
      * Gets the ID of a Capability.
@@ -103,6 +119,9 @@ object CapabilitiesHandler {
         worldzz = HashMap(worldz?.size ?: 0, 1F)
         worldz?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { worldzz!![getID(it.clazz)] = it }
         worldz = null
+        chunkzz = HashMap(worldz?.size ?: 0, 1F)
+        chunkz?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { chunkzz!![getID(it.clazz)] = it }
+        chunkz = null
     }
 
     internal fun syncEntitiesDeath(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDeath }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
@@ -125,6 +144,8 @@ object CapabilitiesHandler {
     internal fun registerTE(event: AttachCapabilitiesEvent<TileEntity>) = tileEntitiezz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
     internal fun registerWorld(event: AttachCapabilitiesEvent<World>) = worldzz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
+
+    internal fun registerChunk(event: AttachCapabilitiesEvent<Chunk>) = chunkzz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
     private fun getKey(clazz: Class<out AbstractCapability>) = try {
         clazz.declaredFields.single { it.isAnnotationPresent(Key::class.java) }.apply { this.isAccessible = true }.get(null) as ResourceLocation
@@ -181,6 +202,8 @@ object CapabilitiesHandler {
             ?: throw IDNotFoundException(id)
 
     internal fun getWorldCapabilityImpl(id: ResourceLocation) = worldzz!![id] ?: throw IDNotFoundException(id)
+
+    internal fun getChunkCapabilityImpl(id: ResourceLocation) = chunkzz!![id] ?: throw IDNotFoundException(id)
 
     internal data class CapabilityStorage(val key: ResourceLocation, val capability: Capability<AbstractCapability>, val clazz: Class<out AbstractCapability>, private val assignable: (Any) -> Boolean) {
         fun shouldRegister(arg: Any) = isAssignable(arg) && !(arg as ICapabilityProvider).hasCapability(capability, null)
