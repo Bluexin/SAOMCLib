@@ -119,7 +119,7 @@ object CapabilitiesHandler {
         worldzz = HashMap(worldz?.size ?: 0, 1F)
         worldz?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { worldzz!![getID(it.clazz)] = it }
         worldz = null
-        chunkzz = HashMap(worldz?.size ?: 0, 1F)
+        chunkzz = HashMap(chunkz?.size ?: 0, 1F)
         chunkz?.map { CapabilityStorage(getKey(it.first), getCapability(it.first), it.first, it.second) }?.forEach { chunkzz!![getID(it.clazz)] = it }
         chunkz = null
     }
