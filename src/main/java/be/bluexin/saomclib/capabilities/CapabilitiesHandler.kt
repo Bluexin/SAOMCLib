@@ -71,7 +71,7 @@ object CapabilitiesHandler {
      * Register a capability to registry for all subtypes of Chunk.
      */
     fun <T : AbstractCapability> registerChunkCapability(clazz: Class<T>, storage: Capability.IStorage<T>, assignable: (Any) -> Boolean) {
-        worldz?.add(Pair(clazz, assignable)) ?: throw WrongPhaseException(clazz)
+        chunkz?.add(Pair(clazz, assignable)) ?: throw WrongPhaseException(clazz)
         CapabilityManager.INSTANCE.register(clazz, storage, clazz)
     }
 
