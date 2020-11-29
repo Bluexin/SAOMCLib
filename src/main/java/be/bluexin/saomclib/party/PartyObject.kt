@@ -183,7 +183,9 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
     }
 
     fun updateMember(type: Type, player: PlayerInfo, target: PlayerInfo){
-        type.updateClient(player.player as EntityPlayerMP, this, target)
+        if (player.player != null && player.player is EntityPlayerMP){
+            type.updateClient(player.player as EntityPlayerMP, this, target)
+        }
     }
 
     companion object{

@@ -16,6 +16,7 @@ import java.util.*
 open class CommonProxy {
 
     open fun preInit(){
+
     }
 
     open fun getPlayerEntity(ctx: MessageContext): EntityPlayer? = ctx.serverHandler.player

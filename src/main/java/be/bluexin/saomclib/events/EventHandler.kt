@@ -22,10 +22,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
-
 /**
  *
-
  * @author Bluexin
  */
 internal object EventHandler {
@@ -116,5 +114,7 @@ internal object EventHandler {
             }
         }
     }
+
+
 
 }
