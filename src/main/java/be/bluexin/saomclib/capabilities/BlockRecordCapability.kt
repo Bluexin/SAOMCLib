@@ -7,6 +7,7 @@ import net.minecraft.nbt.NBTTagList
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.capabilities.CapabilityInject
@@ -79,3 +80,5 @@ class BlockRecordCapability : AbstractCapability() {
 }
 
 fun Chunk.getBlockRecords() = this.getCapability(BlockRecordCapability.CAPABILITY, null)!!
+
+fun World.getBlockRecords(pos: BlockPos) = this.getChunk(pos).getCapability(BlockRecordCapability.CAPABILITY, null)!!
