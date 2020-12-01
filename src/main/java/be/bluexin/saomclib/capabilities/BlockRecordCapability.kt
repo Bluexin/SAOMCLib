@@ -81,4 +81,4 @@ class BlockRecordCapability : AbstractCapability() {
 
 fun Chunk.getBlockRecords() = this.getCapability(BlockRecordCapability.CAPABILITY, null)!!
 
-fun World.getBlockRecords(pos: BlockPos) = this.getChunk(pos).getCapability(BlockRecordCapability.CAPABILITY, null)!!
+fun World.getBlockRecords(pos: BlockPos) = this.getChunk(pos).getBlockRecords()
