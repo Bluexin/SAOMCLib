@@ -14,7 +14,7 @@ import net.minecraftforge.common.capabilities.CapabilityInject
 class BlockRecordCapability : AbstractCapability() {
 
     lateinit var chunk: Chunk
-    private var modifiedBlockCache: HashMap<Int, ArrayList<Pair<Int, Int>>> = hashMapOf()
+    private var modifiedBlockCache: HashSet<BlockPos> = hashSetOf()
 
     override fun setup(param: Any): AbstractCapability {
         this.chunk = param as Chunk
@@ -22,20 +22,18 @@ class BlockRecordCapability : AbstractCapability() {
     }
 
     fun addBlockPos(pos: BlockPos) {
-        addBlockPos(pos.x, pos.y, pos.z)
+        modifiedBlockCache.add(pos)
     }
 
     fun addBlockPos(x: Int, y: Int, z: Int) {
-        if (modifiedBlockCache[y]?.add(Pair(x, z)) != true) {
-            modifiedBlockCache[y] = arrayListOf(Pair(x, z))
-        }
+        addBlockPos(BlockPos(x, y, z))
     }
 
     /**
      * Will quickly scan the chunk to see if the block has been modified
      */
     fun isBlockModified(pos: BlockPos): Boolean {
-        return modifiedBlockCache[pos.y]?.any { it.first == pos.x && it.second == pos.z } == true
+        return modifiedBlockCache.contains(pos)
     }
 
     class Storage : Capability.IStorage<BlockRecordCapability> {
@@ -43,14 +41,12 @@ class BlockRecordCapability : AbstractCapability() {
             val map = NBTTagCompound()
             val coords = NBTTagList()
 
-            instance.modifiedBlockCache.forEach { y, xz ->
-                xz.forEach {
-                    val tag = NBTTagCompound()
-                    tag.setInteger("x", it.first)
-                    tag.setInteger("y", y)
-                    tag.setInteger("z", it.second)
-                    coords.appendTag(tag)
-                }
+            instance.modifiedBlockCache.forEach { pos ->
+                val tag = NBTTagCompound()
+                tag.setInteger("x", pos.x)
+                tag.setInteger("y", pos.y)
+                tag.setInteger("z", pos.z)
+                coords.appendTag(tag)
             }
             map.setTag("coords", coords)
 

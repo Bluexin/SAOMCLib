@@ -99,7 +99,7 @@ object PacketPipeline {
     }
 
     private fun checkValid(clazz: Class<out IMessage>) = try {
-        clazz.getConstructor()?.newInstance() ?: throw NoConstructorException(clazz)
+        clazz.getConstructor().newInstance() ?: throw NoConstructorException(clazz)
     } catch (e: NoSuchMethodException) {
         throw NoConstructorException(clazz)
     } catch (e: Exception) {
