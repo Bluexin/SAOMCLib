@@ -72,7 +72,7 @@ class PartyCapability : AbstractEntityCapability() {
             }
         }
 
-        override fun writeNBT(capability: Capability<PartyCapability>?, instance: PartyCapability, side: EnumFacing?): NBTBase? {
+        override fun writeNBT(capability: Capability<PartyCapability>?, instance: PartyCapability, side: EnumFacing?): NBTBase {
             val nbt = NBTTagCompound()
 
             if (instance.partyData != null){

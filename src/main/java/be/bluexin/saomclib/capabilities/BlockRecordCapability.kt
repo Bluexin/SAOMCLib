@@ -38,7 +38,7 @@ class BlockRecordCapability : AbstractCapability() {
     }
 
     class Storage : Capability.IStorage<BlockRecordCapability> {
-        override fun writeNBT(capability: Capability<BlockRecordCapability>?, instance: BlockRecordCapability, side: EnumFacing?): NBTBase? {
+        override fun writeNBT(capability: Capability<BlockRecordCapability>?, instance: BlockRecordCapability, side: EnumFacing?): NBTBase {
             val map = NBTTagCompound()
             val coords = NBTTagList()
 

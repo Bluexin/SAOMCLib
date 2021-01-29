@@ -20,20 +20,20 @@ object TFPartyEvents {
      *******************************/
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onPartyJoin(e: TeamEvent.PlayerAdd){
-        PartyManager.getPartyObject(PlayerInfo(e.togetherTeam.owner))?.addMember(e.playerInformation.uuid)?: {
+        PartyManager.getPartyObject(PlayerInfo(e.togetherTeam.owner))?.addMember(e.playerInformation.uuid)?: run {
             val party = createParty(e.togetherTeam)
             party.addMember(e.playerInformation.uuid)
             PartyManager.addParty(party)
-        }.invoke()
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onPartyLeave(e: TeamEvent.RemovePlayer){
-        PartyManager.getPartyObject(PlayerInfo(e.togetherTeam.owner))?.removeMember(e.playerInformation.uuid)?: {
+        PartyManager.getPartyObject(PlayerInfo(e.togetherTeam.owner))?.removeMember(e.playerInformation.uuid)?: run {
             val party = createParty(e.togetherTeam)
             party.removeMember(e.playerInformation.uuid)
             PartyManager.addParty(party)
-        }.invoke()
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

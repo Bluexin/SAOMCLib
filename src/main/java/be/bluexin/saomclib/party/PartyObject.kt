@@ -59,11 +59,11 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
 
     override fun removeMember(member: PlayerInfo): Boolean{
         if (remove(member)){
-            if (membersInfo.count() <= 1 || membersInfo.isEmpty()) {
+            if (membersInfo.count() <= 1) {
                 dissolve()
             }
             else if (member == leaderInfo) {
-                leaderInfo = {
+                leaderInfo = run {
                     val leader = fireLeaderLeft()
                     if (leader != null && !membersInfo.contains(leader) && fireJoinCheck(leader)) {
                         fireJoin(leader)
@@ -71,10 +71,10 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
                         membersInfo += leader
                     }
                     leader
-                }.invoke() ?: membersInfo.firstOrNull() ?: {
+                } ?: membersInfo.firstOrNull() ?: run {
                     dissolve()
                     leaderInfo
-                }.invoke()
+                }
                 // if leader change wasn't possible, disband the party
                 if (member == leaderInfo) return true
                 fireLeaderChanged(leaderInfo, member)
@@ -87,6 +87,8 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
     }
 
     private fun remove(player: PlayerInfo): Boolean {
+        return membersInfo.remove(player)
+        /*
         val memberIterator = membersInfo.iterator()
         var removed = false
         while (memberIterator.hasNext() && !removed){
@@ -100,7 +102,7 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
                 removed = true
             }
         }
-        return removed
+        return removed*/
     }
 
     override fun dissolve() {
@@ -137,6 +139,19 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
     }
 
     override fun cancel(player: PlayerInfo): Boolean {
+        return if (invitedInfo.remove(player) != null){
+            leaderInfo.player?.message("commands.pt.declined", player.username)
+            player.player?.message("commands.pt.decline.success", leaderInfo.username)
+            updateMembers(Type.CANCELINVITE, player)
+            updateMember(Type.CANCELINVITE, player, player)
+            fireInviteCanceled(player)
+            if (!isParty)
+                dissolve()
+            else fireRefresh()
+            true
+        }
+        else false
+        /*
         val inviteIterator = invitedInfo.iterator()
         var removed = false
         while (inviteIterator.hasNext() && !removed){
@@ -154,32 +169,37 @@ class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
         if (!isParty)
             dissolve()
         else fireRefresh()
-        return removed
+        return removed*/
     }
 
+    /**
+     * Returns true if the party is no longer valid
+     * and marks for removal
+     */
     override fun cleanupInvites(): Boolean {
-        val inviteIterator = invitedInfo.iterator()
-        while (inviteIterator.hasNext()){
-            val invited = inviteIterator.next()
-            if (invited.value <= time){
-                val player = invited.key
+        val toRemove = arrayListOf<PlayerInfo>()
+        invitedInfo.forEach {
+            if (it.value <= time){
+                toRemove.add(it.key)
+            }
+        }
+        if (toRemove.isNotEmpty()){
+            toRemove.forEach { player ->
                 player.player?.message("commands.pt.cancel.notification")
                 leaderInfo.player?.message("commands.pt.cancel.leaderNotification", player.username)
-                inviteIterator.remove()
+                invitedInfo.remove(player)
                 updateMembers(Type.CANCELINVITE, player)
                 updateMember(Type.CANCELINVITE, player, player)
                 fireInviteCanceled(player)
             }
+            fireRefresh()
         }
-        if (!isParty)
-            dissolve()
-        else fireRefresh()
         return !isParty
     }
 
     fun updateMembers(type: Type, target: PlayerInfo){
-        membersInfo.asSequence().filter { it.player is EntityPlayerMP }.forEach { type.updateClient(it.player as EntityPlayerMP, this, target) }
-        invitedInfo.asSequence().filter { it.key.player is EntityPlayerMP }.forEach { type.updateClient(it.key.player as EntityPlayerMP, this, target) }
+        membersInfo.filter { it.player is EntityPlayerMP }.forEach { type.updateClient(it.player as EntityPlayerMP, this, target) }
+        invitedInfo.filter { it.key.player is EntityPlayerMP }.forEach { type.updateClient(it.key.player as EntityPlayerMP, this, target) }
     }
 
     fun updateMember(type: Type, player: PlayerInfo, target: PlayerInfo){

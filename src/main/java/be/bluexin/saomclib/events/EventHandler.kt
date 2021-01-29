@@ -69,11 +69,11 @@ internal object EventHandler {
         val ptcap = Minecraft.getMinecraft().player.getPartyCapability()
         evt.left.add("Party: ${ptcap.partyData}")
         if (ptcap.partyData != null) {
-            evt.left.add(ptcap.partyData!!.membersInfo.joinToString { it.username } + " " + ptcap.partyData!!.invitedInfo.keys.joinToString { "+${it.username}" })
+            evt.left.add(ptcap.partyData!!.membersInfo.joinToString { it.username } + " " + ptcap.partyData!!.invitedInfo.map { it.key }.joinToString { "+${it.username}" })
         }
         evt.left.add("Invited: ${ptcap.inviteData}")
         ptcap.inviteData.forEach { inviteData ->
-            evt.left.add(inviteData.membersInfo.joinToString { it.username } + " " + inviteData.invitedInfo.keys.joinToString { "+${it.username}" })
+            evt.left.add(inviteData.membersInfo.joinToString { it.username } + " " + inviteData.invitedInfo.map { it.key }.joinToString { "+${it.username}" })
         }
     }
 
@@ -109,9 +109,7 @@ internal object EventHandler {
     @SubscribeEvent
     fun clearInvites(evt: TickEvent.ServerTickEvent){
         if (evt.phase == TickEvent.Phase.END) {
-            PartyManager.parties.forEach {
-                it.cleanupInvites()
-            }
+            PartyManager.parties.removeIf { it.cleanupInvites() }
         }
     }
 

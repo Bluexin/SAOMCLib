@@ -94,8 +94,10 @@ public class DataManager extends WorldSavedData {
         //TEAM SAVING
         NBTTagCompound teamCompound = new NBTTagCompound();
         for (ITogetherTeam togetherTeam : teams) {
+            String teamID = TogetherRegistries.getTogetherTeamID(togetherTeam.getClass());
+            if (teamID == null || teamID.isEmpty()) continue;
             NBTTagCompound team = new NBTTagCompound();
-            team.setString("TeamID", TogetherRegistries.getTogetherTeamID(togetherTeam.getClass()));
+            team.setString("TeamID",teamID);
             team.setTag("Value", togetherTeam.getNBTTag());
             teamCompound.setTag(togetherTeam.getTeamName(), team);
         }
@@ -103,7 +105,9 @@ public class DataManager extends WorldSavedData {
         //OFFLINE RECOVERY SAVING
         NBTTagCompound offlineRecovery = new NBTTagCompound();
         for (IOfflineSyncRecovery recovery : recoveries) {
-            offlineRecovery.setTag(TogetherRegistries.getSyncActionIdFromOfflineRecovery(recovery), recovery.writeToNBT());
+            String recoveryID =TogetherRegistries.getSyncActionIdFromOfflineRecovery(recovery);
+            if (recoveryID == null || recoveryID.isEmpty()) continue;
+            offlineRecovery.setTag(recoveryID, recovery.writeToNBT());
         }
         custom.setTag(RECOVERY, offlineRecovery);
 

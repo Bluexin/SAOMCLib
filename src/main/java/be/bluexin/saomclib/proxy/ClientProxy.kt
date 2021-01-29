@@ -31,11 +31,12 @@ class ClientProxy : CommonProxy() {
     override fun getGameProfile(uuid: UUID) = FMLClientHandler.instance().client.connection?.getPlayerInfo(uuid)?.gameProfile
 
     override fun getPlayerHealth(uuid: UUID): Float {
-        return FMLClientHandler.instance().client.connection?.getPlayerInfo(uuid)?.displayHealth?.toFloat() ?: {
+        return FMLClientHandler.instance().client.connection?.getPlayerInfo(uuid)?.displayHealth?.toFloat() ?: run {
             val player = EntityOtherPlayerMP(FMLClientHandler.instance().worldClient, getGameProfile(uuid)!!)
-            FMLClientHandler.instance().worldClient.saveHandler.playerNBTManager.readPlayerData(player)?.getFloat("Health")
-                    ?: 0f
-        }.invoke()
+            FMLClientHandler.instance().worldClient.saveHandler.playerNBTManager.readPlayerData(player)
+                ?.getFloat("Health")
+                ?: 0f
+        }
     }
 
     override fun getPlayerMaxHealth(uuid: UUID): Float {

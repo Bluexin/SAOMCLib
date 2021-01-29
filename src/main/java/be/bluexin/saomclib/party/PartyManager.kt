@@ -2,11 +2,10 @@ package be.bluexin.saomclib.party
 
 import be.bluexin.saomclib.events.firePartyCreate
 import net.minecraft.entity.player.EntityPlayer
-import java.util.concurrent.CopyOnWriteArraySet
 
 object PartyManager {
 
-    val parties = CopyOnWriteArraySet<IParty>()
+    val parties = ArrayList<IParty>()
 
     fun addParty(party: IParty){
         parties.add(party)
@@ -54,10 +53,6 @@ object PartyManager {
 
     fun clean(){
         parties.clear()
-    }
-
-    fun getPartyIterator(): MutableIterator<IParty>{
-        return parties.iterator()
     }
 
 }

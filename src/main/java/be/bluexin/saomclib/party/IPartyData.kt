@@ -18,13 +18,12 @@ interface IPartyData: Cloneable{
     /**
      * Gets the list of current members.
      */
-    val membersInfo: MutableCollection<PlayerInfo>
+    val membersInfo: HashSet<PlayerInfo>
 
     /**
      * Gets the list of invited players.
      */
     val invitedInfo: Object2LongMap<PlayerInfo>
-
 
     operator fun contains(player: EntityPlayer) = isMember(player)
     operator fun contains(player: UUID) = isMember(player)
