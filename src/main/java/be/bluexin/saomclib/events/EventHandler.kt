@@ -109,7 +109,7 @@ internal object EventHandler {
     @SubscribeEvent
     fun clearInvites(evt: TickEvent.ServerTickEvent){
         if (evt.phase == TickEvent.Phase.END) {
-            PartyManager.parties.removeIf { it.cleanupInvites() }
+            PartyManager.parties.asSequence().filter { it.cleanupInvites() }.forEach { it.dissolve() }
         }
     }
 

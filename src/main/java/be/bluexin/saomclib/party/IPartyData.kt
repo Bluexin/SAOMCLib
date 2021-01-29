@@ -134,7 +134,7 @@ interface IPartyData: Cloneable{
     public override fun clone(): Any {
         return when (SAOMCLib.proxy.getSide()){
             CLIENT -> PartyClientObject(this)
-            SERVER -> PartyObject(this)
+            SERVER -> PartyServerObject(this)
         }
     }
 

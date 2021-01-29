@@ -9,7 +9,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2LongMap
 import net.minecraft.entity.player.EntityPlayerMP
 
-class PartyObject (override var leaderInfo: PlayerInfo) : IParty {
+class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty {
 
     constructor(partyData: IPartyData): this(partyData.leaderInfo){
         membersInfo += partyData.membersInfo

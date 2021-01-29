@@ -163,7 +163,7 @@ fun IPartyData.fireRefresh(){
 }
 
 fun PartyManager.firePartyCreate(player: PlayerInfo): IParty {
-    val event = PartyCreate(PartyObject(player))
+    val event = PartyCreate(PartyServerObject(player))
     MinecraftForge.EVENT_BUS.post(event)
     return event.party
 }
