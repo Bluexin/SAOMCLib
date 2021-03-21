@@ -100,6 +100,7 @@ internal object EventHandler {
     @SubscribeEvent
     fun playerConnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent){
         PartyManager.getPartyObject(evt.player)?.sync(evt.player)
+        if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesLogin(evt.player)
         evt.player.world.onServer {
             PacketPipeline.sendTo(MakeClientAwarePacket(true), evt.player as EntityPlayerMP)
         }
