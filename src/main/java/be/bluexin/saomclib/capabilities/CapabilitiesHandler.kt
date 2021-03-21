@@ -124,18 +124,28 @@ object CapabilitiesHandler {
         chunkz = null
     }
 
-    internal fun syncEntitiesDeath(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDeath }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
+    internal fun syncEntitiesDeath(entity: Entity) = entitiezz?.
+        filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDeath }?.
+        forEach {
+            (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
 
-    internal fun restoreEntitiesDeath(entity: Entity, original: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldRestoreOnDeath }?.forEach {
-        if ((entity.getCapability(it.value.capability, null) as AbstractEntityCapability).restore(entity, original)) it.value.capability.readNBT(entity.getCapability(it.value.capability, null), null, it.value.capability.writeNBT(original.getCapability(it.value.capability, null), null))
+    internal fun restoreEntitiesDeath(entity: Entity, original: Entity) = entitiezz?.
+        filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldRestoreOnDeath }?.
+        forEach {
+            if ((entity.getCapability(it.value.capability, null) as AbstractEntityCapability).restore(entity, original)) it.value.capability.readNBT(entity.getCapability(it.value.capability, null), null, it.value.capability.writeNBT(original.getCapability(it.value.capability, null), null))
     }
 
-    internal fun syncEntitiesDimension(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDimensionChange }?.forEach {
-        val c = (entity.getCapability(it.value.capability, null) as AbstractEntityCapability)
-        if (c.restore(entity, entity)) c.sync()
+    internal fun syncEntitiesDimension(entity: Entity) = entitiezz?.
+        filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSyncOnDimensionChange }?.
+        forEach {
+            val c = (entity.getCapability(it.value.capability, null) as AbstractEntityCapability)
+            if (c.restore(entity, entity)) c.sync()
     }
 
-    internal fun syncEntitiesLogin(entity: Entity) = entitiezz?.filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSendOnLogin }?.forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
+    internal fun syncEntitiesLogin(entity: Entity) =
+        entitiezz?.
+            filter { it.value.isAssignable(entity) && (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).shouldSendOnLogin }?.
+            forEach { (entity.getCapability(it.value.capability, null) as AbstractEntityCapability).sync() }
 
     internal fun registerEntity(event: AttachCapabilitiesEvent<Entity>) = entitiezz?.filter { it.value.shouldRegister(event.`object`) }?.forEach { event.addCapability(it.value.key, CapabilitySerializableImpl(it.value.clazz, it.value.capability, event.`object`)) }
 
