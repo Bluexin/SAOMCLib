@@ -3,6 +3,7 @@ package be.bluexin.saomclib.commands
 import be.bluexin.saomclib.message
 import be.bluexin.saomclib.party.PartyManager
 import be.bluexin.saomclib.party.PlayerInfo
+import be.bluexin.saomclib.party.playerInfo
 import net.minecraft.command.CommandException
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
@@ -15,7 +16,7 @@ enum class PTCommands: CommandBase {
     INVITE {
         override fun getTabCompletions(server: MinecraftServer, sender: ICommandSender, params: Array<String>, pos: BlockPos?): MutableList<String> {
             if (sender !is EntityPlayer) return mutableListOf()
-            val party = PartyManager.getPartyData(sender)
+            val party = PartyManager.getPartyObject(sender.playerInfo())
             val current = party?.membersInfo?.mapNotNull(PlayerInfo::player)?.map { it.name }?: emptyList()
             val invited = party?.invitedInfo?.mapNotNull { it.key.player }?.map { it.name }?: emptyList()
             val list = server.onlinePlayerNames.filterNot { it == sender.name || current.contains(it) || invited.contains(it)}
@@ -42,7 +43,7 @@ enum class PTCommands: CommandBase {
     ACCEPT {
         override fun execute(server: MinecraftServer, sender: ICommandSender, params: Array<String>) {
             val player = sender as EntityPlayer
-            val party = PartyManager.getInvitedParty(sender) ?: throw CommandException("commands.pt.accept.notInvited")
+            val party = PartyManager.getInvitedParty(sender.playerInfo()) ?: throw CommandException("commands.pt.accept.notInvited")
 
             if (party.isInvited(player)) {
                 party.addMember(player)
@@ -58,7 +59,7 @@ enum class PTCommands: CommandBase {
         override fun execute(server: MinecraftServer, sender: ICommandSender, params: Array<String>) {
             val player = sender as EntityPlayer
 
-            val party = PartyManager.getInvitedParty(sender) ?: throw CommandException("commands.pt.accept.notInvited")
+            val party = PartyManager.getInvitedParty(sender.playerInfo()) ?: throw CommandException("commands.pt.accept.notInvited")
             if (party.isInvited(player)) {
                 party.cancel(player)
             } else throw CommandException("commands.pt.accept.notInvited")
@@ -71,7 +72,7 @@ enum class PTCommands: CommandBase {
     KICK {
         override fun getTabCompletions(server: MinecraftServer, sender: ICommandSender, params: Array<String>, pos: BlockPos?): MutableList<String> {
             if (sender !is EntityPlayer) return mutableListOf()
-            val party = PartyManager.getPartyObject(sender)?: return mutableListOf()
+            val party = PartyManager.getPartyObject(sender.playerInfo())?: return mutableListOf()
 
             val list = party.membersInfo.mapNotNull(PlayerInfo::player).filterNot { it == sender }.map { it.name }.toList()
             return getListOfStringsMatchingLastWord(params, list)
@@ -81,7 +82,7 @@ enum class PTCommands: CommandBase {
             val player = sender as EntityPlayer
 
             if (params.isEmpty()) throw WrongUsageException(Command.getUsage(sender))
-            val party = PartyManager.getPartyObject(sender)?:  throw CommandException("commands.pt.leave.notInPT")
+            val party = PartyManager.getPartyObject(sender.playerInfo())?:  throw CommandException("commands.pt.leave.notInPT")
             if (party.leaderInfo.equals(player)) {
                 val target = net.minecraft.command.CommandBase.getPlayer(server, player, params[0]) // Player not found will interrupt execution
                 if (party.isMember(target)) {
@@ -100,7 +101,7 @@ enum class PTCommands: CommandBase {
         override fun execute(server: MinecraftServer, sender: ICommandSender, params: Array<String>) {
             val player = sender as EntityPlayer
 
-            val party = PartyManager.getPartyObject(player) ?: throw CommandException("commands.pt.leave.notInPT")
+            val party = PartyManager.getPartyObject(player.playerInfo()) ?: throw CommandException("commands.pt.leave.notInPT")
             if (party.isMember(player)) {
                 party.removeMember(player)
                 if (party.isParty || !party.isLeader(player))
@@ -117,7 +118,7 @@ enum class PTCommands: CommandBase {
     CANCEL {
         override fun getTabCompletions(server: MinecraftServer, sender: ICommandSender, params: Array<String>, pos: BlockPos?): MutableList<String> {
             if (sender !is EntityPlayer) return mutableListOf()
-            val party = PartyManager.getPartyData(sender)?: return mutableListOf()
+            val party = PartyManager.getPartyObject(sender.playerInfo())?: return mutableListOf()
 
             val list = party.invitedInfo.mapNotNull { it.key.player }.map { it.name }.toList()
             return getListOfStringsMatchingLastWord(params, list)
@@ -127,7 +128,7 @@ enum class PTCommands: CommandBase {
             val player = sender as EntityPlayer
 
             if (params.isEmpty()) throw WrongUsageException(Command.getUsage(sender))
-            val party = PartyManager.getPartyObject(player)?: throw CommandException("commands.pt.leave.notInPT")
+            val party = PartyManager.getPartyObject(player.playerInfo())?: throw CommandException("commands.pt.leave.notInPT")
             if (party.leaderInfo.player == player) {
                 val target = net.minecraft.command.CommandBase.getPlayer(server, player, params[0]) // Player not found will interrupt execution
                 if (party.isInvited(target)) {
@@ -146,7 +147,7 @@ enum class PTCommands: CommandBase {
         override fun execute(server: MinecraftServer, sender: ICommandSender, params: Array<String>) {
             val player = sender as EntityPlayer
 
-            val party = PartyManager.getPartyObject(sender)?: PartyManager.getInvitedParty(sender)?: throw CommandException("commands.pt.leave.notInPT")
+            val party = PartyManager.getPartyObject(sender.playerInfo())?: PartyManager.getInvitedParty(sender.playerInfo())?: throw CommandException("commands.pt.leave.notInPT")
             if (party.isParty) {
                 player.message("commands.pt.print.output", party.leaderInfo.username, party.membersInfo.mapNotNull(PlayerInfo::player).joinToString { it.displayNameString })
             }
@@ -171,7 +172,7 @@ enum class PTCommands: CommandBase {
          */
         fun checkInParty(sender: ICommandSender): Boolean {
             val player = (sender as? EntityPlayer) ?: return false
-            return PartyManager.getPartyObject(player)?.isParty == true
+            return PartyManager.getPartyObject(player.playerInfo())?.isParty == true
         }
 
         /**
@@ -180,7 +181,7 @@ enum class PTCommands: CommandBase {
          */
         fun checkIfLeader(sender: ICommandSender): Boolean {
             return if (checkInParty(sender))
-                PartyManager.getPartyObject(sender as EntityPlayer)?.leaderInfo?.uuid == sender.uniqueID
+                PartyManager.getPartyObject((sender as EntityPlayer).playerInfo())?.leaderInfo?.uuid == sender.uniqueID
             else false
         }
 
@@ -189,14 +190,14 @@ enum class PTCommands: CommandBase {
          */
         fun checkIfInvited(sender: ICommandSender): Boolean {
             val player = sender as? EntityPlayer?: return false
-            return PartyManager.getInvitedParty(player) != null
+            return PartyManager.getInvitedParty(player.playerInfo()) != null
         }
 
         /**
          * Checks if the party has any pending invites sent
          */
         fun checkAnyInvited(sender: ICommandSender): Boolean {
-            return checkIfLeader(sender) && PartyManager.getPartyObject(sender as EntityPlayer)!!.invitedInfo.count() > 0
+            return checkIfLeader(sender) && PartyManager.getPartyObject((sender as EntityPlayer).playerInfo())!!.invitedInfo.count() > 0
         }
     }
 }

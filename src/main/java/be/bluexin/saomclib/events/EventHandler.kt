@@ -7,6 +7,7 @@ import be.bluexin.saomclib.onServer
 import be.bluexin.saomclib.packets.MakeClientAwarePacket
 import be.bluexin.saomclib.packets.PacketPipeline
 import be.bluexin.saomclib.party.PartyManager
+import be.bluexin.saomclib.party.playerInfo
 import be.bluexin.saomclib.utils.ModHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
@@ -73,17 +74,17 @@ internal object EventHandler {
         }
         evt.left.add("Invited: ${ptcap.inviteData}")
         ptcap.inviteData.forEach { inviteData ->
-            evt.left.add(inviteData.membersInfo.joinToString { it.username } + " " + inviteData.invitedInfo.map { it.key }.joinToString { "+${it.username}" })
+            evt.left.add(inviteData.getMembers().joinToString { it.username } + " " + inviteData.invitedInfo.map { it.key }.joinToString { "+${it.username}" })
         }
     }
 
     @SubscribeEvent
     fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
-        PartyManager.getInvitedParty(evt.player)?.cancel(evt.player)
+        PartyManager.getInvitedParty(evt.player.playerInfo())?.cancel(evt.player)
         if (!ModHelper.isTogetherForeverLoaded) {
             evt.player.world.onServer {
-                if (PartyManager.getPartyObject(evt.player)?.isParty == false)
-                    PartyManager.removeParty(PartyManager.getPartyObject(evt.player)!!)
+                if (PartyManager.getPartyObject(evt.player.playerInfo())?.isParty == false)
+                    PartyManager.removeParty(PartyManager.getPartyObject(evt.player.playerInfo())!!)
             }
         }
         // Just incase
@@ -99,9 +100,9 @@ internal object EventHandler {
 
     @SubscribeEvent
     fun playerConnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent){
-        PartyManager.getPartyObject(evt.player)?.sync(evt.player)
-        if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesLogin(evt.player)
         evt.player.world.onServer {
+            PartyManager.getPartyObject(evt.player.playerInfo())?.sync(evt.player)
+            CapabilitiesHandler.syncEntitiesLogin(evt.player)
             PacketPipeline.sendTo(MakeClientAwarePacket(true), evt.player as EntityPlayerMP)
         }
     }
@@ -110,7 +111,15 @@ internal object EventHandler {
     @SubscribeEvent
     fun clearInvites(evt: TickEvent.ServerTickEvent){
         if (evt.phase == TickEvent.Phase.END) {
-            PartyManager.parties.asSequence().filter { it.cleanupInvites() }.forEach { it.dissolve() }
+            PartyManager.parties.forEach { if (it.cleanupInvites()) it.dissolve() }
+            /*
+            val parties = PartyManager.getParties()
+            while(parties.hasNext()){
+                val party = parties.next()
+                if (party.cleanupInvites()){
+                    party.dissolve()
+                }
+            }*/
         }
     }
 

@@ -71,7 +71,8 @@ open class PartyEvent(val partyData: IPartyData): Event() {
      * Fired when the leader has changed.
      * Fired both on client and server
      * @param party The party data in question
-     * @param player The new leader
+     * @param newLeader The new leader
+     * @param oldLeader The old leader
      */
     class LeaderChanged(party: IPartyData, val newLeader: PlayerInfo, val oldLeader: PlayerInfo) : PartyEvent(party)
 

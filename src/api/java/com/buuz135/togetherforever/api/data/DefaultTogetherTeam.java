@@ -28,10 +28,7 @@ import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @TogetherTeam(id = "default_together_team")
 public class DefaultTogetherTeam implements ITogetherTeam {
@@ -86,7 +83,7 @@ public class DefaultTogetherTeam implements ITogetherTeam {
         compound.setString("Owner", owner.toString());
         for (IPlayerInformation information : playersInformation) {
             NBTTagCompound informationCompound = new NBTTagCompound();
-            informationCompound.setString("PlayerID", TogetherRegistries.getPlayerInformationID(information.getClass()));
+            informationCompound.setString("PlayerID", Objects.requireNonNull(TogetherRegistries.getPlayerInformationID(information.getClass())));
             informationCompound.setTag("Value", information.getNBTTag());
             compound.setTag(information.getUUID().toString(), informationCompound);
         }

@@ -61,7 +61,7 @@ public abstract class EventSyncAction<T extends PlayerEvent, S extends IOfflineS
     @SubscribeEvent(receiveCanceled = true)
     public void onEvent(T event) {
         if (!event.getClass().equals(eventClass)) return;
-        TogetherForeverAPI.LOGGER.debug("Triggering event class: " + event.getClass().toString());
+        TogetherForeverAPI.LOGGER.debug("Triggering event class: " + event.getClass());
         if (TogetherForeverAPI.getInstance().getWorld() == null) return;
         TogetherForeverAPI.LOGGER.debug("World is not null");
         ITogetherTeam team = TogetherForeverAPI.getInstance().getPlayerTeam(event.getEntityPlayer().getUniqueID());

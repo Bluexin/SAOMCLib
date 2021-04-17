@@ -10,7 +10,7 @@ import java.util.*
  *
  * @author Bluexin
  */
-interface IParty: IPartyData {
+abstract class IParty: IPartyData() {
 
     /**
      * Adds a member to this party.
@@ -25,7 +25,7 @@ interface IParty: IPartyData {
 
     fun addMember(member: UUID): Boolean = addMember(PlayerInfo(member))
 
-    fun addMember(member: PlayerInfo): Boolean
+    abstract fun addMember(member: PlayerInfo): Boolean
 
     /**
      * Accepts a party invite.
@@ -37,7 +37,7 @@ interface IParty: IPartyData {
 
     fun acceptInvite(player: UUID): Boolean = acceptInvite(PlayerInfo(player))
 
-    fun acceptInvite(player: PlayerInfo): Boolean
+    abstract fun acceptInvite(player: PlayerInfo): Boolean
 
     /**
      * Removes a member from this party.
@@ -51,19 +51,19 @@ interface IParty: IPartyData {
 
     fun removeMember(member: UUID): Boolean = removeMember(PlayerInfo(member))
 
-    fun removeMember(member: PlayerInfo): Boolean
+    abstract fun removeMember(member: PlayerInfo): Boolean
 
     /**
      * Dissolves this party, aka removing all the members.
      *
      * Should fire [PartyEvent3.Disbanded] when successful, both on client and server.
      */
-    fun dissolve()
+    abstract fun dissolve()
 
     /**
      * Resends all party data as [PartyEvent3.Refreshed]
      */
-    fun syncAll()
+    abstract fun syncAll()
 
     /**
      * Resends party data to player as [PartyEvent3.Refreshed]
@@ -72,7 +72,7 @@ interface IParty: IPartyData {
 
     fun sync(member: UUID) = sync(PlayerInfo(member))
 
-    fun sync(member: PlayerInfo)
+    abstract fun sync(member: PlayerInfo)
 
 
     /**
@@ -86,7 +86,7 @@ interface IParty: IPartyData {
 
     fun invite(player: UUID): Boolean = invite(PlayerInfo(player))
 
-    fun invite(player: PlayerInfo): Boolean
+    abstract fun invite(player: PlayerInfo): Boolean
 
     /**
      * Cancel a party invite.
@@ -100,13 +100,13 @@ interface IParty: IPartyData {
 
     fun cancel(player: UUID): Boolean = cancel(PlayerInfo(player))
 
-    fun cancel(player: PlayerInfo): Boolean
+    abstract fun cancel(player: PlayerInfo): Boolean
 
     /**
      * Clean up the invites (invite timeout) based on current world time.
      * @return returns true if party is no longer valid
      */
-    fun cleanupInvites(): Boolean
+    abstract fun cleanupInvites(): Boolean
 
 
     /**

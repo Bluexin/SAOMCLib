@@ -12,7 +12,7 @@ data class PartyClientObject(override var leaderInfo: PlayerInfo,
                              override val membersInfo: HashSet<PlayerInfo> = hashSetOf(),
                              override val invitedInfo: Object2LongMap<PlayerInfo> = Object2LongLinkedOpenHashMap<PlayerInfo>().apply {
                                  defaultReturnValue(Long.MIN_VALUE)
-                             }): IPartyData {
+                             }): IPartyData() {
 
     constructor(partyData: IPartyData): this(partyData.leaderInfo, partyData.membersInfo, partyData.invitedInfo)
 

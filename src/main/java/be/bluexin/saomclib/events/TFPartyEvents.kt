@@ -38,7 +38,7 @@ object TFPartyEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onPartyCreate(e: TeamEvent.Create){
-        if (PartyManager.getPartyData(PlayerInfo(e.togetherTeam.owner)) == null)
+        if (PartyManager.getPartyObject(PlayerInfo(e.togetherTeam.owner)) == null)
             createParty(e.togetherTeam)
     }
 
@@ -109,7 +109,11 @@ object TFPartyEvents {
     private fun createParty(e: IPartyData): ITogetherTeam{
         val party = DefaultTogetherTeam()
         party.addPlayer(createPlayerInfo(e.leaderInfo))
-        e.membersInfo.forEach { party.addPlayer(createPlayerInfo(it)) }
+        val members = e.membersInfo.iterator()
+        while (members.hasNext()){
+            val member = members.next()
+            party.addPlayer(createPlayerInfo(member))
+        }
         TogetherForeverAPI.getInstance().addTeam(party)
         return party
     }

@@ -29,6 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -88,7 +89,7 @@ public class TogetherForeverCommand extends CommandBase {
 
     @Nonnull
     @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
+    public List<String> getTabCompletions(@NotNull MinecraftServer server, @NotNull ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
         if (args.length == 1)
             return subCommandActions.stream().map(SubCommandAction::getSubCommandName).collect(Collectors.toList());
         if (args.length > 1) {
@@ -100,7 +101,7 @@ public class TogetherForeverCommand extends CommandBase {
     }
 
     @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+    public boolean checkPermission(@NotNull MinecraftServer server, @NotNull ICommandSender sender) {
         return true;
     }
 

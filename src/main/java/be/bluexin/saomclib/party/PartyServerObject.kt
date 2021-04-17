@@ -9,7 +9,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2LongMap
 import net.minecraft.entity.player.EntityPlayerMP
 
-class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty {
+class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty() {
 
     constructor(partyData: IPartyData): this(partyData.leaderInfo){
         membersInfo += partyData.membersInfo
@@ -87,22 +87,19 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty {
     }
 
     private fun remove(player: PlayerInfo): Boolean {
-        return membersInfo.remove(player)
-        /*
-        val memberIterator = membersInfo.iterator()
-        var removed = false
-        while (memberIterator.hasNext() && !removed){
-            val member = memberIterator.next()
-            if (member == player) {
-                memberIterator.remove()
+        val members = membersInfo.iterator()
+        while (members.hasNext()){
+            val memeber = members.next()
+            if (memeber == player) {
+                members.remove()
                 Type.LEAVE.updateClient(player.player as EntityPlayerMP, this, player)
                 updateMembers(Type.LEAVE, player)
                 fireLeave(player)
                 fireRefresh()
-                removed = true
+                return true
             }
         }
-        return removed*/
+        return false
     }
 
     override fun dissolve() {
@@ -127,7 +124,7 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty {
             // 300 second timer
             // TODO make timeout a config  option
             //invitedInfo += Pair(player, time + (300 * 20))
-            invitedInfo += Pair(player, time + (20 * 20))
+            invitedInfo += Pair(player, time + (60 * 20))
             leaderInfo.player?.message("commands.pt.invite.success", player.username)
             player.player?.message("commands.pt.invited", leaderInfo.username)
             updateMembers(Type.INVITE, player)
@@ -151,25 +148,6 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty {
             true
         }
         else false
-        /*
-        val inviteIterator = invitedInfo.iterator()
-        var removed = false
-        while (inviteIterator.hasNext() && !removed){
-            val invited = inviteIterator.next()
-            if (invited.key == player) {
-                inviteIterator.remove()
-                leaderInfo.player?.message("commands.pt.declined", player.username)
-                player.player?.message("commands.pt.decline.success", leaderInfo.username)
-                updateMembers(Type.CANCELINVITE, player)
-                updateMember(Type.CANCELINVITE, player, player)
-                fireInviteCanceled(player)
-                removed = true
-            }
-        }
-        if (!isParty)
-            dissolve()
-        else fireRefresh()
-        return removed*/
     }
 
     /**
@@ -177,6 +155,25 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty {
      * and marks for removal
      */
     override fun cleanupInvites(): Boolean {
+        val inviteIterator = invitedInfo.iterator()
+        var changed = false
+        while (inviteIterator.hasNext()){
+            val invite = inviteIterator.next()
+            if (invite.value <= time){
+                val playerInfo = invite.key
+                inviteIterator.remove()
+                playerInfo.player?.message("commands.pt.cancel.notification")
+                leaderInfo.player?.message("commands.pt.cancel.leaderNotification", playerInfo.username)
+                updateMembers(Type.CANCELINVITE, playerInfo)
+                updateMember(Type.CANCELINVITE, playerInfo, playerInfo)
+                fireInviteCanceled(playerInfo)
+                changed = true
+            }
+        }
+        if (changed){
+            fireRefresh()
+        }
+        /*
         val toRemove = arrayListOf<PlayerInfo>()
         invitedInfo.forEach {
             if (it.value <= time){
@@ -193,13 +190,21 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty {
                 fireInviteCanceled(player)
             }
             fireRefresh()
-        }
+        }*/
         return !isParty
     }
 
     fun updateMembers(type: Type, target: PlayerInfo){
-        membersInfo.filter { it.player is EntityPlayerMP }.forEach { type.updateClient(it.player as EntityPlayerMP, this, target) }
-        invitedInfo.filter { it.key.player is EntityPlayerMP }.forEach { type.updateClient(it.key.player as EntityPlayerMP, this, target) }
+        var memberIterator = membersInfo.iterator()
+        while (memberIterator.hasNext()){
+            val member = memberIterator.next()
+            (member.player as? EntityPlayerMP)?.let { type.updateClient(member.player as EntityPlayerMP, this, target) }
+        }
+        memberIterator = invitedInfo.keys.iterator()
+        while (memberIterator.hasNext()){
+            val member = memberIterator.next()
+            (member.player as? EntityPlayerMP)?.let { type.updateClient(member.player as EntityPlayerMP, this, target) }
+        }
     }
 
     fun updateMember(type: Type, player: PlayerInfo, target: PlayerInfo){

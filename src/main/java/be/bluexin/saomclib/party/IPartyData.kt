@@ -9,21 +9,39 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import java.util.*
 
-interface IPartyData: Cloneable{
+abstract class IPartyData: Cloneable{
     /**
      * Gets the list of current leader.
      */
-    var leaderInfo: PlayerInfo
+    internal abstract var leaderInfo: PlayerInfo
 
     /**
      * Gets the list of current members.
      */
-    val membersInfo: HashSet<PlayerInfo>
+    internal abstract val membersInfo: HashSet<PlayerInfo>
 
     /**
      * Gets the list of invited players.
      */
-    val invitedInfo: Object2LongMap<PlayerInfo>
+    internal abstract val invitedInfo: Object2LongMap<PlayerInfo>
+
+    fun getMembers(): List<PlayerInfo>{
+        val memberList = arrayListOf<PlayerInfo>()
+        val members = membersInfo.iterator()
+        while (members.hasNext()){
+            memberList.add(members.next())
+        }
+        return memberList
+    }
+
+    fun getInvited(): List<PlayerInfo>{
+        val invitedList = arrayListOf<PlayerInfo>()
+        val members = invitedInfo.iterator()
+        while (members.hasNext()){
+            invitedList.add(members.next().key)
+        }
+        return invitedList
+    }
 
     operator fun contains(player: EntityPlayer) = isMember(player)
     operator fun contains(player: UUID) = isMember(player)
@@ -57,7 +75,15 @@ interface IPartyData: Cloneable{
 
     fun isMember(player: UUID): Boolean = isMember(PlayerInfo(player))
 
-    fun isMember(player: PlayerInfo): Boolean = membersInfo.contains(player)
+    fun isMember(player: PlayerInfo): Boolean {
+        val members = membersInfo.iterator()
+        while (members.hasNext()){
+            val member = members.next()
+            if (member == player)
+                return true
+        }
+        return false
+    }
 
     /**
      * Checks whether a player is invited to this party.
@@ -69,7 +95,15 @@ interface IPartyData: Cloneable{
 
     fun isInvited(player: UUID): Boolean = isInvited(PlayerInfo(player))
 
-    fun isInvited(player: PlayerInfo): Boolean = invitedInfo.containsKey(player)
+    fun isInvited(player: PlayerInfo): Boolean {
+        val members = invitedInfo.iterator()
+        while (members.hasNext()){
+            val member = members.next()
+            if (member.key == player)
+                return true
+        }
+        return false
+    }
 
     /**
      * Gets whether the provided player is the leader of this party.

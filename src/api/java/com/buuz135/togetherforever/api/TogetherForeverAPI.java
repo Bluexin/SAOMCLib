@@ -41,6 +41,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -164,7 +165,7 @@ public class TogetherForeverAPI {
             accept.getStyle().setBold(true).setColor(TextFormatting.GREEN).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tofe accept " + sender.getName())).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString("Click to accept")));
             ITextComponent decline = new TextComponentString("[DECLINE]");
             decline.getStyle().setBold(true).setColor(TextFormatting.RED).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tofe decline " + sender.getName())).setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString("Click to accept")));
-            receiver.getPlayer().sendMessage(new TextComponentString("You have been invited to join " + sender.getName() + "'s team. Click ")
+            Objects.requireNonNull(receiver.getPlayer()).sendMessage(new TextComponentString("You have been invited to join " + sender.getName() + "'s team. Click ")
                     .appendSibling(accept).appendText(" ").appendSibling(decline));
         }
         teamInvites.add(invite);
@@ -206,7 +207,7 @@ public class TogetherForeverAPI {
      */
     public DataManager getDataManager(World world) {
         if (world == null) return null;
-        DataManager dataManager = (DataManager) world.getMapStorage().getOrLoadData(DataManager.class, DataManager.NAME);
+        DataManager dataManager = (DataManager) Objects.requireNonNull(world.getMapStorage()).getOrLoadData(DataManager.class, DataManager.NAME);
         if (dataManager == null) {
             dataManager = new DataManager();
             world.getMapStorage().setData(DataManager.NAME, dataManager);

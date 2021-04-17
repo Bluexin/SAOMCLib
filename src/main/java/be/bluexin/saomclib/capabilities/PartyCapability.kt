@@ -7,6 +7,7 @@ import be.bluexin.saomclib.packets.party.PartyType
 import be.bluexin.saomclib.party.IPartyData
 import be.bluexin.saomclib.party.PartyClientObject
 import be.bluexin.saomclib.party.PartyManager
+import be.bluexin.saomclib.party.playerInfo
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
@@ -21,13 +22,13 @@ class PartyCapability : AbstractEntityCapability() {
     var partyData: IPartyData? = null
     get() {
         return if (reference.get()?.world?.isRemote == false)
-            PartyManager.getPartyData(reference.get() as EntityPlayer)
+            PartyManager.getPartyObject((reference.get() as EntityPlayer).playerInfo())
         else field
     }
     var inviteData: MutableSet<IPartyData> = mutableSetOf()
     get() {
         return if (reference.get()?.world?.isRemote == false)
-            PartyManager.getInvitedParties(reference.get() as EntityPlayer).toMutableSet()
+            PartyManager.getInvitedParties((reference.get() as EntityPlayer).playerInfo()).toMutableSet()
         else field
     }
 
@@ -54,8 +55,8 @@ class PartyCapability : AbstractEntityCapability() {
             if (instance.reference.get() is EntityPlayer) {
                 val world = instance.reference.get()?.world
                 world?.onServer {
-                    instance.partyData = PartyManager.getPartyData(instance.reference.get() as EntityPlayer)
-                    instance.inviteData = PartyManager.getInvitedParties(instance.reference.get() as EntityPlayer).toMutableSet()
+                    instance.partyData = PartyManager.getPartyObject((instance.reference.get() as EntityPlayer).playerInfo())
+                    instance.inviteData = PartyManager.getInvitedParties((instance.reference.get() as EntityPlayer).playerInfo()).toMutableSet()
                 }
                 world?.onClient {
                     if (nbtTagCompound.hasKey("party")) {

@@ -2,9 +2,9 @@ package be.bluexin.saomclib.guild
 
 import be.bluexin.saomclib.party.IParty
 
-interface IGuild: IParty {
+abstract class IGuild: IParty() {
 
-    val name: String
+    abstract val name: String
 
     //TODO Add permission system
 }
