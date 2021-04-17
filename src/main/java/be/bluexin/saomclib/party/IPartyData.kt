@@ -13,7 +13,8 @@ abstract class IPartyData: Cloneable{
     /**
      * Gets the list of current leader.
      */
-    internal abstract var leaderInfo: PlayerInfo
+    abstract var leaderInfo: PlayerInfo
+        internal set
 
     /**
      * Gets the list of current members.
