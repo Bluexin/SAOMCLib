@@ -32,7 +32,7 @@ idea {
 
 group = 'com.tencao'
 version = mc_version + '-' + mod_version
-archivesBaseName = "saomc-lib"
+archivesBaseName = "saomclib"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
@@ -150,21 +150,6 @@ uploadArchives {
     }
 }
 
-task sourceJar(type: Jar, dependsOn: "sourceMainJava", overwrite: true) {
-    from "src/main/java"
-    classifier = 'sources'
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
-}
-
-artifacts {
-    archives sourceJar
-    archives deobfJar
-}
-
 compileKotlin {
     kotlinOptions {
         jvmTarget = '1.8'
@@ -180,7 +165,7 @@ jar {
 
     manifest {
         attributes([
-                "Specification-Title"     : "com.tencao.saomclib",
+                "Specification-Title"     : "saomclib",
                 //"Specification-Vendor": "com.tencao.saomclib authors",
                 "Specification-Version"   : "1", // We are version 1 of ourselves
                 "Implementation-Title"    : project.name,
