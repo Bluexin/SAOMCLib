@@ -1,25 +1,17 @@
 package com.tencao.saomclib.events
 
-import com.tencao.saomclib.SAOMCLib
 import com.tencao.saomclib.capabilities.CapabilitiesHandler
-import com.tencao.saomclib.capabilities.getPartyCapability
 import com.tencao.saomclib.onServer
-import com.tencao.saomclib.packets.to_client.MakeClientAwarePacket
-import com.tencao.saomclib.packets.PacketPipeline
+import com.tencao.saomclib.packets.toClient.MakeClientAwarePacket
 import com.tencao.saomclib.party.PartyManager
 import com.tencao.saomclib.party.playerInfo
-import com.tencao.saomclib.utils.ModHelper
-import net.minecraft.client.Minecraft
+import com.tencao.saomclib.sendPacket
 import net.minecraft.entity.Entity
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 import net.minecraft.world.chunk.Chunk
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
@@ -73,23 +65,25 @@ internal object EventHandler {
     fun playerDisconnect(evt: PlayerEvent.PlayerLoggedOutEvent) {
         PartyManager.getInvitedParty(evt.player.playerInfo())?.cancel(evt.player)
         // Just incase
+        /*
         evt.player.world.onServer {
             PacketPipeline.sendTo(MakeClientAwarePacket(false), evt.player as ServerPlayerEntity)
-        }
+        }*/
     }
 
     @SubscribeEvent
-    fun playerConnect(evt: PlayerEvent.PlayerLoggedInEvent){
+    fun playerConnect(evt: PlayerEvent.PlayerLoggedInEvent) {
         evt.player.world.onServer {
-            PartyManager.getPartyObject(evt.player.playerInfo())?.sync(evt.player)
-            CapabilitiesHandler.syncEntitiesLogin(evt.player)
-            PacketPipeline.sendTo(MakeClientAwarePacket(true), evt.player as ServerPlayerEntity)
+            evt.player.server?.deferTask {
+                PartyManager.getPartyObject(evt.player.playerInfo())?.sync(evt.player)
+                CapabilitiesHandler.syncEntitiesLogin(evt.player)
+                (evt.player as ServerPlayerEntity).sendPacket(MakeClientAwarePacket())
+            }
         }
     }
 
-
     @SubscribeEvent
-    fun clearInvites(evt: TickEvent.ServerTickEvent){
+    fun clearInvites(evt: TickEvent.ServerTickEvent) {
         if (evt.phase == TickEvent.Phase.END) {
             PartyManager.parties.forEach { if (it.cleanupInvites()) it.dissolve() }
             /*
@@ -102,7 +96,4 @@ internal object EventHandler {
             }*/
         }
     }
-
-
-
 }

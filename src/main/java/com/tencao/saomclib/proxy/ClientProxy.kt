@@ -1,15 +1,9 @@
 package com.tencao.saomclib.proxy
 
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.player.ClientPlayerEntity
-import net.minecraft.client.network.play.ClientPlayNetHandler
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import net.minecraftforge.client.MinecraftForgeClient
-import net.minecraftforge.common.util.FakePlayerFactory.getMinecraft
 import java.util.*
-import java.util.function.Supplier
 
 /**
  * Part of saouintw, the networking mod for the SAO UI
@@ -19,9 +13,9 @@ import java.util.function.Supplier
 @Suppress("unused")
 object ClientProxy : IProxy {
 
-    //fun getPlayerEntity(ctx: MessageContext): PlayerEntity? = if (ctx.side.isClient) Minecraft.getInstance().player
+    // fun getPlayerEntity(ctx: MessageContext): PlayerEntity? = if (ctx.side.isClient) Minecraft.getInstance().player
 
-    //override fun getMinecraftThread(ctx: MessageContext): IThreadListener = Minecraft.getInstance()
+    // override fun getMinecraftThread(ctx: MessageContext): IThreadListener = Minecraft.getInstance()
 
     override fun getMainWorld(): World = Minecraft.getInstance().world!!
 
@@ -37,7 +31,7 @@ object ClientProxy : IProxy {
         return 20f
     }
 
-    override fun isPlayerOnline(uuid: UUID) = getGameProfile(uuid)?.name?.let {name ->
+    override fun isPlayerOnline(uuid: UUID) = getGameProfile(uuid)?.name?.let { name ->
         Minecraft.getInstance().currentServerData?.playerList?.any {
             it.string.contains(name, true)
         }
@@ -46,6 +40,4 @@ object ClientProxy : IProxy {
     override var isServerSideLoaded: Boolean = false
 
     override val getSide = IProxy.ProxySide.CLIENT
-
-
 }

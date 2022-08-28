@@ -4,7 +4,6 @@ import com.tencao.saomclib.SAOMCLib
 import com.tencao.saomclib.packets.PacketPipeline.registerMessage
 import com.tencao.saomclib.packets.PacketPipeline.sendTo
 import com.tencao.saomclib.sendPacket
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkDirection
@@ -12,9 +11,6 @@ import net.minecraftforge.fml.network.NetworkRegistry
 import org.apache.http.params.CoreProtocolPNames.PROTOCOL_VERSION
 import java.util.*
 import java.util.function.Function
-import kotlin.reflect.KFunction1
-import kotlin.reflect.KFunction2
-
 
 /**
  * Packet Pipeline to be used.
@@ -60,7 +56,7 @@ object PacketPipeline {
      * @param type class for the packet itself
      * @param decoder class for handling the packet
      */
-    fun <P : IPacket>registerClientToServerMessage(type: Class<P>, decoder: Function<PacketBuffer, P>){
+    fun <P : IPacket>registerClientToServerMessage(type: Class<P>, decoder: Function<PacketBuffer, P>) {
         registerMessage(type, decoder, NetworkDirection.PLAY_TO_SERVER)
     }
 
@@ -71,16 +67,11 @@ object PacketPipeline {
      * @param type class for the packet itself
      * @param decoder class for handling the packet
      */
-    fun <P : IPacket>registerServerToClientMessage(type: Class<P>, decoder: Function<PacketBuffer, P>){
+    fun <P : IPacket>registerServerToClientMessage(type: Class<P>, decoder: Function<PacketBuffer, P>) {
         registerMessage(type, decoder, NetworkDirection.PLAY_TO_CLIENT)
     }
 
-    fun <P : IPacket>registerMessage(type: Class<P>, decoder: Function<PacketBuffer, P>, networkDirection: NetworkDirection){
+    fun <P : IPacket>registerMessage(type: Class<P>, decoder: Function<PacketBuffer, P>, networkDirection: NetworkDirection) {
         ntw.registerMessage(packetId++, type, IPacket::encode, decoder, IPacket::handle, Optional.of(networkDirection))
     }
-
-    fun <P : IPacket> registerClientToServerMessagee(Class: Class<P>, apply: Function<PacketBuffer, P>) {
-
-    }
-
 }

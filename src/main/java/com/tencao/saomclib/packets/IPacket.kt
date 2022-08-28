@@ -2,7 +2,6 @@ package com.tencao.saomclib.packets
 
 import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Function
 import java.util.function.Supplier
 
 interface IPacket {

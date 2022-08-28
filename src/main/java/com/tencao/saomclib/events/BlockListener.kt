@@ -17,26 +17,25 @@ import net.minecraftforge.fml.common.Mod
 internal object BlockListener {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onBlockBreak(evt: BlockEvent.BreakEvent){
+    fun onBlockBreak(evt: BlockEvent.BreakEvent) {
         evt.world.onServer {
             evt.world.getBlockRecords(evt.pos)?.addBlockPos(evt.pos)
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onBlockBreak(evt: BlockEvent.EntityPlaceEvent){
+    fun onBlockBreak(evt: BlockEvent.EntityPlaceEvent) {
         evt.world.onServer {
             evt.world.getBlockRecords(evt.pos)?.addBlockPos(evt.pos)
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onBlockBreak(evt: BlockEvent.EntityMultiPlaceEvent){
+    fun onBlockBreak(evt: BlockEvent.EntityMultiPlaceEvent) {
         evt.world.onServer {
             evt.replacedBlockSnapshots.forEach {
                 evt.world.getBlockRecords(evt.pos)?.addBlockPos(evt.pos)
             }
         }
     }
-
 }

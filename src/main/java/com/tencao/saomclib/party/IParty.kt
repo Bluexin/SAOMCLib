@@ -13,7 +13,7 @@ import java.util.*
  * @author Bluexin
  */
 @OnlyIn(Dist.DEDICATED_SERVER)
-abstract class IParty: IPartyData() {
+abstract class IParty : IPartyData() {
 
     /**
      * Adds a member to this party.
@@ -77,7 +77,6 @@ abstract class IParty: IPartyData() {
 
     abstract fun sync(member: PlayerInfo)
 
-
     /**
      * Invite someone to this party.
      *
@@ -111,7 +110,6 @@ abstract class IParty: IPartyData() {
      */
     abstract fun cleanupInvites(): Boolean
 
-
     /**
      * Changes the current leader, returns false if new
      * leader isn't in the current party.
@@ -120,13 +118,13 @@ abstract class IParty: IPartyData() {
 
     fun changeLeader(player: UUID): Boolean = changeLeader(PlayerInfo(player))
 
-    fun changeLeader(player: PlayerInfo): Boolean{
-        if (player !in this)
+    fun changeLeader(player: PlayerInfo): Boolean {
+        if (player !in this) {
             return false
+        }
         val oldLeader = leaderInfo
         leaderInfo = player
         fireLeaderChanged(player, oldLeader)
         return true
     }
-
 }

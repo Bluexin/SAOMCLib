@@ -1,6 +1,6 @@
-package com.tencao.saomclib.packets.to_client
+package com.tencao.saomclib.packets.toClient
 
-import com.tencao.saomclib.*
+import com.tencao.saomclib.SAOMCLib
 import com.tencao.saomclib.capabilities.AbstractEntityCapability
 import com.tencao.saomclib.capabilities.CapabilitiesHandler
 import com.tencao.saomclib.packets.IPacket
@@ -39,15 +39,16 @@ class SyncEntityCapabilityPacket() : IPacket {
     }
 
     override fun handle(context: NetworkEvent.Context) {
-            val cap = CapabilitiesHandler.getEntityCapability(ResourceLocation(capabilityID))
-            try {
-                Minecraft.getInstance().world?.allEntities?.forEach {
-                    if (it.uniqueID == targetUUID)
-                        cap.readNBT(it.getCapability(cap, null).resolve().get(), null, data)
+        val cap = CapabilitiesHandler.getEntityCapability(ResourceLocation(capabilityID))
+        try {
+            Minecraft.getInstance().world?.allEntities?.forEach {
+                if (it.uniqueID == targetUUID) {
+                    cap.readNBT(it.getCapability(cap, null).resolve().get(), null, data)
                 }
-            } catch (e: Exception) {
-                SAOMCLib.LOGGER.info("[SyncEntityCapabilityPacket] Suppressed an error.\nPacket content: ${capabilityID}, ${targetUUID}, ${data}\nPlayers: ${Minecraft.getInstance().world?.players}", e)
             }
+        } catch (e: Exception) {
+            SAOMCLib.LOGGER.info("[SyncEntityCapabilityPacket] Suppressed an error.\nPacket content: $capabilityID, $targetUUID, ${data}\nPlayers: ${Minecraft.getInstance().world?.players}", e)
+        }
     }
 
     override fun encode(buffer: PacketBuffer) {
@@ -61,10 +62,9 @@ class SyncEntityCapabilityPacket() : IPacket {
         fun decode(buffer: PacketBuffer): SyncEntityCapabilityPacket {
             return SyncEntityCapabilityPacket(
                 buffer.readString(),
-                buffer.readCompoundTag()?: CompoundNBT(),
+                buffer.readCompoundTag() ?: CompoundNBT(),
                 UUID.fromString(buffer.readString())
             )
         }
-
     }
 }

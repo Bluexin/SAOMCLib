@@ -1,4 +1,4 @@
-package com.tencao.saomclib.packets.to_server
+package com.tencao.saomclib.packets.toServer
 
 import com.tencao.saomclib.message
 import com.tencao.saomclib.packets.IPacket
@@ -14,24 +14,24 @@ import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkEvent
 import java.util.*
 
-class PTUpdateServerPKT(): IPacket{
+class PTUpdateServerPKT() : IPacket {
 
     lateinit var partyType: PartyType
     lateinit var type: Type
     var target: UUID = UUID.randomUUID()
 
-    constructor(type: Type, partyType: PartyType): this(){
+    constructor(type: Type, partyType: PartyType) : this() {
         this.type = type
         this.partyType = partyType
     }
 
-    constructor(type: Type, partyType: PartyType, target: UUID): this(){
+    constructor(type: Type, partyType: PartyType, target: UUID) : this() {
         this.type = type
         this.partyType = partyType
         this.target = target
     }
 
-    constructor(type: Type, partyType: PartyType, target: PlayerInfo): this(){
+    constructor(type: Type, partyType: PartyType, target: PlayerInfo) : this() {
         this.type = type
         this.partyType = partyType
         this.target = target.uuid
@@ -44,20 +44,19 @@ class PTUpdateServerPKT(): IPacket{
     }
 
     override fun handle(context: NetworkEvent.Context) {
-        val player = context.sender as? ServerPlayerEntity?: return
+        val player = context.sender as? ServerPlayerEntity ?: return
         val party = when (partyType) {
             PartyType.MAIN -> PartyManager.getOrCreateParty(PlayerInfo(player))
-            PartyType.INVITE -> PartyManager.getInvitedParty(player.playerInfo())?: let {
+            PartyType.INVITE -> PartyManager.getInvitedParty(player.playerInfo()) ?: let {
                 player.message("You do not have permission to invite")
                 return
             }
         }
-        when (type){
+        when (type) {
             Type.INVITE -> {
                 if (party.isLeader(player)) {
                     party.invite(target)
-                }
-                else player.message("You do not have permission to invite")
+                } else player.message("You do not have permission to invite")
             }
             Type.ACCEPTINVITE -> {
                 party.acceptInvite(player)
@@ -69,29 +68,27 @@ class PTUpdateServerPKT(): IPacket{
                 party.removeMember(player)
             }
             Type.KICK -> {
-                if (party.isLeader(player)){
+                if (party.isLeader(player)) {
                     party.removeMember(target)
-                }
-                else player.message("You do not have permission to kick")
+                } else player.message("You do not have permission to kick")
             }
             Type.DISBAND -> {
-                if (party.isLeader(player)){
+                if (party.isLeader(player)) {
                     party.dissolve()
-                }
-                else player.message("You do not have permission to disband the party")
+                } else player.message("You do not have permission to disband the party")
             }
             Type.LEADERCHANGE -> {
-                if (party.isLeader(player)){
-                    if (!party.changeLeader(target))
+                if (party.isLeader(player)) {
+                    if (!party.changeLeader(target)) {
                         player.message("New leader is not in current party")
-                }
-                else player.message("You do not have permission to disband the party")
+                    }
+                } else player.message("You do not have permission to disband the party")
             }
             else -> return
         }
     }
 
-    companion object{
+    companion object {
         fun decode(buffer: PacketBuffer): PTUpdateServerPKT {
             return PTUpdateServerPKT(
                 Type.values()[buffer.readInt()],
@@ -100,8 +97,6 @@ class PTUpdateServerPKT(): IPacket{
             )
         }
     }
-
-
 }
 
 /**

@@ -13,15 +13,15 @@ import java.util.*
 @JsonAdapter(PlayerInfoSerializer::class)
 data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
 
-    constructor(player: PlayerEntity): this(player.uniqueID){
+    constructor(player: PlayerEntity) : this(player.uniqueID) {
         this.username = player.scoreboardName
     }
 
-    constructor(uuid: UUID, name: String): this(uuid){
+    constructor(uuid: UUID, name: String) : this(uuid) {
         this.username = name
     }
 
-    constructor(profile: GameProfile): this(profile.id){
+    constructor(profile: GameProfile) : this(profile.id) {
         username = profile.name
         gameProfile = profile
     }
@@ -29,10 +29,11 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     val uuidString by lazy { uuid.toString() }
     var playerImpl: WeakReference<PlayerEntity>? = null
         get() {
-            if (field == null){
+            if (field == null) {
                 val player = proxy.getPlayerEntity(uuid)
-                if (player != null)
+                if (player != null) {
                     field = WeakReference(player)
+                }
             }
             return field
         }
@@ -40,26 +41,27 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     val player: PlayerEntity?
         get() = playerImpl?.get()
 
-
-    //Health cache
+    // Health cache
     val health: Float
-    get() {
-        return player?.health?: proxy.getPlayerHealth(uuid)
-    }
+        get() {
+            return player?.health ?: proxy.getPlayerHealth(uuid)
+        }
 
     val maxHealth: Float
-    get() {
-        return player?.maxHealth?: proxy.getPlayerMaxHealth(uuid)
-    }
-
-    @SerializedName("Username") var username: String = ""
         get() {
-            if (field.isEmpty())
-                field = proxy.getGameProfile(uuid)?.name?: return uuidString
+            return player?.maxHealth ?: proxy.getPlayerMaxHealth(uuid)
+        }
+
+    @SerializedName("Username")
+    var username: String = ""
+        get() {
+            if (field.isEmpty()) {
+                field = proxy.getGameProfile(uuid)?.name ?: return uuidString
+            }
             return field
         }
 
-    var gameProfile: GameProfile = proxy.getGameProfile(uuid)?: GameProfile(uuid, username)
+    var gameProfile: GameProfile = proxy.getGameProfile(uuid) ?: GameProfile(uuid, username)
 
     val isOnline: Boolean
         get() = proxy.isPlayerOnline(uuid)
@@ -95,16 +97,14 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
         return uuid.hashCode()
     }
 
-
-    companion object{
+    companion object {
         val EMPTY = PlayerInfo(UUID.fromString("00000000-0000-0000-0000-000000000000"))
 
         val gson: Gson = GsonBuilder().create()
     }
-
 }
 
-object PlayerInfoSerializer: JsonSerializer<PlayerInfo>, JsonDeserializer<PlayerInfo>{
+object PlayerInfoSerializer : JsonSerializer<PlayerInfo>, JsonDeserializer<PlayerInfo> {
     override fun serialize(src: PlayerInfo, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         return JsonPrimitive("${src.uuidString}:${src.username}")
     }

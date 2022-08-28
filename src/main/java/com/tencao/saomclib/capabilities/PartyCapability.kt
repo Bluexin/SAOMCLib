@@ -1,6 +1,7 @@
 package com.tencao.saomclib.capabilities
 
 import com.tencao.saomclib.SAOMCLib
+import com.tencao.saomclib.getOrNull
 import com.tencao.saomclib.onClient
 import com.tencao.saomclib.onServer
 import com.tencao.saomclib.packets.PartyType
@@ -9,7 +10,9 @@ import com.tencao.saomclib.party.PartyClientObject
 import com.tencao.saomclib.party.PartyManager
 import com.tencao.saomclib.party.playerInfo
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.nbt.*
+import net.minecraft.nbt.CompoundNBT
+import net.minecraft.nbt.INBT
+import net.minecraft.nbt.ListNBT
 import net.minecraft.util.Direction
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.capabilities.Capability
@@ -18,30 +21,29 @@ import net.minecraftforge.common.capabilities.CapabilityInject
 class PartyCapability : AbstractEntityCapability() {
 
     var partyData: IPartyData? = null
-    get() {
-        return if (reference.get()?.world?.isRemote == false)
-            PartyManager.getPartyObject((reference.get() as PlayerEntity).playerInfo())
-        else field
-    }
+        get() {
+            return if (reference.get()?.world?.isRemote == false) {
+                PartyManager.getPartyObject((reference.get() as PlayerEntity).playerInfo())
+            } else field
+        }
     var inviteData: MutableSet<IPartyData> = mutableSetOf()
-    get() {
-        return if (reference.get()?.world?.isRemote == false)
-            PartyManager.getInvitedParties((reference.get() as PlayerEntity).playerInfo()).toMutableSet()
-        else field
-    }
+        get() {
+            return if (reference.get()?.world?.isRemote == false) {
+                PartyManager.getInvitedParties((reference.get() as PlayerEntity).playerInfo()).toMutableSet()
+            } else field
+        }
 
-    fun setPartyData(partyData: IPartyData?, partyType: PartyType){
-        when (partyType){
+    fun setPartyData(partyData: IPartyData?, partyType: PartyType) {
+        when (partyType) {
             PartyType.MAIN -> this.partyData = partyData
             PartyType.INVITE -> {
-                if (partyData != null){
+                if (partyData != null) {
                     this.inviteData.removeIf { it.isLeader(partyData.leaderInfo) }
                     this.inviteData.add(partyData)
                 }
             }
         }
     }
-
 
     override val shouldSyncOnDeath = true
     override val shouldSyncOnDimensionChange = true
@@ -63,7 +65,7 @@ class PartyCapability : AbstractEntityCapability() {
                     }
                     if (nbtTagCompound.contains("invitedList")) {
                         val tagList = nbtTagCompound.getList("invitedList", 10)
-                        for (i in 0 until tagList.count()){
+                        for (i in 0 until tagList.count()) {
                             instance.inviteData.add(PartyClientObject.readNBT(tagList.getCompound(i))!!)
                         }
                     }
@@ -74,10 +76,10 @@ class PartyCapability : AbstractEntityCapability() {
         override fun writeNBT(capability: Capability<PartyCapability>?, instance: PartyCapability, side: Direction?): INBT {
             val nbt = CompoundNBT()
 
-            if (instance.partyData != null){
+            if (instance.partyData != null) {
                 nbt.put("party", instance.partyData!!.writeNBT())
             }
-            if (instance.inviteData.isNotEmpty()){
+            if (instance.inviteData.isNotEmpty()) {
                 val tagList = ListNBT()
                 instance.inviteData.forEach {
                     tagList.add(it.writeNBT())
@@ -86,7 +88,6 @@ class PartyCapability : AbstractEntityCapability() {
             }
             return nbt
         }
-
     }
 
     companion object {
@@ -98,4 +99,4 @@ class PartyCapability : AbstractEntityCapability() {
     }
 }
 
-fun PlayerEntity.getPartyCapability() = this.getCapability(PartyCapability.CAP_INSTANCE, null).resolve().get()
+fun PlayerEntity.getPartyCapability() = this.getCapability(PartyCapability.CAP_INSTANCE, null).resolve().getOrNull()

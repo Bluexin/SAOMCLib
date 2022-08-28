@@ -49,7 +49,6 @@ class SimpleCapability : AbstractEntityCapability() {
                 instance.num = (nbt as CompoundNBT).getInt("num")
                 SAOMCLib.LOGGER.info("Reading ${instance.num} on remote=${instance.reference.get()?.world?.isRemote}.")
             }
-
         }
     }
 }

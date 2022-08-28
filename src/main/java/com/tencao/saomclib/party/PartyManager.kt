@@ -12,11 +12,11 @@ object PartyManager {
         return parties.iterator()
     }*/
 
-    fun addParty(party: IParty){
+    fun addParty(party: IParty) {
         parties.add(party)
     }
 
-    fun getPartyObject(player: PlayerInfo): IParty?{
+    fun getPartyObject(player: PlayerInfo): IParty? {
         return parties.firstOrNull { player in it }
         /*
         val partyIterator = parties.iterator()
@@ -36,10 +36,10 @@ object PartyManager {
 
     fun getOrCreateParty(player: PlayerInfo): IParty {
         return getPartyObject(player)
-                ?: createParty(player)
+            ?: createParty(player)
     }
 
-    fun getInvitedParty(player: PlayerInfo): IParty?{
+    fun getInvitedParty(player: PlayerInfo): IParty? {
         return parties.firstOrNull { it.isInvited(player) }
         /*
         val partyIterator = parties.iterator()
@@ -51,7 +51,7 @@ object PartyManager {
         return null*/
     }
 
-    fun getInvitedParties(player: PlayerInfo): Set<IParty>{
+    fun getInvitedParties(player: PlayerInfo): Set<IParty> {
         return parties.filter { it.isInvited(player) }.toSet()
         /*
         val invitedParties = mutableSetOf<IParty>()
@@ -64,7 +64,7 @@ object PartyManager {
         return invitedParties*/
     }
 
-    fun removeParty(party: IParty){
+    fun removeParty(party: IParty) {
         parties.remove(party)/*
         val partyIterator = parties.iterator()
         while (partyIterator.hasNext()){
@@ -74,11 +74,9 @@ object PartyManager {
                 return
             }
         }*/
-
     }
 
-    fun clean(){
+    fun clean() {
         parties.clear()
     }
-
 }

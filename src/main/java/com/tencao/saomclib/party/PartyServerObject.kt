@@ -4,14 +4,14 @@ import com.tencao.saomclib.SAOMCLib
 import com.tencao.saomclib.events.*
 import com.tencao.saomclib.message
 import com.tencao.saomclib.packets.Type
-import com.tencao.saomclib.packets.to_client.updateClient
+import com.tencao.saomclib.packets.toClient.updateClient
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2LongMap
 import net.minecraft.entity.player.ServerPlayerEntity
 
-class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty() {
+class PartyServerObject(override var leaderInfo: PlayerInfo) : IParty() {
 
-    constructor(partyData: IPartyData): this(partyData.leaderInfo){
+    constructor(partyData: IPartyData) : this(partyData.leaderInfo) {
         membersInfo += partyData.membersInfo
         invitedInfo += partyData.invitedInfo
     }
@@ -22,14 +22,13 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty() {
         defaultReturnValue(Long.MIN_VALUE)
     }
 
-
     /**
      * Attempts to add player to the current party
      * If the join check fails and the player is
      * invited, the invite will be canceled
      */
     override fun addMember(member: PlayerInfo): Boolean {
-        if (member !in this){
+        if (member !in this) {
             if (fireJoinCheck(member)) {
                 membersInfo += leaderInfo
                 membersInfo += member
@@ -38,31 +37,28 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty() {
                 fireJoin(member)
                 fireRefresh()
                 return true
-            }
-            else if (isInvited(member)){
+            } else if (isInvited(member)) {
                 invitedInfo -= member
                 fireInviteCanceled(member)
                 fireRefresh()
                 updateMembers(Type.CANCELINVITE, member)
             }
-
         }
         return false
     }
 
     override fun acceptInvite(player: PlayerInfo): Boolean {
-        return if (isInvited(player)){
+        return if (isInvited(player)) {
             addMember(player)
             true
         } else false
     }
 
-    override fun removeMember(member: PlayerInfo): Boolean{
-        if (remove(member)){
+    override fun removeMember(member: PlayerInfo): Boolean {
+        if (remove(member)) {
             if (membersInfo.count() <= 1) {
                 dissolve()
-            }
-            else if (member == leaderInfo) {
+            } else if (member == leaderInfo) {
                 leaderInfo = run {
                     val leader = fireLeaderLeft()
                     if (leader != null && !membersInfo.contains(leader) && fireJoinCheck(leader)) {
@@ -82,13 +78,12 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty() {
                 updateMembers(Type.LEADERCHANGE, leaderInfo)
             }
             return true
-        }
-        else return false
+        } else return false
     }
 
     private fun remove(player: PlayerInfo): Boolean {
         val members = membersInfo.iterator()
-        while (members.hasNext()){
+        while (members.hasNext()) {
             val memeber = members.next()
             if (memeber == player) {
                 members.remove()
@@ -120,10 +115,10 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty() {
     }
 
     override fun invite(player: PlayerInfo): Boolean {
-        if (player !in this && !isInvited(player) && fireInviteCheck(player)){
+        if (player !in this && !isInvited(player) && fireInviteCheck(player)) {
             // 300 second timer
             // TODO make timeout a config  option
-            //invitedInfo += Pair(player, time + (300 * 20))
+            // invitedInfo += Pair(player, time + (300 * 20))
             invitedInfo += Pair(player, time + (60 * 20))
             leaderInfo.player?.message("commands.pt.invite.success", player.username)
             player.player?.message("commands.pt.invited", leaderInfo.username)
@@ -136,18 +131,17 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty() {
     }
 
     override fun cancel(player: PlayerInfo): Boolean {
-        return if (invitedInfo.remove(player) != null){
+        return if (invitedInfo.remove(player) != null) {
             leaderInfo.player?.message("commands.pt.declined", player.username)
             player.player?.message("commands.pt.decline.success", leaderInfo.username)
             updateMembers(Type.CANCELINVITE, player)
             updateMember(Type.CANCELINVITE, player, player)
             fireInviteCanceled(player)
-            if (!isParty)
+            if (!isParty) {
                 dissolve()
-            else fireRefresh()
+            } else fireRefresh()
             true
-        }
-        else false
+        } else false
     }
 
     /**
@@ -157,9 +151,9 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty() {
     override fun cleanupInvites(): Boolean {
         val inviteIterator = invitedInfo.iterator()
         var changed = false
-        while (inviteIterator.hasNext()){
+        while (inviteIterator.hasNext()) {
             val invite = inviteIterator.next()
-            if (invite.value <= time){
+            if (invite.value <= time) {
                 val playerInfo = invite.key
                 inviteIterator.remove()
                 playerInfo.player?.message("commands.pt.cancel.notification")
@@ -170,7 +164,7 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty() {
                 changed = true
             }
         }
-        if (changed){
+        if (changed) {
             fireRefresh()
         }
         /*
@@ -194,28 +188,27 @@ class PartyServerObject (override var leaderInfo: PlayerInfo) : IParty() {
         return !isParty
     }
 
-    fun updateMembers(type: Type, target: PlayerInfo){
+    fun updateMembers(type: Type, target: PlayerInfo) {
         var memberIterator = membersInfo.iterator()
-        while (memberIterator.hasNext()){
+        while (memberIterator.hasNext()) {
             val member = memberIterator.next()
             (member.player as? ServerPlayerEntity)?.let { type.updateClient(member.player as ServerPlayerEntity, this, target) }
         }
         memberIterator = invitedInfo.keys.iterator()
-        while (memberIterator.hasNext()){
+        while (memberIterator.hasNext()) {
             val member = memberIterator.next()
             (member.player as? ServerPlayerEntity)?.let { type.updateClient(member.player as ServerPlayerEntity, this, target) }
         }
     }
 
-    fun updateMember(type: Type, player: PlayerInfo, target: PlayerInfo){
-        if (player.player != null && player.player is ServerPlayerEntity){
+    fun updateMember(type: Type, player: PlayerInfo, target: PlayerInfo) {
+        if (player.player != null && player.player is ServerPlayerEntity) {
             type.updateClient(player.player as ServerPlayerEntity, this, target)
         }
     }
 
-    companion object{
+    companion object {
         val time: Long
             get() = SAOMCLib.proxy.getMainWorld().worldInfo.gameTime
     }
-
 }

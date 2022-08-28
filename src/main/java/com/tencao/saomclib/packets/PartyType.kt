@@ -5,7 +5,7 @@ enum class PartyType {
     INVITE;
 }
 
-enum class Type{
+enum class Type {
     JOIN,
     INVITE,
     ACCEPTINVITE,

@@ -1,12 +1,13 @@
 package com.tencao.saomclib.capabilities
 
 import com.tencao.saomclib.SAOMCLib
-import net.minecraft.nbt.*
+import net.minecraft.nbt.CompoundNBT
+import net.minecraft.nbt.INBT
+import net.minecraft.nbt.ListNBT
 import net.minecraft.util.Direction
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IWorld
-import net.minecraft.world.World
 import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.capabilities.CapabilityInject
@@ -62,7 +63,7 @@ class BlockRecordCapability : AbstractCapability() {
             instance.modifiedBlockCache.clear()
 
             var tag: CompoundNBT
-            for (i in 0 until coords.count()){
+            for (i in 0 until coords.count()) {
                 tag = coords.getCompound(i)
                 instance.addBlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"))
             }
@@ -75,7 +76,6 @@ class BlockRecordCapability : AbstractCapability() {
 
         @CapabilityInject(BlockRecordCapability::class)
         lateinit var CAPABILITY: Capability<BlockRecordCapability>
-
     }
 }
 

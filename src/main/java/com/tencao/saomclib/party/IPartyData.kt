@@ -8,7 +8,7 @@ import net.minecraft.nbt.CompoundNBT
 import net.minecraft.nbt.ListNBT
 import java.util.*
 
-abstract class IPartyData: Cloneable{
+abstract class IPartyData : Cloneable {
     /**
      * Gets the list of current leader.
      */
@@ -25,19 +25,19 @@ abstract class IPartyData: Cloneable{
      */
     internal abstract val invitedInfo: Object2LongMap<PlayerInfo>
 
-    fun getMembers(): List<PlayerInfo>{
+    fun getMembers(): List<PlayerInfo> {
         val memberList = arrayListOf<PlayerInfo>()
         val members = membersInfo.iterator()
-        while (members.hasNext()){
+        while (members.hasNext()) {
             memberList.add(members.next())
         }
         return memberList
     }
 
-    fun getInvited(): List<PlayerInfo>{
+    fun getInvited(): List<PlayerInfo> {
         val invitedList = arrayListOf<PlayerInfo>()
         val members = invitedInfo.iterator()
-        while (members.hasNext()){
+        while (members.hasNext()) {
             invitedList.add(members.next().key)
         }
         return invitedList
@@ -77,10 +77,11 @@ abstract class IPartyData: Cloneable{
 
     fun isMember(player: PlayerInfo): Boolean {
         val members = membersInfo.iterator()
-        while (members.hasNext()){
+        while (members.hasNext()) {
             val member = members.next()
-            if (member == player)
+            if (member == player) {
                 return true
+            }
         }
         return false
     }
@@ -97,10 +98,11 @@ abstract class IPartyData: Cloneable{
 
     fun isInvited(player: PlayerInfo): Boolean {
         val members = invitedInfo.iterator()
-        while (members.hasNext()){
+        while (members.hasNext()) {
             val member = members.next()
-            if (member.key == player)
+            if (member.key == player) {
                 return true
+            }
         }
         return false
     }
@@ -166,10 +168,9 @@ abstract class IPartyData: Cloneable{
     }
 
     public override fun clone(): Any {
-        return when (SAOMCLib.proxy.getSide){
+        return when (SAOMCLib.proxy.getSide) {
             IProxy.ProxySide.CLIENT -> PartyClientObject(this)
             IProxy.ProxySide.SERVER -> PartyServerObject(this)
         }
     }
-
 }

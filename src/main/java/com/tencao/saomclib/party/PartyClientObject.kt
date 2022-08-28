@@ -8,15 +8,17 @@ import net.minecraftforge.api.distmarker.OnlyIn
 import java.util.*
 
 @OnlyIn(Dist.CLIENT)
-data class PartyClientObject(override var leaderInfo: PlayerInfo,
-                             override val membersInfo: HashSet<PlayerInfo> = hashSetOf(),
-                             override val invitedInfo: Object2LongMap<PlayerInfo> = Object2LongLinkedOpenHashMap<PlayerInfo>().apply {
-                                 defaultReturnValue(Long.MIN_VALUE)
-                             }): IPartyData() {
+data class PartyClientObject(
+    override var leaderInfo: PlayerInfo,
+    override val membersInfo: HashSet<PlayerInfo> = hashSetOf(),
+    override val invitedInfo: Object2LongMap<PlayerInfo> = Object2LongLinkedOpenHashMap<PlayerInfo>().apply {
+        defaultReturnValue(Long.MIN_VALUE)
+    }
+) : IPartyData() {
 
-    constructor(partyData: IPartyData): this(partyData.leaderInfo, partyData.membersInfo, partyData.invitedInfo)
+    constructor(partyData: IPartyData) : this(partyData.leaderInfo, partyData.membersInfo, partyData.invitedInfo)
 
-    companion object{
+    companion object {
         fun readNBT(nbtTagCompound: CompoundNBT?): PartyClientObject? {
             if (nbtTagCompound == null || nbtTagCompound.isEmpty) return null
 
@@ -28,8 +30,8 @@ data class PartyClientObject(override var leaderInfo: PlayerInfo,
             membersTag.forEach {
                 it as CompoundNBT
                 partyObject.membersInfo += PlayerInfo(
-                        UUID.fromString(it.getString("uuid")),
-                        it.getString("name")
+                    UUID.fromString(it.getString("uuid")),
+                    it.getString("name")
                 )
             }
             partyObject.invitedInfo.clear()
@@ -39,8 +41,9 @@ data class PartyClientObject(override var leaderInfo: PlayerInfo,
                 partyObject.invitedInfo.put(
                     PlayerInfo(
                         UUID.fromString(it.getString("uuid")),
-                        it.getString("name")),
-                        it.getLong("time")
+                        it.getString("name")
+                    ),
+                    it.getLong("time")
                 )
             }
             if (partyObject.membersInfo.isEmpty()) return null

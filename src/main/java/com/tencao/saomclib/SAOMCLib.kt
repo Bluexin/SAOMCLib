@@ -1,26 +1,22 @@
 package com.tencao.saomclib
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.tencao.saomclib.SAOMCLib.MODID
 import com.tencao.saomclib.capabilities.BlockRecordCapability
 import com.tencao.saomclib.capabilities.CapabilitiesHandler
 import com.tencao.saomclib.capabilities.PartyCapability
-import com.tencao.saomclib.commands.PTCommands
 import com.tencao.saomclib.events.BlockListener
+import com.tencao.saomclib.events.ClientEventListener
 import com.tencao.saomclib.events.EventHandler
 import com.tencao.saomclib.packets.PacketPipeline
-import com.tencao.saomclib.packets.to_client.MakeClientAwarePacket
-import com.tencao.saomclib.packets.to_client.PTUpdateClientPKT
-import com.tencao.saomclib.packets.to_client.SyncEntityCapabilityPacket
-import com.tencao.saomclib.packets.to_server.PTUpdateServerPKT
+import com.tencao.saomclib.packets.toClient.MakeClientAwarePacket
+import com.tencao.saomclib.packets.toClient.PTUpdateClientPKT
+import com.tencao.saomclib.packets.toClient.SyncEntityCapabilityPacket
+import com.tencao.saomclib.packets.toServer.PTUpdateServerPKT
 import com.tencao.saomclib.proxy.ClientProxy
 import com.tencao.saomclib.proxy.ServerProxy
-import net.minecraft.command.CommandSource
-import net.minecraft.command.Commands
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.chunk.Chunk
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.RegisterCommandsEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.DistExecutor
@@ -32,7 +28,6 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent
 import org.apache.logging.log4j.LogManager
 import thedarkcolour.kotlinforforge.forge.FORGE_BUS
 import thedarkcolour.kotlinforforge.forge.MOD_BUS
-
 
 @Mod(MODID)
 object SAOMCLib {
@@ -46,18 +41,18 @@ object SAOMCLib {
     }
 
     init {
+        FORGE_BUS.register(this)
         MOD_BUS.addListener(::setup)
         MOD_BUS.addListener(::enqueueIMC)
+        MOD_BUS.addListener(::clientSetup)
         FORGE_BUS.addListener(::registerCommands)
-        //eventBus.register(this)
-        MinecraftForge.EVENT_BUS.register(this)
+        // eventBus.register(this)
     }
 
     @SubscribeEvent
-    @JvmSynthetic
     fun setup(event: FMLCommonSetupEvent) {
-        MinecraftForge.EVENT_BUS.register(EventHandler)
-        MinecraftForge.EVENT_BUS.register(BlockListener)
+        FORGE_BUS.register(EventHandler)
+        FORGE_BUS.register(BlockListener)
         CapabilitiesHandler.registerChunkCapability(BlockRecordCapability::class.java, BlockRecordCapability.Storage()) { it is Chunk }
         CapabilitiesHandler.registerEntityCapability(PartyCapability::class.java, PartyCapability.PartyStorage) { it is PlayerEntity }
         PacketPipeline.registerServerToClientMessage(PTUpdateClientPKT::class.java, PTUpdateClientPKT.Companion::decode)
@@ -67,16 +62,18 @@ object SAOMCLib {
     }
 
     @SubscribeEvent
-    @JvmSynthetic
+    fun clientSetup(event: FMLClientSetupEvent) {
+        FORGE_BUS.register(ClientEventListener)
+    }
+
+    @SubscribeEvent
     fun enqueueIMC(event: InterModEnqueueEvent) {
         CapabilitiesHandler.setup()
     }
 
     @SubscribeEvent
-    @JvmSynthetic
     fun registerCommands(event: RegisterCommandsEvent) {
-        val commands = PTCommands.values()
-        var index = 0
+        /*
         val root: LiteralArgumentBuilder<CommandSource> = Commands.literal("saomc")
             .then(Commands.literal("pt")
                 .then(PTCommands.INVITE.register())
@@ -87,7 +84,6 @@ object SAOMCLib {
                 .then(PTCommands.LEAVE.register())
                 .then(PTCommands.PRINT.register())
             )
-        event.dispatcher.register(root)
+        event.dispatcher.register(root)*/
     }
-
 }

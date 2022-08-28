@@ -1,6 +1,6 @@
 package com.tencao.saomclib.capabilities
 
-import com.tencao.saomclib.packets.to_client.SyncEntityCapabilityPacket
+import com.tencao.saomclib.packets.toClient.SyncEntityCapabilityPacket
 import com.tencao.saomclib.sendPacket
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.ServerPlayerEntity

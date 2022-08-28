@@ -1,12 +1,5 @@
 package com.tencao.saomclib.commands
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.command.CommandSource
-import net.minecraft.command.Commands
-import net.minecraft.server.MinecraftServer
-import net.minecraft.test.TestArgArgument
-import net.minecraft.util.math.BlockPos
-
 /*
 enum class CommandList: CommandBase {
     PT {

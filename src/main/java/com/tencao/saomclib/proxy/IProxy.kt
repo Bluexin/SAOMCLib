@@ -7,9 +7,9 @@ import java.util.*
 
 interface IProxy {
 
-    //fun getPlayerEntity(ctx: MessageContext): PlayerEntity
+    // fun getPlayerEntity(ctx: MessageContext): PlayerEntity
 
-    //fun getMinecraftThread(ctx: MessageContext): IThreadListener
+    // fun getMinecraftThread(ctx: MessageContext): IThreadListener
 
     fun getMainWorld(): World
 

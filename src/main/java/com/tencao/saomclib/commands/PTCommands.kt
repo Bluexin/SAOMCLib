@@ -6,25 +6,22 @@ import com.tencao.saomclib.message
 import com.tencao.saomclib.party.PartyManager
 import com.tencao.saomclib.party.PlayerInfo
 import com.tencao.saomclib.party.playerInfo
-import net.minecraft.command.CommandException
 import net.minecraft.command.CommandSource
 import net.minecraft.command.Commands
 import net.minecraft.command.arguments.EntityArgument
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.MinecraftServer
-import net.minecraft.util.math.BlockPos
 
-enum class PTCommands: CommandBase {
+enum class PTCommands : CommandBase {
     INVITE {
         override fun register(): LiteralArgumentBuilder<CommandSource> {
             return Commands.literal("invite")
                 .requires { cs -> checkPermission(cs) }
-                .then(Commands.argument("player", EntityArgument.player())
-                    .executes { ctx ->
-                        execute(ctx, EntityArgument.getPlayer(ctx, "player"))
-                    }
+                .then(
+                    Commands.argument("player", EntityArgument.player())
+                        .executes { ctx ->
+                            execute(ctx, EntityArgument.getPlayer(ctx, "player"))
+                        }
                 )
-
         }
 
         /*
@@ -44,14 +41,15 @@ enum class PTCommands: CommandBase {
             if (pt.isLeader(player)) {
                 if (!pt.isInvited(target)) {
                     pt.invite(target)
-                } else
+                } else {
                     commandException("commands.pt.invite.alreadyPresent", target.scoreboardName)
+                }
             } else commandException("commands.pt.invite.notLeader", pt.leaderInfo.username)
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
 
         override fun checkPermission(sender: CommandSource): Boolean {
-            return  (!checkInParty(sender) || checkIfLeader(sender))
+            return (!checkInParty(sender) || checkIfLeader(sender))
         }
     },
     ACCEPT {
@@ -107,10 +105,11 @@ enum class PTCommands: CommandBase {
         override fun register(): LiteralArgumentBuilder<CommandSource> {
             return Commands.literal("kick")
                 .requires { cs -> checkPermission(cs) }
-                .then(Commands.argument("player", EntityArgument.player())
-                    .executes { ctx ->
-                        execute(ctx, EntityArgument.getPlayer(ctx, "player"))
-                    }
+                .then(
+                    Commands.argument("player", EntityArgument.player())
+                        .executes { ctx ->
+                            execute(ctx, EntityArgument.getPlayer(ctx, "player"))
+                        }
                 )
         }
 
@@ -125,7 +124,7 @@ enum class PTCommands: CommandBase {
 
         fun execute(ctx: CommandContext<CommandSource>, target: PlayerEntity): Int {
             val player = ctx.source.asPlayer()
-            val party = PartyManager.getPartyObject(player.playerInfo())?:  commandException("commands.pt.leave.notInPT")
+            val party = PartyManager.getPartyObject(player.playerInfo()) ?: commandException("commands.pt.leave.notInPT")
             if (party.leaderInfo.equals(player)) {
                 if (party.isMember(target)) {
                     party.removeMember(target)
@@ -155,10 +154,11 @@ enum class PTCommands: CommandBase {
             val party = PartyManager.getPartyObject(player.playerInfo()) ?: commandException("commands.pt.leave.notInPT")
             if (party.isMember(player)) {
                 party.removeMember(player)
-                if (party.isParty || !party.isLeader(player))
+                if (party.isParty || !party.isLeader(player)) {
                     player.message("commands.pt.leave.success", party.leaderInfo.username)
-                else
+                } else {
                     player.message("commands.pt.leave.disband")
+                }
             } else commandException("commands.pt.leave.notInPT")
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
@@ -171,10 +171,11 @@ enum class PTCommands: CommandBase {
         override fun register(): LiteralArgumentBuilder<CommandSource> {
             return Commands.literal("cancel")
                 .requires { cs -> checkPermission(cs) }
-                .then(Commands.argument("player", EntityArgument.player())
-                    .executes { ctx ->
-                        execute(ctx, EntityArgument.getPlayer(ctx, "player"))
-                    }
+                .then(
+                    Commands.argument("player", EntityArgument.player())
+                        .executes { ctx ->
+                            execute(ctx, EntityArgument.getPlayer(ctx, "player"))
+                        }
                 )
         }
 
@@ -190,7 +191,7 @@ enum class PTCommands: CommandBase {
         fun execute(ctx: CommandContext<CommandSource>, target: PlayerEntity): Int {
             val player = ctx.source.asPlayer()
 
-            val party = PartyManager.getPartyObject(player.playerInfo())?: commandException("commands.pt.leave.notInPT")
+            val party = PartyManager.getPartyObject(player.playerInfo()) ?: commandException("commands.pt.leave.notInPT")
             if (party.leaderInfo.player == player) {
                 if (party.isInvited(target)) {
                     party.cancel(target)
@@ -217,10 +218,15 @@ enum class PTCommands: CommandBase {
         fun execute(ctx: CommandContext<CommandSource>): Int {
             val player = ctx.source.asPlayer()
 
-            val party = PartyManager.getPartyObject(player.playerInfo())?: PartyManager.getInvitedParty(player.playerInfo())?: commandException("commands.pt.leave.notInPT")
+            val party = PartyManager.getPartyObject(player.playerInfo()) ?: PartyManager.getInvitedParty(player.playerInfo()) ?: commandException("commands.pt.leave.notInPT")
             if (party.isParty) {
-                player.message("commands.pt.print.output", party.leaderInfo.username, party.membersInfo.mapNotNull(
-                    PlayerInfo::player).joinToString { it.scoreboardName })
+                player.message(
+                    "commands.pt.print.output",
+                    party.leaderInfo.username,
+                    party.membersInfo.mapNotNull(
+                        PlayerInfo::player
+                    ).joinToString { it.scoreboardName }
+                )
             }
             return com.mojang.brigadier.Command.SINGLE_SUCCESS
         }
@@ -245,16 +251,16 @@ enum class PTCommands: CommandBase {
          * general party management commands.
          */
         fun checkIfLeader(sender: CommandSource): Boolean {
-            return if (checkInParty(sender))
+            return if (checkInParty(sender)) {
                 PartyManager.getPartyObject(sender.asPlayer().playerInfo())?.leaderInfo?.uuid == sender.asPlayer().uniqueID
-            else false
+            } else false
         }
 
         /**
          * Checks if the sender has been invited to any parties
          */
         fun checkIfInvited(sender: CommandSource): Boolean {
-            val player = sender.asPlayer()?: return false
+            val player = sender.asPlayer() ?: return false
             return PartyManager.getInvitedParty(player.playerInfo()) != null
         }
 

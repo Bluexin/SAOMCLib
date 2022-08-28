@@ -13,14 +13,14 @@ import net.minecraftforge.fml.common.Mod
 internal object ClientListener {
 
     @SubscribeEvent
-    fun clientDisconnect(e: ClientPlayerNetworkEvent.LoggedOutEvent){
+    fun clientDisconnect(e: ClientPlayerNetworkEvent.LoggedOutEvent) {
         SAOMCLib.proxy.isServerSideLoaded = false
     }
 
     @SubscribeEvent
     fun renderDebugText(evt: RenderGameOverlayEvent.Text) {
         if (!Minecraft.getInstance().gameSettings.showDebugInfo) return
-        val ptcap = Minecraft.getInstance().player?.getPartyCapability()?: return
+        val ptcap = Minecraft.getInstance().player?.getPartyCapability() ?: return
         evt.left.add("Party: ${ptcap.partyData}")
         if (ptcap.partyData != null) {
             evt.left.add(ptcap.partyData!!.membersInfo.joinToString { it.username } + " " + ptcap.partyData!!.invitedInfo.map { it.key }.joinToString { "+${it.username}" })
