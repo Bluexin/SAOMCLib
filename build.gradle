@@ -126,7 +126,7 @@ minecraft {
 }
 
 // This is only here while FG is under active development
-configurations.all  {
+configurations.configureEach {
     resolutionStrategy {
         cacheDynamicVersionsFor 10, 'seconds'
         cacheChangingModulesFor 0, 'seconds'
@@ -141,7 +141,6 @@ configurations {
 }
 
 repositories {
-    jcenter()
     mavenCentral()
     maven {
         url "https://maven.bluexin.be/repository/releases/"
@@ -164,7 +163,6 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
 
     compile "net.shadowfacts:Forgelin:${forgelin_version}"
-    implementation fg.deobf(fileTree(dir: 'libs', include: ['*.jar']))
 }
 
 javadoc {
@@ -195,17 +193,17 @@ jar {
 }
 
 
-tasks.withType(Copy) {
+tasks.withType(Copy).configureEach {
     includeEmptyDirs = false
 }
 
-task sourcesJar(type: Jar) {
+tasks.register('sourcesJar', Jar.class) {
     archiveClassifier.set('sources')
     from sourceSets.main.allSource
     from sourceSets.api.allSource
 }
 
-task deobfJar(type: Jar) {
+tasks.register('deobfJar', Jar.class) {
     archiveClassifier.set('deobf')
     from sourceSets.main.output
     from sourceSets.api.output
@@ -216,7 +214,7 @@ artifacts {
     archives sourcesJar
 }
 
-task reobf {
+tasks.register('reobf') {
     dependsOn 'reobfJar'
 }
 
@@ -257,6 +255,6 @@ compileKotlin {
     }
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.incremental = false
 }
