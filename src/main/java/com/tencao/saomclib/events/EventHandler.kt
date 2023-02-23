@@ -78,7 +78,7 @@ internal object EventHandler {
 
     @SubscribeEvent
     fun playerDisconnect(evt: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent) {
-        PartyManager.getInvitedParty(evt.player.playerInfo())?.cancel(evt.player)
+        PartyManager.getInvitedParties(evt.player.playerInfo()).forEach { it.cancel(evt.player) }
         if (!ModHelper.isTogetherForeverLoaded) {
             evt.player.world.onServer {
                 if (PartyManager.getPartyObject(evt.player.playerInfo())?.isParty == false) {

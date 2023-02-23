@@ -15,6 +15,7 @@ commands.pt.invite.success=Successfully invited %s to the party.
 commands.pt.invite.alreadyPresent=Player %s is already in the party or being invited to this party.
 commands.pt.invite.notLeader=You need to be party leader to invite someone. Ask %s!
 commands.pt.invite.self=You can't invite yourself.
+commands.pt.invite.notFound=Party with that leader not found.
 commands.pt.invited=You have been invited to %s's party. Use "/saomc pt accept|decline".
 
 commands.pt.accept=accept
