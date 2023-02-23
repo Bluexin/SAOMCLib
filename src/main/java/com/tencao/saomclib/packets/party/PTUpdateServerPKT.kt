@@ -6,6 +6,7 @@ import com.tencao.saomclib.packets.PacketPipeline
 import com.tencao.saomclib.party.PartyManager
 import com.tencao.saomclib.party.PlayerInfo
 import com.tencao.saomclib.party.playerInfo
+import com.tencao.saomclib.party.toPlayerInfo
 import com.tencao.saomclib.readString
 import com.tencao.saomclib.writeString
 import io.netty.buffer.ByteBuf
@@ -21,34 +22,39 @@ class PTUpdateServerPKT() : IMessage {
     lateinit var partyType: PartyType
     lateinit var type: Type
     var target: UUID = UUID.randomUUID()
+    var partyLeader: UUID = UUID( 0, 0)
 
     constructor(type: Type, partyType: PartyType) : this() {
         this.type = type
         this.partyType = partyType
     }
 
-    constructor(type: Type, partyType: PartyType, target: UUID) : this() {
+    constructor(type: Type, partyType: PartyType, target: UUID, leader: UUID = UUID( 0, 0)) : this() {
         this.type = type
         this.partyType = partyType
         this.target = target
+        this.partyLeader = UUID.randomUUID()
     }
 
-    constructor(type: Type, partyType: PartyType, target: PlayerInfo) : this() {
+    constructor(type: Type, partyType: PartyType, target: PlayerInfo, leader: PlayerInfo = PlayerInfo.EMPTY) : this() {
         this.type = type
         this.partyType = partyType
         this.target = target.uuid
+        this.partyLeader = leader.uuid
     }
 
     override fun fromBytes(buf: ByteBuf) {
         partyType = PartyType.values()[buf.readInt()]
         type = Type.values()[buf.readInt()]
         target = UUID.fromString(buf.readString())
+        partyLeader = UUID.fromString(buf.readString())
     }
 
     override fun toBytes(buf: ByteBuf) {
         buf.writeInt(PartyType.values().indexOf(partyType))
         buf.writeInt(Type.values().indexOf(type))
         buf.writeString(target.toString())
+        buf.writeString(partyLeader.toString())
     }
 
     companion object {
@@ -56,7 +62,7 @@ class PTUpdateServerPKT() : IMessage {
             override fun handleServerPacket(player: EntityPlayer, message: PTUpdateServerPKT, ctx: MessageContext, mainThread: IThreadListener): IMessage? {
                 val party = when (message.partyType) {
                     PartyType.MAIN -> PartyManager.getOrCreateParty(PlayerInfo(player))
-                    PartyType.INVITE -> PartyManager.getInvitedParty(player.playerInfo()) ?: let {
+                    PartyType.INVITE -> PartyManager.getInvitedParty(player.playerInfo(), message.partyLeader.toPlayerInfo()) ?: let {
                         player.message("You do not have permission to invite")
                         return null
                     }

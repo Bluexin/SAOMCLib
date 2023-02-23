@@ -229,6 +229,8 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact jar
+            artifact tasks.sourcesJar
+            artifact tasks.deobfJar
         }
     }
 

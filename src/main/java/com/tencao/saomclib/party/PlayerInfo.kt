@@ -98,7 +98,7 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
     }
 
     companion object {
-        val EMPTY = PlayerInfo(UUID.fromString("00000000-0000-0000-0000-000000000000"))
+        val EMPTY = PlayerInfo(UUID( 0, 0))
 
         val gson: Gson = GsonBuilder().create()
     }
@@ -116,3 +116,5 @@ object PlayerInfoSerializer : JsonSerializer<PlayerInfo>, JsonDeserializer<Playe
 }
 
 fun EntityPlayer.playerInfo() = PlayerInfo(this)
+
+fun UUID.toPlayerInfo() = PlayerInfo(this)

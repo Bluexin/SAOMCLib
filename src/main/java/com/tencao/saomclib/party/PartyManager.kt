@@ -39,8 +39,8 @@ object PartyManager {
             ?: createParty(player)
     }
 
-    fun getInvitedParty(player: PlayerInfo): IParty? {
-        return parties.firstOrNull { it.isInvited(player) }
+    fun getInvitedParty(player: PlayerInfo, leader: PlayerInfo): IParty? {
+        return parties.firstOrNull { it.leaderInfo.equals(leader) && it.isInvited(player) }
         /*
         val partyIterator = parties.iterator()
         while (partyIterator.hasNext()){
