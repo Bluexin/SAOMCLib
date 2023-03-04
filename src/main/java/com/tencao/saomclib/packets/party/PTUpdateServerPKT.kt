@@ -63,7 +63,6 @@ class PTUpdateServerPKT() : IMessage {
                 val party = when (message.partyType) {
                     PartyType.MAIN -> PartyManager.getOrCreateParty(PlayerInfo(player))
                     PartyType.INVITE -> PartyManager.getInvitedParty(player.playerInfo(), message.partyLeader.toPlayerInfo()) ?: let {
-                        player.message("You do not have permission to invite")
                         return null
                     }
                 }
@@ -111,6 +110,12 @@ class PTUpdateServerPKT() : IMessage {
  * Sends a packet to the server to update the party
  * data server side, this will not succeed if the
  * required permissions aren't met.
+ *
+ * @param target - The target of the action, for example the person invited
+ * @param leader - The current leader of the party, only used for invited
+ * @param type - Is this the main party or invited party
  */
+
+fun Type.updateServer(target: PlayerInfo, leader: PlayerInfo) = PacketPipeline.sendToServer(PTUpdateServerPKT(this, PartyType.INVITE, target, leader))
 fun Type.updateServer(target: PlayerInfo, type: PartyType) = PacketPipeline.sendToServer(PTUpdateServerPKT(this, type, target))
 fun Type.updateServer(type: PartyType) = PacketPipeline.sendToServer(PTUpdateServerPKT(this, type, Minecraft.getMinecraft().player.uniqueID))
