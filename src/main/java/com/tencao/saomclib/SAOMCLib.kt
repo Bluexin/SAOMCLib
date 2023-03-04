@@ -35,12 +35,18 @@ import org.apache.logging.log4j.Logger
  * @author Bluexin
  */
 @Suppress("KDocUnresolvedReference")
-@Mod(modid = SAOMCLib.MODID, name = "SAOMC Library", version = SAOMCLib.VERSION, dependencies = SAOMCLib.DEPENDENCIES)
+@Mod(
+    modid = SAOMCLib.MODID,
+    name = "SAOMC Library",
+    version = SAOMCLib.VERSION,
+    dependencies = SAOMCLib.DEPENDENCIES,
+    modLanguageAdapter = "io.github.chaosunity.forgelin.KotlinAdapter"
+)
 object SAOMCLib {
 
     const val MODID = "saomclib"
     const val VERSION = "1.4.11"
-    const val DEPENDENCIES = "required-after:forgelin@[1.8.4,)"
+    const val DEPENDENCIES = "required-after:forgelin_continuous@[1.5.30.0,)"
 
     @SidedProxy(clientSide = "com.tencao.saomclib.proxy.ClientProxy", serverSide = "com.tencao.saomclib.proxy.CommonProxy")
     lateinit var proxy: CommonProxy
