@@ -109,6 +109,14 @@ abstract class IPartyData : Cloneable {
     }
 
     /**
+     * Gets the amount of time left for an invite
+     * @return Returns the time in ticks left
+     */
+    fun inviteCountdown(player: PlayerInfo): Long {
+        return invitedInfo[player]?.minus(PartyServerObject.time)?: 0L
+    }
+
+    /**
      * Gets whether the provided player is the leader of this party.
      *
      * @param player the player to check for leadership
