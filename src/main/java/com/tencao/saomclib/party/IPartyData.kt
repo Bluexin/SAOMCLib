@@ -112,8 +112,8 @@ abstract class IPartyData : Cloneable {
      * Gets the amount of time left for an invite
      * @return Returns the time in ticks left
      */
-    fun inviteCountdown(player: PlayerInfo): Long {
-        return invitedInfo[player]?.minus(PartyServerObject.time)?: 0L
+    fun inviteCountdown(player: PlayerInfo): Int {
+        return invitedInfo[player]?.minus(PartyServerObject.time)?.toInt()?: 0
     }
 
     /**
