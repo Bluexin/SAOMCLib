@@ -16,7 +16,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.example.examplemod.ExampleMod"
+      {
+        "value": "be.bluexin.saomclib.SAOMCLib",
+        "adapter": "kotlin"
+      }
     ]
   },
   "mixins": [
@@ -26,7 +29,8 @@
     "fabricloader": ">=0.14",
     "fabric": ">=0.78",
     "minecraft": ">=1.19.4",
-    "java": ">=17"
+    "java": ">=17",
+    "fabric-language-kotlin": ">=1.9.3+kotlin.1.8.20"
   },
   "suggests": {
     "another-mod": "*"
