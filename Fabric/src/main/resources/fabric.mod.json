@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "saomclib",
+  "version": "${version}",
+  "name": "SAOMCLib",
+  "description": "Library mod for handling party-related features",
+  "authors": [
+    "Bluexin",
+    "Tencao"
+  ],
+  "contact": {
+    "sources": "https://github.com/Bluexin/SAOMCLib"
+  },
+  "license": "ARR (temporarily)",
+  "icon": "assets/modid/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.example.examplemod.ExampleMod"
+    ]
+  },
+  "mixins": [
+    "modid.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14",
+    "fabric": ">=0.78",
+    "minecraft": ">=1.19.4",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
+  
