@@ -13,8 +13,8 @@ public class ExampleMixin {
 
     @Inject(at = @At("HEAD"), method = "init()V")
     private void init(CallbackInfo info) {
-        Constants.INSTANCE.getLOG().info("This line is printed by an example mod mixin from Fabric!");
-        Constants.INSTANCE.getLOG().info("MC Version: {}", Minecraft.getInstance().getVersionType());
-        Constants.INSTANCE.getLOG().info("Classloader: {}", this.getClass().getClassLoader());
+        Constants.LOG.info("This line is printed by an example mod mixin from Fabric!");
+        Constants.LOG.info("MC Version: {}", Minecraft.getInstance().getVersionType());
+        Constants.LOG.info("Classloader: {}", this.getClass().getClassLoader());
     }
 }

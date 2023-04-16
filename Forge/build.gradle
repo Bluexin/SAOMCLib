@@ -75,7 +75,7 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    implementation /*TODO: shade*/ project(":Common")
+    implementation project(":Common")
     implementation "thedarkcolour:kotlinforforge:$forge_kotlin_version"
 }
 
