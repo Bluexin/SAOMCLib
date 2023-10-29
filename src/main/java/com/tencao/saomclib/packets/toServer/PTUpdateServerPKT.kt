@@ -40,7 +40,7 @@ class PTUpdateServerPKT() : IPacket {
     override fun encode(buffer: PacketBuffer) {
         buffer.writeInt(Type.values().indexOf(type))
         buffer.writeInt(PartyType.values().indexOf(partyType))
-        buffer.writeString(target.toString())
+        buffer.writeUtf(target.toString())
     }
 
     override fun handle(context: NetworkEvent.Context) {
@@ -93,7 +93,7 @@ class PTUpdateServerPKT() : IPacket {
             return PTUpdateServerPKT(
                 Type.values()[buffer.readInt()],
                 PartyType.values()[buffer.readInt()],
-                UUID.fromString(buffer.readString())
+                UUID.fromString(buffer.readUtf())
             )
         }
     }
@@ -105,4 +105,4 @@ class PTUpdateServerPKT() : IPacket {
  * required permissions aren't met.
  */
 fun Type.updateServer(target: PlayerInfo, type: PartyType) = PacketPipeline.sendToServer(PTUpdateServerPKT(this, type, target))
-fun Type.updateServer(type: PartyType) = PacketPipeline.sendToServer(PTUpdateServerPKT(this, type, Minecraft.getInstance().player!!.uniqueID))
+fun Type.updateServer(type: PartyType) = PacketPipeline.sendToServer(PTUpdateServerPKT(this, type, Minecraft.getInstance().player!!.uuid))

@@ -16,18 +16,18 @@ object ServerProxy : IProxy {
 
     // override fun getMinecraftThread(ctx: MessageContext): IThreadListener = ServerLifecycleHooks.getCurrentServer()
 
-    override fun getMainWorld(): World = ServerLifecycleHooks.getCurrentServer().worlds.first()
+    override fun getMainWorld(): World = ServerLifecycleHooks.getCurrentServer().allLevels.first()
 
-    override fun getPlayerEntity(uuid: UUID): PlayerEntity? = ServerLifecycleHooks.getCurrentServer().playerList.getPlayerByUUID(uuid)
+    override fun getPlayerEntity(uuid: UUID): PlayerEntity? = ServerLifecycleHooks.getCurrentServer().playerList.getPlayer(uuid)
 
-    override fun getGameProfile(uuid: UUID) = ServerLifecycleHooks.getCurrentServer().playerProfileCache.getProfileByUUID(uuid)
+    override fun getGameProfile(uuid: UUID) = ServerLifecycleHooks.getCurrentServer().profileCache.get(uuid)
 
     override fun getPlayerHealth(uuid: UUID): Float {
-        return ServerLifecycleHooks.getCurrentServer().playerList.getPlayerByUUID(uuid)?.health ?: 0f
+        return ServerLifecycleHooks.getCurrentServer().playerList.getPlayer(uuid)?.health ?: 0f
     }
 
     override fun getPlayerMaxHealth(uuid: UUID): Float {
-        return ServerLifecycleHooks.getCurrentServer().playerList.getPlayerByUUID(uuid)?.maxHealth ?: 0f
+        return ServerLifecycleHooks.getCurrentServer().playerList.getPlayer(uuid)?.maxHealth ?: 0f
     }
 
     override fun isPlayerOnline(uuid: UUID) = getPlayerEntity(uuid) != null

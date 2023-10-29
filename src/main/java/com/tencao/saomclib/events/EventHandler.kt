@@ -48,17 +48,17 @@ internal object EventHandler {
 
     @SubscribeEvent
     fun cloneEvent(evt: PlayerEvent.Clone) {
-        if (evt.entityLiving.isServerWorld) CapabilitiesHandler.restoreEntitiesDeath(evt.entity, evt.original)
+        if (evt.entityLiving.isEffectiveAi) CapabilitiesHandler.restoreEntitiesDeath(evt.entity, evt.original)
     }
 
     @SubscribeEvent
     fun respawnEvent(evt: PlayerEvent.PlayerRespawnEvent) {
-        if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDeath(evt.player)
+        if (!evt.player.level.isClientSide) CapabilitiesHandler.syncEntitiesDeath(evt.player)
     }
 
     @SubscribeEvent
     fun playerChangeDimension(evt: PlayerEvent.PlayerChangedDimensionEvent) {
-        if (!evt.player.world.isRemote) CapabilitiesHandler.syncEntitiesDimension(evt.player)
+        if (!evt.player.level.isClientSide) CapabilitiesHandler.syncEntitiesDimension(evt.player)
     }
 
     @SubscribeEvent
@@ -73,8 +73,8 @@ internal object EventHandler {
 
     @SubscribeEvent
     fun playerConnect(evt: PlayerEvent.PlayerLoggedInEvent) {
-        evt.player.world.onServer {
-            evt.player.server?.deferTask {
+        evt.player.level.onServer {
+            evt.player.server?.submitAsync {
                 PartyManager.getPartyObject(evt.player.playerInfo())?.sync(evt.player)
                 CapabilitiesHandler.syncEntitiesLogin(evt.player)
                 (evt.player as ServerPlayerEntity).sendPacket(MakeClientAwarePacket())

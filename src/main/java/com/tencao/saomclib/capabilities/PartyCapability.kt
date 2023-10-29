@@ -22,13 +22,13 @@ class PartyCapability : AbstractEntityCapability() {
 
     var partyData: IPartyData? = null
         get() {
-            return if (reference.get()?.world?.isRemote == false) {
+            return if (reference.get()?.level?.isClientSide == false) {
                 PartyManager.getPartyObject((reference.get() as PlayerEntity).playerInfo())
             } else field
         }
     var inviteData: MutableSet<IPartyData> = mutableSetOf()
         get() {
-            return if (reference.get()?.world?.isRemote == false) {
+            return if (reference.get()?.level?.isClientSide == false) {
                 PartyManager.getInvitedParties((reference.get() as PlayerEntity).playerInfo()).toMutableSet()
             } else field
         }
@@ -54,7 +54,7 @@ class PartyCapability : AbstractEntityCapability() {
         override fun readNBT(capability: Capability<PartyCapability>?, instance: PartyCapability, side: Direction?, nbt: INBT?) {
             val nbtTagCompound = nbt as? CompoundNBT ?: return
             if (instance.reference.get() is PlayerEntity) {
-                val world = instance.reference.get()?.world
+                val world = instance.reference.get()?.level
                 world?.onServer {
                     instance.partyData = PartyManager.getPartyObject((instance.reference.get() as PlayerEntity).playerInfo())
                     instance.inviteData = PartyManager.getInvitedParties((instance.reference.get() as PlayerEntity).playerInfo()).toMutableSet()

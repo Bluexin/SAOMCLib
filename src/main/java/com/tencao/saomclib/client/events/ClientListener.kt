@@ -19,7 +19,7 @@ internal object ClientListener {
 
     @SubscribeEvent
     fun renderDebugText(evt: RenderGameOverlayEvent.Text) {
-        if (!Minecraft.getInstance().gameSettings.showDebugInfo) return
+        if (!Minecraft.getInstance().options.renderDebug) return
         val ptcap = Minecraft.getInstance().player?.getPartyCapability() ?: return
         evt.left.add("Party: ${ptcap.partyData}")
         if (ptcap.partyData != null) {

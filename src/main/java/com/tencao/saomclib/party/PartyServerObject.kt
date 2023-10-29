@@ -209,6 +209,6 @@ class PartyServerObject(override var leaderInfo: PlayerInfo) : IParty() {
 
     companion object {
         val time: Long
-            get() = SAOMCLib.proxy.getMainWorld().worldInfo.gameTime
+            get() = SAOMCLib.proxy.getMainWorld().levelData.gameTime
     }
 }

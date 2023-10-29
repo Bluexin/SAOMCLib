@@ -38,8 +38,8 @@ class PTUpdateClientPKT() : IPacket {
     override fun encode(buffer: PacketBuffer) {
         buffer.writeInt(Type.values().indexOf(type))
         buffer.writeInt(PartyType.values().indexOf(partyType))
-        buffer.writeCompoundTag(data?.writeNBT() ?: CompoundNBT())
-        buffer.writeString(PlayerInfo.gson.toJson(target))
+        buffer.writeNbt(data?.writeNBT() ?: CompoundNBT())
+        buffer.writeUtf(PlayerInfo.gson.toJson(target))
     }
 
     override fun handle(context: NetworkEvent.Context) {
@@ -48,7 +48,7 @@ class PTUpdateClientPKT() : IPacket {
         val partyData = data ?: return
         when (type) {
             Type.JOIN -> {
-                if (target.equals(player.uniqueID)) {
+                if (target.equals(player.uuid)) {
                     partyCap.inviteData.removeIf { it.isLeader(partyData.leaderInfo) }
                     partyCap.partyData = partyData
                 } else {
@@ -63,7 +63,7 @@ class PTUpdateClientPKT() : IPacket {
                 partyData.fireRefresh()
             }
             Type.CANCELINVITE -> {
-                if (target.equals(player.uniqueID)) {
+                if (target.equals(player.uuid)) {
                     partyCap.inviteData.removeIf { it.isLeader(partyData.leaderInfo) }
                 } else {
                     partyCap.setPartyData(partyData, partyType)
@@ -72,7 +72,7 @@ class PTUpdateClientPKT() : IPacket {
                 partyData.fireRefresh()
             }
             Type.LEAVE -> {
-                if (target.equals(player.uniqueID)) {
+                if (target.equals(player.uuid)) {
                     partyCap.partyData = null
                 } else {
                     partyCap.setPartyData(partyData, partyType)
@@ -81,7 +81,7 @@ class PTUpdateClientPKT() : IPacket {
                 partyData.fireRefresh()
             }
             Type.KICK -> {
-                if (target.equals(player.uniqueID)) {
+                if (target.equals(player.uuid)) {
                     partyCap.partyData = null
                 } else {
                     partyCap.setPartyData(partyData, partyType)
@@ -122,8 +122,8 @@ class PTUpdateClientPKT() : IPacket {
             return PTUpdateClientPKT(
                 Type.values()[buffer.readInt()],
                 PartyType.values()[buffer.readInt()],
-                PartyClientObject.readNBT(buffer.readCompoundTag()),
-                PlayerInfo.gson.fromJson(buffer.readString(), PlayerInfo::class.java)
+                PartyClientObject.readNBT(buffer.readNbt()),
+                PlayerInfo.gson.fromJson(buffer.readUtf(), PlayerInfo::class.java)
             )
         }
     }

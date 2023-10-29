@@ -29,7 +29,7 @@ class SyncEntityCapabilityPacket() : IPacket {
         val rl = CapabilitiesHandler.getID(capability.javaClass)
         capabilityID = rl.toString()
         data = CapabilitiesHandler.getEntityCapability(rl).writeNBT(capability, null) as CompoundNBT
-        targetUUID = target.uniqueID
+        targetUUID = target.uuid
     }
 
     constructor(capabilityID: String, data: CompoundNBT, targetUUID: UUID) : this() {
@@ -41,29 +41,29 @@ class SyncEntityCapabilityPacket() : IPacket {
     override fun handle(context: NetworkEvent.Context) {
         val cap = CapabilitiesHandler.getEntityCapability(ResourceLocation(capabilityID))
         try {
-            Minecraft.getInstance().world?.allEntities?.forEach {
-                if (it.uniqueID == targetUUID) {
+            Minecraft.getInstance().level?.entitiesForRendering()?.forEach {
+                if (it.uuid == targetUUID) {
                     cap.readNBT(it.getCapability(cap, null).resolve().get(), null, data)
                 }
             }
         } catch (e: Exception) {
-            SAOMCLib.LOGGER.info("[SyncEntityCapabilityPacket] Suppressed an error.\nPacket content: $capabilityID, $targetUUID, ${data}\nPlayers: ${Minecraft.getInstance().world?.players}", e)
+            SAOMCLib.LOGGER.info("[SyncEntityCapabilityPacket] Suppressed an error.\nPacket content: $capabilityID, $targetUUID, ${data}\nPlayers: ${Minecraft.getInstance().level?.players()}", e)
         }
     }
 
     override fun encode(buffer: PacketBuffer) {
-        buffer.writeString(capabilityID)
-        buffer.writeCompoundTag(data)
-        buffer.writeString(targetUUID.toString())
+        buffer.writeUtf(capabilityID)
+        buffer.writeNbt(data)
+        buffer.writeUtf(targetUUID.toString())
     }
 
     companion object {
 
         fun decode(buffer: PacketBuffer): SyncEntityCapabilityPacket {
             return SyncEntityCapabilityPacket(
-                buffer.readString(),
-                buffer.readCompoundTag() ?: CompoundNBT(),
-                UUID.fromString(buffer.readString())
+                buffer.readUtf(),
+                buffer.readNbt() ?: CompoundNBT(),
+                UUID.fromString(buffer.readUtf())
             )
         }
     }

@@ -41,3 +41,4 @@ enum class CommandList: CommandBase {
         val commands = values().map { it.getID() }
     }
 }*/
+*/

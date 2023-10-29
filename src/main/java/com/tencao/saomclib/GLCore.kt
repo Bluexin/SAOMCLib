@@ -27,12 +27,12 @@ import kotlin.math.min
 
 object GLCore {
 
-    val glFont: FontRenderer get() = Client.minecraft.fontRenderer ?: defaultFont
-    private val defaultFont: FontRenderer by lazy { Client.minecraft.fontResourceMananger.defaultFontRenderer }
+    val glFont: FontRenderer get() = Client.minecraft.font ?: defaultFont
+    private val defaultFont: FontRenderer by lazy { Client.minecraft.fontResourceMananger.createFont() }
     private val glTextureManager get() = Client.minecraft.textureManager
     val tessellator: Tessellator
         get() = Tessellator.getInstance()
-    val bufferBuilder: BufferBuilder = tessellator.buffer
+    val bufferBuilder: BufferBuilder = tessellator.builder
 
     /*
     val matrixStack: MatrixStack
@@ -109,18 +109,18 @@ object GLCore {
     @JvmOverloads
     fun glString(font: FontRenderer, string: String, x: Int, y: Int, argb: Int, matrixStack: MatrixStack, shadow: Boolean = false, centered: Boolean = false) {
         if (shadow) {
-            font.drawStringWithShadow(
+            font.drawShadow(
                 matrixStack,
                 string,
                 x.toFloat(),
-                y.toFloat() - if (centered) font.FONT_HEIGHT / 2f else 0f,
+                y.toFloat() - if (centered) font.lineHeight / 2f else 0f,
                 glFontColor(argb)
             )
-        } else font.drawString(
+        } else font.draw(
             matrixStack,
             string,
             x.toFloat(),
-            y.toFloat() - if (centered) font.FONT_HEIGHT / 2f else 0f,
+            y.toFloat() - if (centered) font.lineHeight / 2f else 0f,
             glFontColor(argb)
         )
     }
@@ -138,18 +138,18 @@ object GLCore {
     @JvmOverloads
     fun glString(font: FontRenderer, string: ITextComponent, x: Int, y: Int, argb: Int, matrixStack: MatrixStack, shadow: Boolean = false, centered: Boolean = false) {
         if (shadow) {
-            font?.drawTextWithShadow(
+            font?.drawShadow(
                 matrixStack,
                 string,
                 x.toFloat(),
-                y.toFloat() - if (centered) font.FONT_HEIGHT / 2f else 0f,
+                y.toFloat() - if (centered) font.lineHeight / 2f else 0f,
                 glFontColor(argb)
             )
-        } else font?.drawText(
+        } else font?.draw(
             matrixStack,
             string,
             x.toFloat(),
-            y.toFloat() - if (centered) font.FONT_HEIGHT / 2f else 0f,
+            y.toFloat() - if (centered) font.lineHeight / 2f else 0f,
             glFontColor(argb)
         )
     }
@@ -166,17 +166,17 @@ object GLCore {
 
     @JvmOverloads
     fun glStringWidth(string: String, font: FontRenderer? = glFont): Int {
-        return font?.getStringWidth(string) ?: 0
+        return font?.width(string) ?: 0
     }
 
     @JvmOverloads
     fun glStringHeight(font: FontRenderer? = glFont): Int {
-        return font?.FONT_HEIGHT ?: 0
+        return font?.lineHeight ?: 0
     }
 
     @JvmOverloads
     fun glBindTexture(location: ResourceLocation, textureManager: TextureManager = glTextureManager) {
-        textureManager.bindTexture(location)
+        textureManager.bind(location)
     }
 
     /**
@@ -207,69 +207,69 @@ object GLCore {
         val f = 1f / textureW
         val f1 = 1f / textureH
         begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
-        bufferBuilder.pos(x, y + height, z).tex((srcX.toFloat() * f), ((srcY + srcHeight).toFloat() * f1)).endVertex()
-        bufferBuilder.pos(x + width, y + height, z).tex(((srcX + srcWidth).toFloat() * f), ((srcY + srcHeight).toFloat() * f1)).endVertex()
-        bufferBuilder.pos(x + width, y, z).tex(((srcX + srcWidth).toFloat() * f), (srcY.toFloat() * f1)).endVertex()
-        bufferBuilder.pos(x, y, z).tex((srcX.toFloat() * f), (srcY.toFloat() * f1)).endVertex()
+        bufferBuilder.vertex(x, y + height, z).uv((srcX.toFloat() * f), ((srcY + srcHeight).toFloat() * f1)).endVertex()
+        bufferBuilder.vertex(x + width, y + height, z).uv(((srcX + srcWidth).toFloat() * f), ((srcY + srcHeight).toFloat() * f1)).endVertex()
+        bufferBuilder.vertex(x + width, y, z).uv(((srcX + srcWidth).toFloat() * f), (srcY.toFloat() * f1)).endVertex()
+        bufferBuilder.vertex(x, y, z).uv((srcX.toFloat() * f), (srcY.toFloat() * f1)).endVertex()
         draw()
     }
 
     fun addVertex(x: Double, y: Double, z: Double) {
-        bufferBuilder.pos(x, y, z).endVertex()
+        bufferBuilder.vertex(x, y, z).endVertex()
     }
 
     fun addVertex(x: Double, y: Double, z: Double, srcX: Double, srcY: Double) {
-        bufferBuilder.pos(x, y, z).tex(srcX.toFloat(), srcY.toFloat()).endVertex()
+        bufferBuilder.vertex(x, y, z).uv(srcX.toFloat(), srcY.toFloat()).endVertex()
     }
 
     fun addVertex(builder: IVertexBuilder, x: Float, y: Float, z: Float, srcX: Float, srcY: Float, rgba: Int, lightLevel: Float) {
-        builder.pos(x.toDouble(), y.toDouble(), z.toDouble()).color(rgba).tex(srcX, srcY).lightmap(0xF000F0).endVertex()
+        builder.vertex(x.toDouble(), y.toDouble(), z.toDouble()).color(rgba).uv(srcX, srcY).uv2(0xF000F0).endVertex()
     }
 
     fun addVertex(builder: IVertexBuilder, matrixStack: Matrix4f, x: Float, y: Float, z: Float, srcX: Float, srcY: Float, rgba: Int, lightLevel: Float, normal: Vector3f) {
-        builder.pos(matrixStack, x, y, z).color(rgba).tex(srcX, srcY).normal(normal.x, normal.y, normal.z).endVertex()
+        builder.vertex(matrixStack, x, y, z).color(rgba).uv(srcX, srcY).normal(normal.x(), normal.y(), normal.z()).endVertex()
     }
 
     fun addVertex(x: Double, y: Double, z: Double, srcX: Double, srcY: Double, red: Float, green: Float, blue: Float, alpha: Float) {
-        bufferBuilder.pos(x, y, z).tex(srcX.toFloat(), srcY.toFloat()).color(red, green, blue, alpha).endVertex()
+        bufferBuilder.vertex(x, y, z).uv(srcX.toFloat(), srcY.toFloat()).color(red, green, blue, alpha).endVertex()
     }
 
     fun addVertex(x: Double, y: Double, z: Double, red: Float, green: Float, blue: Float, alpha: Float) {
-        bufferBuilder.pos(x, y, z).color(red, green, blue, alpha).endVertex()
+        bufferBuilder.vertex(x, y, z).color(red, green, blue, alpha).endVertex()
     }
 
     fun addVertex(x: Float, y: Float, z: Float, srcX: Double, srcY: Double, red: Float, green: Float, blue: Float, alpha: Float) {
-        bufferBuilder.normal(x, y, z).tex(srcX.toFloat(), srcY.toFloat()).color(red, green, blue, alpha).endVertex()
+        bufferBuilder.normal(x, y, z).uv(srcX.toFloat(), srcY.toFloat()).color(red, green, blue, alpha).endVertex()
     }
 
     //
 
     fun addVertex(matrixStack: MatrixStack, x: Float, y: Float, z: Float) {
-        bufferBuilder.pos(matrixStack.last.matrix, x, y, z).endVertex()
+        bufferBuilder.vertex(matrixStack.last().pose(), x, y, z).endVertex()
     }
 
     fun addVertex(matrixStack: MatrixStack, x: Float, y: Float, z: Float, normalX: Float, normalY: Float, normalZ: Float) {
-        bufferBuilder.pos(matrixStack.last.matrix, x, y, z).normal(normalX, normalY, normalZ).endVertex()
+        bufferBuilder.vertex(matrixStack.last().pose(), x, y, z).normal(normalX, normalY, normalZ).endVertex()
     }
 
     fun addVertex(matrixStack: MatrixStack, x: Float, y: Float, z: Float, normalX: Float, normalY: Float, normalZ: Float, srcX: Double, srcY: Double) {
-        bufferBuilder.pos(matrixStack.last.matrix, x, y, z).normal(normalX, normalY, normalZ).tex(srcX.toFloat(), srcY.toFloat()).endVertex()
+        bufferBuilder.vertex(matrixStack.last().pose(), x, y, z).normal(normalX, normalY, normalZ).uv(srcX.toFloat(), srcY.toFloat()).endVertex()
     }
 
     fun addVertex(matrixStack: MatrixStack, x: Float, y: Float, z: Float, srcX: Double, srcY: Double) {
-        bufferBuilder.pos(matrixStack.last.matrix, x, y, z).tex(srcX.toFloat(), srcY.toFloat()).endVertex()
+        bufferBuilder.vertex(matrixStack.last().pose(), x, y, z).uv(srcX.toFloat(), srcY.toFloat()).endVertex()
     }
 
     fun addVertex(matrixStack: MatrixStack, x: Float, y: Float, z: Float, srcX: Double, srcY: Double, red: Float, green: Float, blue: Float, alpha: Float) {
-        bufferBuilder.pos(matrixStack.last.matrix, x, y, z).tex(srcX.toFloat(), srcY.toFloat()).color(red, green, blue, alpha).endVertex()
+        bufferBuilder.vertex(matrixStack.last().pose(), x, y, z).uv(srcX.toFloat(), srcY.toFloat()).color(red, green, blue, alpha).endVertex()
     }
 
     fun addVertex(matrixStack: MatrixStack, x: Float, y: Float, z: Float, red: Float, green: Float, blue: Float, alpha: Float) {
-        bufferBuilder.pos(matrixStack.last.matrix, x, y, z).color(red, green, blue, alpha).endVertex()
+        bufferBuilder.vertex(matrixStack.last().pose(), x, y, z).color(red, green, blue, alpha).endVertex()
     }
 
     fun addVertex(matrixStack: MatrixStack, x: Float, y: Float, z: Float, normalX: Float, normalY: Float, normalZ: Float, srcX: Double, srcY: Double, red: Float, green: Float, blue: Float, alpha: Float) {
-        bufferBuilder.pos(matrixStack.last.matrix, x, y, z).normal(normalX, normalY, normalZ).tex(srcX.toFloat(), srcY.toFloat()).color(red, green, blue, alpha).endVertex()
+        bufferBuilder.vertex(matrixStack.last().pose(), x, y, z).normal(normalX, normalY, normalZ).uv(srcX.toFloat(), srcY.toFloat()).color(red, green, blue, alpha).endVertex()
     }
 
     @JvmOverloads
@@ -278,15 +278,15 @@ object GLCore {
     }
 
     fun draw() {
-        tessellator.draw()
+        tessellator.end()
     }
 
     fun glRect(x: Int, y: Int, width: Int, height: Int) {
         begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        bufferBuilder.pos(x.toDouble(), (y + height).toDouble(), 0.0)
-        bufferBuilder.pos((x + width).toDouble(), (y + height).toDouble(), 0.0)
-        bufferBuilder.pos((x + width).toDouble(), y.toDouble(), 0.0)
-        bufferBuilder.pos(x.toDouble(), y.toDouble(), 0.0)
+        bufferBuilder.vertex(x.toDouble(), (y + height).toDouble(), 0.0)
+        bufferBuilder.vertex((x + width).toDouble(), (y + height).toDouble(), 0.0)
+        bufferBuilder.vertex((x + width).toDouble(), y.toDouble(), 0.0)
+        bufferBuilder.vertex(x.toDouble(), y.toDouble(), 0.0)
         draw()
     }
 
@@ -309,10 +309,10 @@ object GLCore {
         tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO)
         shadeModel(7425)
         begin(7, DefaultVertexFormats.POSITION_COLOR)
-        bufferBuilder.pos(right, top, zLevel).color(f1, f2, f3, f).endVertex()
-        bufferBuilder.pos(left, top, zLevel).color(f1, f2, f3, f).endVertex()
-        bufferBuilder.pos(left, bottom, zLevel).color(f5, f6, f7, f4).endVertex()
-        bufferBuilder.pos(right, bottom, zLevel).color(f5, f6, f7, f4).endVertex()
+        bufferBuilder.vertex(right, top, zLevel).color(f1, f2, f3, f).endVertex()
+        bufferBuilder.vertex(left, top, zLevel).color(f1, f2, f3, f).endVertex()
+        bufferBuilder.vertex(left, bottom, zLevel).color(f5, f6, f7, f4).endVertex()
+        bufferBuilder.vertex(right, bottom, zLevel).color(f5, f6, f7, f4).endVertex()
         draw()
         shadeModel(7424)
         glBlend(false)
@@ -405,7 +405,7 @@ object GLCore {
     }
 
     fun glRotate(angle: Quaternion) {
-        RenderSystem.rotatef(angle.w, angle.x, angle.y, angle.z)
+        RenderSystem.rotatef(angle.r(), angle.i(), angle.j(), angle.k())
     }
 
     fun glRotate(angle: Float, x: Float, y: Float, z: Float) {

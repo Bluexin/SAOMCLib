@@ -19,7 +19,7 @@ class SimpleCapability : AbstractEntityCapability() {
 
     var num: Int = 0
         set(value) {
-            SAOMCLib.LOGGER.info("Set num to $value for ${reference.get()} on remote=${reference.get()?.world?.isRemote}.")
+            SAOMCLib.LOGGER.info("Set num to $value for ${reference.get()} on remote=${reference.get()?.level?.isClientSide}.")
             field = value
         }
 
@@ -41,13 +41,13 @@ class SimpleCapability : AbstractEntityCapability() {
             override fun writeNBT(capability: Capability<SimpleCapability>, instance: SimpleCapability, side: Direction?): INBT {
                 val tag = CompoundNBT()
                 tag.putInt("num", instance.num)
-                SAOMCLib.LOGGER.info("Writing ${instance.num} on remote=${instance.reference.get()?.world?.isRemote}.")
+                SAOMCLib.LOGGER.info("Writing ${instance.num} on remote=${instance.reference.get()?.level?.isClientSide}.")
                 return tag
             }
 
             override fun readNBT(capability: Capability<SimpleCapability>, instance: SimpleCapability, side: Direction?, nbt: INBT?) {
                 instance.num = (nbt as CompoundNBT).getInt("num")
-                SAOMCLib.LOGGER.info("Reading ${instance.num} on remote=${instance.reference.get()?.world?.isRemote}.")
+                SAOMCLib.LOGGER.info("Reading ${instance.num} on remote=${instance.reference.get()?.level?.isClientSide}.")
             }
         }
     }

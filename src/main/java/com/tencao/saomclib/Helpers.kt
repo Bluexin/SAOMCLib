@@ -34,7 +34,7 @@ import java.util.*
  * @param body the block of code to execute only if the current side is client
  */
 inline infix fun IWorld.onClient(body: () -> Unit) {
-    if (this.isRemote) body()
+    if (this.isClientSide) body()
 }
 
 /**
@@ -43,13 +43,13 @@ inline infix fun IWorld.onClient(body: () -> Unit) {
  * @param body the block of code to execute only if the current side is server
  */
 inline infix fun IWorld.onServer(body: () -> Unit) {
-    if (!this.isRemote) body()
+    if (!this.isClientSide) body()
 }
 
 /**
  * Send a translated text message to a [EntityPlayer].
  */
-fun PlayerEntity.message(str: String, vararg args: Any) = this.sendStatusMessage(TranslationTextComponent(str, *args), false)
+fun PlayerEntity.message(str: String, vararg args: Any) = this.displayClientMessage(TranslationTextComponent(str, *args), false)
 
 /**
  * Send a packet to a player.
@@ -65,17 +65,17 @@ fun ServerPlayerEntity.sendPacket(packet: IPacket) = PacketPipeline.sendTo(packe
  * @author Bluexin, Tencao
  */
 fun ServerPlayerEntity.hasBreakPermission(pos: BlockPos) = this.hasEditPermission(pos) &&
-    ForgeHooks.onBlockBreakEvent(this.entityWorld, this.interactionManager.gameType, this, pos) != -1
+    ForgeHooks.onBlockBreakEvent(this.level, this.gameMode.gameModeForPlayer, this, pos) != -1
 
 fun ServerPlayerEntity.hasEditPermission(pos: BlockPos) =
-    !ServerLifecycleHooks.getCurrentServer().isBlockProtected(this.serverWorld, pos, this) &&
-        Direction.values().any { this.canPlayerEdit(pos, it, ItemStack.EMPTY) }
+    !ServerLifecycleHooks.getCurrentServer().isUnderSpawnProtection(this.getLevel(), pos, this) &&
+        Direction.values().any { this.mayUseItemAt(pos, it, ItemStack.EMPTY) }
 
 fun ServerPlayerEntity.checkedPlaceBlock(pos: BlockPos): Boolean {
     if (!this.hasEditPermission(pos)) return false
-    val world = this.entityWorld
-    val before = BlockSnapshot.create(world.dimensionKey, world, pos)
-    val evt = BlockEvent.EntityPlaceEvent(before, Blocks.AIR.defaultState, this)
+    val world = this.level
+    val before = BlockSnapshot.create(world.dimension(), world, pos)
+    val evt = BlockEvent.EntityPlaceEvent(before, Blocks.AIR.defaultBlockState(), this)
     FORGE_BUS.post(evt)
     if (evt.isCanceled) {
         world.restoringBlockSnapshots = true

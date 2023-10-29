@@ -35,7 +35,7 @@ enum class PTCommands : CommandBase {
         }*/
 
         fun execute(ctx: CommandContext<CommandSource>, target: PlayerEntity): Int {
-            val player = ctx.source.asPlayer()
+            val player = ctx.source.playerOrException
             if (target == player) commandException("commands.pt.invite.self")
             val pt = PartyManager.getOrCreateParty(player.playerInfo())
             if (pt.isLeader(player)) {
@@ -63,7 +63,7 @@ enum class PTCommands : CommandBase {
         }
 
         fun execute(ctx: CommandContext<CommandSource>): Int {
-            val player = ctx.source.asPlayer()
+            val player = ctx.source.playerOrException
             val party = PartyManager.getInvitedParty(player.playerInfo()) ?: commandException("commands.pt.accept.notInvited")
 
             if (party.isInvited(player)) {
@@ -88,7 +88,7 @@ enum class PTCommands : CommandBase {
         }
 
         fun execute(ctx: CommandContext<CommandSource>): Int {
-            val player = ctx.source.asPlayer()
+            val player = ctx.source.playerOrException
 
             val party = PartyManager.getInvitedParty(player.playerInfo()) ?: commandException("commands.pt.accept.notInvited")
             if (party.isInvited(player)) {
@@ -123,7 +123,7 @@ enum class PTCommands : CommandBase {
         }*/
 
         fun execute(ctx: CommandContext<CommandSource>, target: PlayerEntity): Int {
-            val player = ctx.source.asPlayer()
+            val player = ctx.source.playerOrException
             val party = PartyManager.getPartyObject(player.playerInfo()) ?: commandException("commands.pt.leave.notInPT")
             if (party.leaderInfo.equals(player)) {
                 if (party.isMember(target)) {
@@ -149,7 +149,7 @@ enum class PTCommands : CommandBase {
         }
 
         fun execute(ctx: CommandContext<CommandSource>): Int {
-            val player = ctx.source.asPlayer()
+            val player = ctx.source.playerOrException
 
             val party = PartyManager.getPartyObject(player.playerInfo()) ?: commandException("commands.pt.leave.notInPT")
             if (party.isMember(player)) {
@@ -189,7 +189,7 @@ enum class PTCommands : CommandBase {
         }*/
 
         fun execute(ctx: CommandContext<CommandSource>, target: PlayerEntity): Int {
-            val player = ctx.source.asPlayer()
+            val player = ctx.source.playerOrException
 
             val party = PartyManager.getPartyObject(player.playerInfo()) ?: commandException("commands.pt.leave.notInPT")
             if (party.leaderInfo.player == player) {
@@ -216,7 +216,7 @@ enum class PTCommands : CommandBase {
                 }
         }
         fun execute(ctx: CommandContext<CommandSource>): Int {
-            val player = ctx.source.asPlayer()
+            val player = ctx.source.playerOrException
 
             val party = PartyManager.getPartyObject(player.playerInfo()) ?: PartyManager.getInvitedParty(player.playerInfo()) ?: commandException("commands.pt.leave.notInPT")
             if (party.isParty) {
@@ -242,7 +242,7 @@ enum class PTCommands : CommandBase {
          * Checks if this player is in a valid party
          */
         fun checkInParty(sender: CommandSource): Boolean {
-            val player = (sender.asPlayer()) ?: return false
+            val player = (sender.playerOrException) ?: return false
             return PartyManager.getPartyObject(player.playerInfo())?.isParty == true
         }
 
@@ -252,7 +252,7 @@ enum class PTCommands : CommandBase {
          */
         fun checkIfLeader(sender: CommandSource): Boolean {
             return if (checkInParty(sender)) {
-                PartyManager.getPartyObject(sender.asPlayer().playerInfo())?.leaderInfo?.uuid == sender.asPlayer().uniqueID
+                PartyManager.getPartyObject(sender.playerOrException.playerInfo())?.leaderInfo?.uuid == sender.playerOrException.uuid
             } else false
         }
 
@@ -260,7 +260,7 @@ enum class PTCommands : CommandBase {
          * Checks if the sender has been invited to any parties
          */
         fun checkIfInvited(sender: CommandSource): Boolean {
-            val player = sender.asPlayer() ?: return false
+            val player = sender.playerOrException ?: return false
             return PartyManager.getInvitedParty(player.playerInfo()) != null
         }
 
@@ -268,7 +268,7 @@ enum class PTCommands : CommandBase {
          * Checks if the party has any pending invites sent
          */
         fun checkAnyInvited(sender: CommandSource): Boolean {
-            return checkIfLeader(sender) && PartyManager.getPartyObject((sender.asPlayer()).playerInfo())!!.invitedInfo.count() > 0
+            return checkIfLeader(sender) && PartyManager.getPartyObject((sender.playerOrException).playerInfo())!!.invitedInfo.isNotEmpty()
         }
     }
 }

@@ -27,7 +27,7 @@ object PacketPipeline {
      * @see [sendPacket] helper method/shortcut
      */
     fun sendTo(message: IPacket, player: ServerPlayerEntity) {
-        if (player.connection != null) ntw.sendTo(message, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT)
+        if (player.connection != null) ntw.sendTo(message, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT)
     }
 
     /**

@@ -106,7 +106,7 @@ fun CompoundNBT?.hasNumericKey(tag: String) = this.hasKey(tag, Constants.NBT.TAG
 fun CompoundNBT?.hasKey(tag: String) = this != null && this.contains(tag)
 fun CompoundNBT?.hasKey(tag: String, type: Class<out INBT>) = this.hasKey(tag, type.idForClass())
 fun CompoundNBT?.hasKey(tag: String, id: Int) = this != null && this.contains(tag, id)
-fun CompoundNBT?.hasUniqueId(tag: String) = this != null && this.hasUniqueId(tag)
+fun CompoundNBT?.hasUniqueId(tag: String) = this != null && this.hasUUID(tag)
 
 fun CompoundNBT?.setBoolean(tag: String, value: Boolean) = this?.putBoolean(tag, value)
 fun CompoundNBT?.setByte(tag: String, value: Byte) = this?.putByte(tag, value)
@@ -120,7 +120,7 @@ fun CompoundNBT?.setDouble(tag: String, value: Double) = this?.putDouble(tag, va
 fun CompoundNBT?.setCompoundTag(tag: String, value: CompoundNBT) = setTag(tag, value)
 fun CompoundNBT?.setString(tag: String, value: String) = this?.putString(tag, value)
 fun CompoundNBT?.setTagList(tag: String, value: ListNBT) = setTag(tag, value)
-fun CompoundNBT?.setUniqueId(tag: String, value: UUID) = this?.putUniqueId(tag, value)
+fun CompoundNBT?.setUniqueId(tag: String, value: UUID) = this?.putUUID(tag, value)
 fun CompoundNBT?.setTag(tag: String, value: INBT) = this?.put(tag, value)
 
 @JvmOverloads
@@ -149,7 +149,7 @@ fun CompoundNBT?.getCompoundTag(tag: String): CompoundNBT? = getIf(tag, Compound
 fun CompoundNBT?.getString(tag: String) = getIf(tag, CompoundNBT?::hasKey, CompoundNBT::getString)
 fun CompoundNBT?.getTagList(tag: String, type: Class<out INBT>) = getTagList(tag, type.idForClass())
 fun CompoundNBT?.getTagList(tag: String, objType: Int) = getIf(tag, CompoundNBT?::hasKey) { getList(it, objType) }
-fun CompoundNBT?.getUniqueId(tag: String) = getIf(tag, CompoundNBT?::hasUniqueId, CompoundNBT::getUniqueId)
+fun CompoundNBT?.getUniqueId(tag: String) = getIf(tag, CompoundNBT?::hasUniqueId, CompoundNBT::getUUID)
 fun CompoundNBT?.getTag(tag: String) = getIf(tag, CompoundNBT?::hasKey, CompoundNBT::get)
 
 // =========================================================================================================== ItemStack
@@ -287,7 +287,7 @@ val ItemStack.nbt: NBTWrapper
 
 operator fun CompoundNBT.iterator(): Iterator<Pair<String, INBT>> {
     return object : Iterator<Pair<String, INBT>> {
-        val keys = this@iterator.keySet().iterator()
+        val keys = this@iterator.allKeys.iterator()
         override fun hasNext() = keys.hasNext()
         override fun next(): Pair<String, INBT> {
             val next = keys.next()
@@ -356,9 +356,8 @@ fun convertNBT(value: Any?): INBT? = when (value) {
     is Collection<*> -> list(*value.toTypedArray())
     is Map<*, *> -> compound(*value.toList().map { it.first.toString() to it.second }.toTypedArray())
     is ResourceLocation -> StringNBT.valueOf(value.toString())
-
     is INBTSerializable<*> -> value.serializeNBT()
-    is IStringSerializable -> StringNBT.valueOf(value.string)
+    is IStringSerializable -> StringNBT.valueOf(value.serializedName)
 
     else -> null
 }

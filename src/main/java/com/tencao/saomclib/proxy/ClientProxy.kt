@@ -17,11 +17,11 @@ object ClientProxy : IProxy {
 
     // override fun getMinecraftThread(ctx: MessageContext): IThreadListener = Minecraft.getInstance()
 
-    override fun getMainWorld(): World = Minecraft.getInstance().world!!
+    override fun getMainWorld(): World = Minecraft.getInstance().level!!
 
-    override fun getPlayerEntity(uuid: UUID): PlayerEntity? = Minecraft.getInstance().world?.getPlayerByUuid(uuid)
+    override fun getPlayerEntity(uuid: UUID): PlayerEntity? = Minecraft.getInstance().level?.getPlayerByUUID(uuid)
 
-    override fun getGameProfile(uuid: UUID) = Minecraft.getInstance().connection?.getPlayerInfo(uuid)?.gameProfile
+    override fun getGameProfile(uuid: UUID) = Minecraft.getInstance().connection?.getPlayerInfo(uuid)?.profile
 
     override fun getPlayerHealth(uuid: UUID): Float {
         return Minecraft.getInstance().connection?.getPlayerInfo(uuid)?.displayHealth?.toFloat() ?: 0f
@@ -31,11 +31,11 @@ object ClientProxy : IProxy {
         return 20f
     }
 
-    override fun isPlayerOnline(uuid: UUID) = getGameProfile(uuid)?.name?.let { name ->
-        Minecraft.getInstance().currentServerData?.playerList?.any {
+    override fun isPlayerOnline(uuid: UUID) = (getGameProfile(uuid)?.name?.let { name ->
+        Minecraft.getInstance().currentServer?.playerList?.any {
             it.string.contains(name, true)
         }
-    } ?: Minecraft.getInstance().world?.getPlayerByUuid(uuid) != null
+    } ?: Minecraft.getInstance().level?.getPlayerByUUID(uuid)) != null
 
     override var isServerSideLoaded: Boolean = false
 

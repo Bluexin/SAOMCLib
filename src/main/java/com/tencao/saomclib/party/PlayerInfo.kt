@@ -13,7 +13,7 @@ import java.util.*
 @JsonAdapter(PlayerInfoSerializer::class)
 data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
 
-    constructor(player: PlayerEntity) : this(player.uniqueID) {
+    constructor(player: PlayerEntity) : this(player.uuid) {
         this.username = player.scoreboardName
     }
 
@@ -67,7 +67,7 @@ data class PlayerInfo(@SerializedName("UUID") val uuid: UUID) {
         get() = proxy.isPlayerOnline(uuid)
 
     fun equals(other: PlayerEntity): Boolean {
-        return other.uniqueID == uuid
+        return other.uuid == uuid
     }
 
     fun equals(other: PlayerInfo): Boolean {

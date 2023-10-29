@@ -26,11 +26,11 @@ class ExampleEventHandler {
 
     @SubscribeEvent
     fun attackEntity(e: LivingAttackEvent) {
-        if (!e.entity.world.isRemote && e.source.trueSource is PlayerEntity) {
-            SAOMCLib.LOGGER.info("${e.entityLiving} attacked by ${e.source.trueSource}.")
+        if (!e.entity.level.isClientSide && e.source.entity is PlayerEntity) {
+            SAOMCLib.LOGGER.info("${e.entityLiving} attacked by ${e.source.entity}.")
             val rand: Int = (1000 * Math.random()).toInt()
             SAOMCLib.LOGGER.info("Random: $rand.")
-            val cap = e.source.trueSource!!.getCapability(SimpleCapability.CAP_INSTANCE, null).resolve().get()
+            val cap = e.source.entity!!.getCapability(SimpleCapability.CAP_INSTANCE, null).resolve().get()
             cap.num = rand
             cap.sync()
         }

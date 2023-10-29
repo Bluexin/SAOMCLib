@@ -7,9 +7,9 @@ import net.minecraft.client.gui.screen.Screen
  * Calls a profiled block, with given key.
  */
 inline fun Minecraft.profile(key: String, body: () -> Unit) {
-    this.profiler.startSection(key)
+    this.profiler.push(key)
     body()
-    this.profiler.endSection()
+    this.profiler.pop()
 }
 
 /**
@@ -23,18 +23,18 @@ object Client {
     val resourceManager
         get() = minecraft.resourceManager
     val renderManager
-        get() = minecraft.renderManager
+        get() = minecraft.entityRenderDispatcher
     val textureManager
         get() = minecraft.textureManager
     val player
         get() = minecraft.player
 
     fun displayGuiScreen(screen: Screen?) {
-        minecraft.displayGuiScreen(screen)
+        minecraft.setScreen(screen)
     }
 }
 
 val Minecraft.scaledWidth: Int
-    get() = this.mainWindow.scaledWidth
+    get() = this.window.guiScaledWidth
 val Minecraft.scaledHeight: Int
-    get() = this.mainWindow.scaledHeight
+    get() = this.window.guiScaledHeight
