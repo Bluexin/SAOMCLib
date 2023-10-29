@@ -42,7 +42,7 @@ public class JSimpleCapability extends AbstractEntityCapability {
             CompoundNBT tag = new CompoundNBT();
             tag.putInt("num", instance.num);
             Entity ref = instance.reference.get();
-            SAOMCLib.INSTANCE.getLOGGER().info("Writing " + instance.num + " on remote=" + (ref == null ? "null" : ref.world.isRemote) + '.');
+            SAOMCLib.INSTANCE.getLOGGER().info("Writing " + instance.num + " on remote=" + (ref == null ? "null" : ref.level.isClientSide) + '.');
             return tag;
         }
 
@@ -50,7 +50,7 @@ public class JSimpleCapability extends AbstractEntityCapability {
         public void readNBT(Capability<JSimpleCapability> capability, JSimpleCapability instance, Direction side, INBT nbt) {
             instance.num = ((CompoundNBT) nbt).getInt("num");
             Entity ref = instance.reference.get();
-            SAOMCLib.INSTANCE.getLOGGER().info("Reading " + instance.num + " on remote=" + (ref == null ? "null" : ref.world.isRemote) + '.');
+            SAOMCLib.INSTANCE.getLOGGER().info("Reading " + instance.num + " on remote=" + (ref == null ? "null" : ref.level.isClientSide) + '.');
         }
     }
 }
